@@ -1,4 +1,4 @@
-![KORA logo](http://kora.matrix.msu.edu/kora_promo/logo.png "msu.seum logo")
+![KORA logo](http://kora.matrix.msu.edu/logo.png "kora logo")
 
 
 KORA
