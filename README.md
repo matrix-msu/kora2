@@ -1,3 +1,6 @@
+![KORA logo](http://kora.matrix.msu.edu/kora_promo/logo.png "msu.seum logo")
+
+
 KORA
 ====
 
