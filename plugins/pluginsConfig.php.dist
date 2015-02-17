@@ -1,0 +1,9 @@
+<?php
+define('baseUrlPlugin','');
+define('basePathPlugin','');
+
+$dbuser = "";
+$dbpass = "";
+$dbname = "";
+$dbhost = "";
+?>
