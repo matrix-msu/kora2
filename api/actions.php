@@ -1,0 +1,8 @@
+<?php
+$actions = array('search');
+$actions['search'] = array(  "projects" => array(),
+                "schemes" => array("pid"),
+                "controls" => array("pid", "sid"),
+                "data" => array("pid", "sid")
+            );
+?>
