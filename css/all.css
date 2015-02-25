@@ -217,24 +217,21 @@ background-color: #ccc;
 
 .kora-control-group-control-list .kcgcl-row { 
 	border-spacing: 0;
+	border-bottom: 1px solid #eee;
 }
 
 .kora-control-group-control-list .kcgcl-col { 
 	float: left;
-	height: 36px;
-	border: 2px #fff solid;
-	margin: -2px;
-	background-color: #f6f6f6;
 	overflow: hidden;
 	text-overflow: ellipsis;
-	text-align: center;
+	padding: 5px 0px 5px 0px;
 }
 .kora-control-group-control-list .kcgcl-header .kcgcl-col { 
-	border-bottom: 5px #000 solid;
 	background-color: #7a96bd;
 	color: #fff;
 	text-align: left;
 	font-weight: 700;
+	height: 20px;
 }
 .kora-control-group-control-list .kcgcl-header .kcgcl-col.kcgcl-col-del { 
 	text-align: center;
@@ -242,9 +239,6 @@ background-color: #ccc;
 .kora-control-group-control-list .kcgcl-col span { 
 	padding: 5px;
 	display: inline-block;
-}
-.kora-control-group-control-list .kcgcl-col-name { 
-	text-align: right;
 }
 .kora-control-group-control-list .kcgcl-col-pos, .kora-control-group-control-list .kcgcl-col-del { 
 	width: 5%;
