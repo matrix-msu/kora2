@@ -1006,7 +1006,7 @@ class KORA_Clause
 		}
 
 		$dataTable = "p$projectID"."Data";
-		$query = "SELECT DISTINCT id FROM $dataTable WHERE schemeid = '$schemeID' AND ( ";
+		$query = "SELECT DISTINCT id FROM $dataTable WHERE schemeid = '$schemeID' AND ";
 		if($this->clauseType == 'Logical'){
 			if ($this->arg1 == 'ANY')
 			{
@@ -1145,7 +1145,12 @@ class KORA_Clause
 					}
                  
                     else if(strtoupper($this->operator)=='LIKE'){
-                  
+						//If it s LIKE. find a cid because it's control specific
+						$controlQuery = "SELECT cid FROM p".$projectID."Control WHERE name = '$this->arg1'";
+						$controlResult = $db->query($controlQuery)->fetch_assoc();
+						//add specific cid for LIKE comparison to main query
+						$query .='cid = "'.$controlResult['cid'].'" AND ';
+						
 						//Convert special chars to match the encoded values in the db.
 						$encoded_keyword = preg_replace_callback('/[\x{80}-\x{10FFFF}]/u', function ($m) {
 						$char = current($m);
@@ -1158,7 +1163,7 @@ class KORA_Clause
 					
                     }
               
-					else // we assume they're using LIKE or something else where
+					else // we assume they're using something else where
 					{    // they know what they're doing
                       
 						$query .= ' (cid = '.$controlDictionary[$this->arg1]['cid'];
@@ -1174,11 +1179,9 @@ class KORA_Clause
 //				echo "<pre>",print_r(array_keys($controlDictionary)),"</pre>";
 				$query .= '(1=1)';
 			}
-			//Add a closing parenthesis
-			$query .= " )";
+			
 			//If clause is logical, execute the mysql query
 //			echo "<br>$query<br><br>";
-//			print_rr($this);
 			$result = $db->query($query);
 			if (!$result){
 				echo "query: $query<br>";
