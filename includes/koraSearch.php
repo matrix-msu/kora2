@@ -1124,7 +1124,7 @@ class KORA_Clause
 							$query .= ' AND value '.$this->operator." '".$this->arg2."') ";
 						}
 						// catch records where no data is filled in for that control
-						if (!empty($this->arg2))
+						if (empty($this->arg2))
 						{
 							$query  = $query.' OR ';
 							$query .= ' id NOT IN (SELECT DISTINCT id FROM p'.$projectID.'Data WHERE cid='.$controlDictionary[$this->arg1]['cid'].')';
@@ -1137,11 +1137,12 @@ class KORA_Clause
 						$query  .= ' ( cid = '.$controlDictionary[$this->arg1]['cid'];
 						$query .= ' AND value NOT LIKE \''.$this->arg2."') ";
 						// catch records where no data is filled in for that control
-						if (!empty($this->arg2))
+						if (empty($this->arg2))
 						{
 							$query = $query.' OR ';
 							$query .= ' id NOT IN (SELECT DISTINCT id FROM p'.$projectID.'Data WHERE cid='.$controlDictionary[$this->arg1]['cid'].')';
 						}
+						
 					}
                  
                     else if(strtoupper($this->operator)=='LIKE'){
@@ -1158,7 +1159,7 @@ class KORA_Clause
 						return sprintf("&#x%s;", ltrim(strtoupper(bin2hex($utf)), "0"));
 						}, $this->arg2);
 						
-						$query .= ' (value LIKE '.escape('%'.$this->arg2.'%').' OR value LIKE '.escape('%'.$encoded_keyword.'%').') ';
+						$query .= ' (value LIKE '.escape($this->arg2).' OR value LIKE '.escape($encoded_keyword).') ';
 							
 					
                     }
