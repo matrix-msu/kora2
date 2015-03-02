@@ -133,13 +133,11 @@ $(function() {
 
 	if ($('#apmanageprojusers').length > 0)
 	{
-	console.log('here'); 
 		var pid = $('#kora_globals').attr('pid');	
 		$.post('ajax/project.php', {action:'PrintProjectUsers',source:'ProjectFunctions',pid:pid}, function(resp){$("#apmanageprojusers").html(resp);}, 'html');
 	}
 	if ($('#apmanagegroups').length > 0)
 	{
-	console.log('here'); 
 		var pid = $('#kora_globals').attr('pid');	
 		$.post('ajax/project.php', {action:'PrintGroups',source:'ProjectFunctions',pid:pid}, function(resp){$("#apmanagegroups").html(resp);}, 'html');
 	}

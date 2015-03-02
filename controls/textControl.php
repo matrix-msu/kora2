@@ -105,10 +105,12 @@ class TextControl extends Control {
 			}
 			else
 			{
+                echo '<script type="text/javascript" src="ckeditor/ckeditor.js"></script>';
 				echo '<textarea ';
-				if ((string)$this->options->textEditor == 'rich') echo 'class="ckeditor" id="ckeditor" ';
+                if ((string)$this->options->textEditor == 'rich') echo 'id="ckeditor'.$this->cid.'" class="kora_rText" ';
 				echo 'name="'.$this->cName.'" id="'.$this->cName.'" ';
 				echo 'rows="'.$this->options->rows.'" cols="'.$this->options->columns.'">'.$this->value.'</textarea>';
+                echo "<script type='text/javascript'> CKEDITOR.replace('".$this->cName."'); </script>";
 			}
 		}
 		$this->EndDisplay();

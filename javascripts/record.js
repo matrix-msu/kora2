@@ -193,13 +193,17 @@ $(function() {
 	//this fires off everytime editor is checked or unchecked
 	//will validate if statement if there is something in the editor
 	CKEDITOR.on('currentInstance', function(){
-		var kcdiv = $('.ckeditor').parents('.kora_control').first();
-		if(CKEDITOR.instances['ckeditor'].checkDirty()){
-			kcdiv.attr('kcvalid','valid');
-		}else{
-			kcdiv.attr('kcvalid','invalid');
-		}
-		enableValidIngestion();
+        $('.kora_rText').each(function(){
+            var kcdiv = $(this).parents('.kora_control').first();
+            if(CKEDITOR.instances[$(this).attr('id')].getData()!=''){
+                kcdiv.attr('kcvalid','valid');
+            }else if($(this).parents('.kc_required').first()!=null){
+                kcdiv.attr('kcvalid','valid');
+            }else{
+                kcdiv.attr('kcvalid','invalid');
+            }
+            enableValidIngestion();
+        });
 	});
 	
 	//validates a MLC
@@ -268,10 +272,12 @@ $(function() {
 	$( ".ingestionForm" ).submit(function( event ) {
 		
 		event.preventDefault();
-		
-		if(CKEDITOR.instances!=null){
-			CKEDITOR.instances['ckeditor'].updateElement();
-		}
+
+        $('.kora_rText').each(function() {
+            if (CKEDITOR.instances != null) {
+                CKEDITOR.instances[$(this).attr('id')].updateElement();
+            }
+        });
 		
 		// WE NEED TO SELECT EVERY OPTION ADDED TO THESE LISTS BEFORE SUBMIT
 		var multiselects = ['Date (Multi-Input)', 'Text (Multi-Input)', 'Record Associator'];

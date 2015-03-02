@@ -25,7 +25,7 @@ require_once(__DIR__.'/../includes/includes.php');
 Manager::AddCSS('javascripts/colorbox/colorbox.css', Manager::CSS_LIB);
 Manager::AddJS('javascripts/colorbox/jquery.colorbox-min.js', Manager::JS_LIB);
 // TODO: MOVE THIS TO TEXT-EDITOR CLASS?
-Manager::AddJS('ckeditor/ckeditor_basic.js', Manager::JS_LIB);
+Manager::AddJS('ckeditor/ckeditor.js', Manager::JS_LIB);
 Manager::AddJS('javascripts/record.js', Manager::JS_CLASS);
 // TODO: MOVE THIS TO CONTROL CLASS?
 Manager::AddJS('javascripts/control.js', Manager::JS_CLASS);
