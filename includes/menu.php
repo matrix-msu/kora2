@@ -56,6 +56,9 @@ $menu_search = [
 ];
 
 $menu_plugin = [
+];
+
+$menu_pluginSettings = [
 	'pluginSettings.php' => gettext('Plugin Settings')
 ];
 
@@ -82,6 +85,8 @@ if ((Manager::IsLoggedIn()) && (Manager::GetUser()->HasProjectPermissions(INGEST
 if ((Manager::IsLoggedIn()) && (Manager::GetUser()->HasProjectPermissions(MODERATOR))) 
 	{ $menu_record['reviewPublicIngestions.php'] = gettext('Review Public Ingestions'); }
 
+if ((Manager::IsLoggedIn()) && (Manager::GetScheme())) 
+	{ $menu_scheme['schemeLayout.php'] = gettext('Scheme Layout'); }
 if ((Manager::IsLoggedIn()) && (Manager::GetUser()->HasProjectPermissions(CREATE_SCHEME))) 
 	{ $menu_scheme['importScheme.php'] = gettext('Import Scheme From XML'); }
 if ((Manager::IsLoggedIn()) && (Manager::GetUser()->HasProjectPermissions(EDIT_LAYOUT)) && (Manager::GetScheme())) 
@@ -98,16 +103,23 @@ if (Manager::IsProjectAdmin())
 if (Manager::IsProjectAdmin()) 
 	{ $menu_proj['manageProjectPerms.php'] = gettext('Manage Project Permissions'); }
 	
-/*foreach(Plugin::$plugins as $key => $plugin)
-{
-	$menuArray = explode(",",$plugin['FileName']);
-	$html = 'plugins/' . $key . '/';
-	for($i = 0; $i < count($menuArray) - 1; $i++)
-	{
-		$keyVal = explode(" = ", $menuArray[$i]);
-		$menu_plugin[$html . $keyVal[1]] = $keyVal[0];
+$nameArray = array();
+
+foreach(Plugin::$plugins as $plugin){
+	if($plugin['Enabled']==1){
+		$menuArray = explode(",",$plugin['Menu']);
+		
+		$html = $plugin['FileName'] . '/';
+		for($i = 0; $i < count($menuArray) ; $i++)
+		{
+			$keyVal = explode(" = ", $menuArray[$i]);
+			$menu_plugin[baseURI."plugins/".$html.$keyVal[1]] = $keyVal[0];	
+		}
+		$nameArray[explode(",",$plugin['pluginName'])[0]] = $menu_plugin;
+		unset($menu_plugin);
+		$menu_plugin=array();
 	}
-}*/
+}
 
 // SORT ALL MENUS ALPHABETICALLY BEFORE DISPLAYING, SHOULD EVEN HANDLE FORIEGN LANGUAGE!
 asort($menu_nologin);
@@ -117,6 +129,8 @@ asort($menu_scheme);
 asort($menu_record);
 asort($menu_search);
 asort($menu_plugin);
+asort($nameArray);
+asort($menu_pluginSettings);
 
 // HERE IS THE ACTUAL OUTPUT
 print "<div id='left'>\n";
@@ -134,16 +148,12 @@ if (!Manager::IsLoggedIn()) {
 	if (Manager::GetProject() && Manager::GetScheme()) { PrintMenu(gettext('Record'), $menu_record); }
 	if (Manager::GetProject()) { PrintMenu(gettext('Scheme'), $menu_scheme); }
 	PrintMenu(gettext('Project'), $menu_proj);
-	if (Plugin::PluginsExist()) { PrintMenu(gettext('Plugins'), $menu_plugin); }
-	
-	$allPlugins = Plugin::SelectAllPlugins();
-	for($i = 0; $i < count($allPlugins); ++$i)
-	{
-		if ($allPlugins[$i]['enabled'] == '1')
-		{
-			$menu_menus = Plugin::GetMenus($allPlugins[$i][7]);
-			PrintMenu(gettext($allPlugins[$i][0]),$menu_menus);
-		}
+	if (Plugin::PluginsExist()) { PrintMenu(gettext('Plugins'), $menu_pluginSettings); }
+	if (Plugin::PluginsExist()) {
+		
+		foreach($nameArray as $key => $val){
+			PrintMenu(gettext($key), $val, 'plugin ');
+		}	
 	}
 }
 print "</div> <!-- left -->\n";
