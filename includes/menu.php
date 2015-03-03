@@ -85,6 +85,8 @@ if ((Manager::IsLoggedIn()) && (Manager::GetUser()->HasProjectPermissions(INGEST
 if ((Manager::IsLoggedIn()) && (Manager::GetUser()->HasProjectPermissions(MODERATOR))) 
 	{ $menu_record['reviewPublicIngestions.php'] = gettext('Review Public Ingestions'); }
 
+if ((Manager::IsLoggedIn()) && (Manager::GetScheme())) 
+	{ $menu_scheme['schemeLayout.php'] = gettext('Scheme Layout'); }
 if ((Manager::IsLoggedIn()) && (Manager::GetUser()->HasProjectPermissions(CREATE_SCHEME))) 
 	{ $menu_scheme['importScheme.php'] = gettext('Import Scheme From XML'); }
 if ((Manager::IsLoggedIn()) && (Manager::GetUser()->HasProjectPermissions(EDIT_LAYOUT)) && (Manager::GetScheme())) 
