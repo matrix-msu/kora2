@@ -1,5 +1,5 @@
 <?php
-/**
+/*
 Copyright (2008) Matrix: Michigan State University
 
 This file is part of KORA.
@@ -78,7 +78,7 @@ if (!Manager::GetRecord() || !Manager::GetRecord()->HasData())
 //If a record errors out in global search or other context, we will bounce to cross project search
 //Potentially might want to bounce elsewhere.
 if(!$showrecord){
-	echo "<META http-equiv='REFRESH' content='0; url=selectProject.php?err=1'>"; 
+	header("Location: ".baseURI."selectProject.php?err=1"); 
 }
 
 

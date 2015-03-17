@@ -102,6 +102,11 @@ class TextControl extends Control {
 			if ((int) $this->options->rows < 2 && @(string)$this->options->textEditor != 'rich')
 			{
 				print '<input type="text" name="'.$this->cName.'" id="something" size="'.(int)$this->options->columns.'" value="'.htmlEscape($this->value).'"/>';
+			}else if (@(string)$this->options->textEditor != 'rich'){
+				echo '<textarea ';
+                if ((string)$this->options->textEditor == 'rich') echo 'id="'.$this->cid.'" ';
+				echo 'name="'.$this->cName.'" id="'.$this->cName.'" ';
+				echo 'rows="'.$this->options->rows.'" cols="'.$this->options->columns.'">'.$this->value.'</textarea>';
 			}
 			else
 			{

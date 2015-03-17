@@ -21,7 +21,8 @@ $(function() {
 				var year = $('#colorbox .kcdcopts_defyear').val();
 				var era = $('#colorbox .kcdcopts_defera').val();
 				$.ajaxSetup({ async: false });
-				$.post(ajaxhandler, {action:'updateDDefaultValue',source:'DateControl',pid:pid,sid:sid,cid:cid,day:day,month:month,year:year,era:era}, function(resp){$("#ajaxstatus").html(resp);}, 'html');
+				loadSymbolOn();
+				$.post(ajaxhandler, {action:'updateDDefaultValue',source:'DateControl',pid:pid,sid:sid,cid:cid,day:day,month:month,year:year,era:era}, function(resp){$("#ajaxstatus").html(resp);loadSymbolOff();}, 'html');
 				PrintControlOpts(pid,sid,cid);
 				$.ajaxSetup({ async: true });
 		});
@@ -36,7 +37,8 @@ $(function() {
 						var rangestart = $('#colorbox .kcdcopts_rangestart').val();
 						var rangeend = $('#colorbox .kcdcopts_rangeend').val();
 						$.ajaxSetup({ async: false });
-						$.post(ajaxhandler, {action:'updateDDateRange',source:'DateControl',pid:pid,sid:sid,cid:cid,rangestart:rangestart,rangeend:rangeend}, function(resp){$("#ajaxstatus").html(resp);}, 'html');
+						loadSymbolOn();
+						$.post(ajaxhandler, {action:'updateDDateRange',source:'DateControl',pid:pid,sid:sid,cid:cid,rangestart:rangestart,rangeend:rangeend}, function(resp){$("#ajaxstatus").html(resp);loadSymbolOff();}, 'html');
 						PrintControlOpts(pid,sid,cid);
 						$.ajaxSetup({ async: true });
 					});
@@ -52,7 +54,8 @@ $(function() {
 						var rangestart = $('#colorbox .kcdcopts_rangestart').val();
 						var rangeend = $('#colorbox .kcdcopts_rangeend').val();
 						$.ajaxSetup({ async: false });
-						$.post(ajaxhandler, {action:'updateDDateRange',source:'DateControl',pid:pid,sid:sid,cid:cid,rangestart:rangestart,rangeend:rangeend}, function(resp){$("#ajaxstatus").html(resp);}, 'html');
+						loadSymbolOn();
+						$.post(ajaxhandler, {action:'updateDDateRange',source:'DateControl',pid:pid,sid:sid,cid:cid,rangestart:rangestart,rangeend:rangeend}, function(resp){$("#ajaxstatus").html(resp);loadSymbolOff();}, 'html');
 						PrintControlOpts(pid,sid,cid);
 						$.ajaxSetup({ async: true });
 					});
@@ -64,7 +67,8 @@ $(function() {
 				var cid = $('#colorbox .kora_control_opts').attr('cid');
 				var format = $('#colorbox .kcdcopts_format:checked').val();
 				$.ajaxSetup({ async: false });
-				$.post(ajaxhandler, {action:'updateDFormat',source:'DateControl',pid:pid,sid:sid,cid:cid,format:format}, function(resp){$("#ajaxstatus").html(resp);}, 'html');
+				loadSymbolOn();
+				$.post(ajaxhandler, {action:'updateDFormat',source:'DateControl',pid:pid,sid:sid,cid:cid,format:format}, function(resp){$("#ajaxstatus").html(resp);loadSymbolOff();}, 'html');
 				PrintControlOpts(pid,sid,cid);
 				$.ajaxSetup({ async: true });
 		});
@@ -75,7 +79,8 @@ $(function() {
 				var cid = $('#colorbox .kora_control_opts').attr('cid');
 				var era = $('#colorbox .kcdcopts_showera:checked').val();
 				$.ajaxSetup({ async: false });
-				$.post(ajaxhandler, {action:'updateDEra',source:'DateControl',pid:pid,sid:sid,cid:cid,era:era}, function(resp){$("#ajaxstatus").html(resp);}, 'html');
+				loadSymbolOn();
+				$.post(ajaxhandler, {action:'updateDEra',source:'DateControl',pid:pid,sid:sid,cid:cid,era:era}, function(resp){$("#ajaxstatus").html(resp);loadSymbolOff();}, 'html');
 				PrintControlOpts(pid,sid,cid);
 				$.ajaxSetup({ async: true });
 		});
@@ -122,7 +127,8 @@ function KCDC_SavePrefixes()
 	});
 	
 	$.ajaxSetup({ async: false });
-	$.post(ajaxhandler, {action:'updateDPrefixes',source:'DateControl',pid:pid,sid:sid,cid:cid,values:values}, function(resp){$("#ajaxstatus").html(resp);}, 'html');
+	loadSymbolOn();
+	$.post(ajaxhandler, {action:'updateDPrefixes',source:'DateControl',pid:pid,sid:sid,cid:cid,values:values}, function(resp){$("#ajaxstatus").html(resp);loadSymbolOff();}, 'html');
 	PrintControlOpts(pid,sid,cid);
 	$.ajaxSetup({ async: true });
 }
@@ -140,7 +146,8 @@ function KCDC_SaveSuffixes()
 	});
 	
 	$.ajaxSetup({ async: false });
-	$.post(ajaxhandler, {action:'updateDSuffixes',source:'DateControl',pid:pid,sid:sid,cid:cid,values:values}, function(resp){$("#ajaxstatus").html(resp);}, 'html');
+	loadSymbolOn();
+	$.post(ajaxhandler, {action:'updateDSuffixes',source:'DateControl',pid:pid,sid:sid,cid:cid,values:values}, function(resp){$("#ajaxstatus").html(resp);loadSymbolOff();}, 'html');
 	PrintControlOpts(pid,sid,cid);
 	$.ajaxSetup({ async: true });
 }

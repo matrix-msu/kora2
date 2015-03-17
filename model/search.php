@@ -460,10 +460,12 @@ class KoraSearch {
 					if(!is_array($keywords)){
 						$keywords = explode(' ', $keywords);
 					}
-					foreach($keywords as $keyword)
-					{
+					if (count($keywords)  == 1) {
+						//Single keyword, could be KID so also compare to id
+						$keyword = $keywords[0];
+						//value stuff (same as else)
 						if ($i != 1) $objectQuery .= " $boolean ";
-						
+							
 						//Convert special chars to match the encoded values in the db.
 						$encoded_keyword = preg_replace_callback('/[\x{80}-\x{10FFFF}]/u', function ($m) {
 						$char = current($m);
@@ -472,7 +474,24 @@ class KoraSearch {
 						}, $keyword);
 						
 						$objectQuery .= ' (value LIKE '.escape('%'.$keyword.'%').' OR value LIKE '.escape('%'.$encoded_keyword.'%').') ';
+						
+						//id stuff
+						$objectQuery .= ' OR (id = "'.gettext($keyword).'")';
 						$i++;
+					} else {
+						foreach($keywords as $keyword){
+							if ($i != 1) $objectQuery .= " $boolean ";
+							
+							//Convert special chars to match the encoded values in the db.
+							$encoded_keyword = preg_replace_callback('/[\x{80}-\x{10FFFF}]/u', function ($m) {
+							$char = current($m);
+							$utf = iconv('UTF-8', 'UCS-4', $char);
+							return sprintf("&#x%s;", ltrim(strtoupper(bin2hex($utf)), "0"));
+							}, $keyword);
+							
+							$objectQuery .= ' (value LIKE '.escape('%'.$keyword.'%').' OR value LIKE '.escape('%'.$encoded_keyword.'%').') ';
+							$i++;
+						}
 					}
 					$objectQuery .= ')';
 			
@@ -580,45 +599,64 @@ class KoraSearch {
 	 *
 	 * @return true if print success, false otherwise
 	 */
-	public static function PrintSearchResultsAJAXLoad($results_, $isAssociatorSearch=false)
+	public static function PrintSearchResultsAJAXLoad($results_, $isAssociatorSearch=false, $displayRange=null)
 	{
-		//$maxpage = ceil(sizeof($results_) / RESULTS_IN_PAGE);
-		//$bc = Manager::GetBreadCrumbsHTML($maxpage, $pageNum, ADJACENT_PAGES_SHOWN, $searchLink);
-		
-		// TODO: MAYBE FIND A BETTER WAY TO PASS THIS ADJACENT_PAGES_SHOWN VAR TO JAVASCRIPT?
-		print "<div class='ks_results' navlinkadj='".ADJACENT_PAGES_SHOWN."' >";
-		print "<div class='ks_results_navlinks'></div><div class='ks_results_numresults'>Num Results</div><br /><br />";
-		$currpage = 1;
-		$currpagecount = 0;
-		foreach ($results_ as $kid)
-		{
-			$recinfo = Record::ParseRecordID($kid);
-			if (!$recinfo) { continue; }
-			
-			// PAGE SEPARATION
-			if ($currpagecount == 0)
-			{ print "<div class='ks_results_page' page='$currpage' >"; }
-			
-			
-			if($isAssociatorSearch){
-				print "<div class='ks_results_assoc' kid='".$kid."'><a>Associated this record (".$kid.")</a></div>";
+		//Display all results on one page
+		if ($displayRange == 'all') {
+			print "<div class='ks_results'><div class='ks_results_numresults'>Num Results</div><br /><br />";
+			foreach ($results_ as $kid)
+			{
+				$recinfo = Record::ParseRecordID($kid);
+				if (!$recinfo) { continue; }
+				
+				print "<div class='ks_results_page' page='1' >";
+				
+				if($isAssociatorSearch){
+					print "<div class='ks_results_assoc' kid='".$kid."'><a>Associated this record (".$kid.")</a></div>";
+				}
+				
+				print "<div class='ks_result_item' pid='${recinfo['pid']}' sid='${recinfo['sid']}' rid='${recinfo['rid']}' loaded='false' >$kid</div>";
+				print"</div>";
 			}
-			print "<div class='ks_result_item' pid='${recinfo['pid']}' sid='${recinfo['sid']}' rid='${recinfo['rid']}' loaded='false' >$kid</div>";
+			print "</div>";
+		//Display paginated version of results	
+		} else {
+			// TODO: MAYBE FIND A BETTER WAY TO PASS THIS ADJACENT_PAGES_SHOWN VAR TO JAVASCRIPT?
+			print "<div class='ks_results' navlinkadj='".ADJACENT_PAGES_SHOWN."' >";
+			print "<div class='ks_results_navlinks'></div><div class='ks_results_numresults'>Num Results</div><br /><br />";
+			$currpage = 1;
+			$currpagecount = 0;
+			foreach ($results_ as $kid)
+			{
+				$recinfo = Record::ParseRecordID($kid);
+				if (!$recinfo) { continue; }
+				
+				// PAGE SEPARATION
+				if ($currpagecount == 0)
+				{ print "<div class='ks_results_page' page='$currpage' >"; }
+				
+				
+				if($isAssociatorSearch){
+					print "<div class='ks_results_assoc' kid='".$kid."'><a>Associated this record (".$kid.")</a></div>";
+				}
+				print "<div class='ks_result_item' pid='${recinfo['pid']}' sid='${recinfo['sid']}' rid='${recinfo['rid']}' loaded='false' >$kid</div>";
+				
+				// PAGE SEPARATION
+				if ($currpagecount == RESULTS_IN_PAGE)
+				{ print "</div>"; $currpagecount = 0; $currpage++; }
+				else
+				{ $currpagecount++; }
+			}
+			// THIS WILL CLOSE OUT THE FINAL PAGE IF IT IS NOT EXACTLY THE RIGHT COUNT ALREADY
+			if ($currpagecount != 0)
+			{ print "</div>"; $currpagecount = 0; }
 			
-			// PAGE SEPARATION
-			if ($currpagecount == RESULTS_IN_PAGE)
-			{ print "</div>"; $currpagecount = 0; $currpage++; }
-			else
-			{ $currpagecount++; }
+			print "<div class='ks_results_navlinks'></div>";
+			if(sizeof($results_)>0)
+				print "<div class='ks_results_numresults'>Num Results</div>";
+			print "</div>";
 		}
-		// THIS WILL CLOSE OUT THE FINAL PAGE IF IT IS NOT EXACTLY THE RIGHT COUNT ALREADY
-		if ($currpagecount != 0)
-		{ print "</div>"; $currpagecount = 0; }
 		
-		print "<div class='ks_results_navlinks'></div>";
-		if(sizeof($results_)>0)
-			print "<div class='ks_results_numresults'>Num Results</div>";
-		print "</div>";
 		return true;
 	}
 

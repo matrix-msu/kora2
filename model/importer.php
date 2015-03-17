@@ -234,7 +234,7 @@ class Importer {
 		if (!empty($this->keyfield))
 			print "Keyfield:".$this->keyfield."</br></br>";
 		
-		print '<table border=1>';
+		print '<table class="importer_table_keys" border=1>';
 		print "<tr><td>XML Tag Name</td><td>Scheme Control Name</td><td></td></tr>";
 		for ($i=0 ; $i<sizeof($this->existingTagnames) ; ++$i) {
 			$tag = $this->existingTagnames[$i];

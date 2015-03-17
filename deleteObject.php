@@ -38,8 +38,7 @@ Manager::PrintHeader();
 $rid = Manager::GetRecord()->GetRID();
 echo '<h2>'.gettext('Delete Record').': '.$rid.'</h2>';
 
-echo gettext('Warning').': '.gettext('This will permanently delete this record and all data associated with it').'.  ';
-echo gettext('Are you sure you really want to delete this record?').'<br /><br />';
+echo gettext('Warning').': '.gettext('This will permanently delete all data within this record. Are you sure you really want to delete this record?').'<br /><br />';
 
 if (sizeof(Manager::GetRecord()->GetAssociatedRecords()) > 0)
 {

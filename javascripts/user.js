@@ -1,5 +1,6 @@
 function ReloadUserUpdatePage(response){
-	$('.account_error').html("<META http-equiv='REFRESH' content='0; url=accountSettings.php?submit="+response+"'>");
+	var baseURI = $('#kora_globals').attr('baseURI');
+	window.location.replace(baseURI+'accountSettings.php?submit="'+response+'"');
 }
 
 $(function() {
@@ -18,6 +19,7 @@ $(function() {
 		fd.append('username',user);
 		fd.append('password',pass);
 		
+		loadSymbolOn();
 		$.ajax({
 			url: ajaxhandler,
 			data: fd,
@@ -31,6 +33,7 @@ $(function() {
 					$('#global_error').text(data);
 					$('#global_error').attr('style','color:red');
 				}
+				loadSymbolOff();
 			}
 		});
 	});
@@ -46,6 +49,7 @@ $(function() {
 			fd.append('username',user);
 			fd.append('password',pass);
 			
+			loadSymbolOn();
 			$.ajax({
 				url: ajaxhandler,
 				data: fd,
@@ -59,6 +63,7 @@ $(function() {
 						$('#global_error').text(data);
 						$('#global_error').attr('style','color:red');
 					}
+					loadSymbolOff();
 				}
 			});
 		}
@@ -84,6 +89,7 @@ $(function() {
 		fd.append('username',user);
 		fd.append('token',token);
 		
+		loadSymbolOn();
 		$.ajax({
 			url: ajaxhandler,
 			data: fd,
@@ -93,6 +99,7 @@ $(function() {
 			success: function(data){
 				$('#global_error').html(data);
 				$('#global_error').css('color', 'red');
+				loadSymbolOff();
 			}
 		});
 	});
@@ -122,6 +129,7 @@ $(function() {
 		fd.append('recaptcha_response_field',resp);
 		fd.append('recaptcha_challenge_field',chal);
 		
+		loadSymbolOn();
 		$.ajax({
 			url: ajaxhandler,
 			data: fd,
@@ -131,6 +139,7 @@ $(function() {
 			success: function(data){
 				$('#global_error').html(data);
 				$('#global_error').css('color', 'red');
+				loadSymbolOff();
 			}
 		});
 	});
@@ -143,6 +152,7 @@ $(function() {
 		fd.append('action','recoverPassword');
 		fd.append('username',user);
 		
+		loadSymbolOn();
 		$.ajax({
 			url: ajaxhandler,
 			data: fd,
@@ -152,6 +162,7 @@ $(function() {
 			success: function(data){
 				$('#global_error').text(data);
 				$('#global_error').css('color', 'red');
+				loadSymbolOff();
 			}
 		});
 	});
@@ -164,6 +175,7 @@ $(function() {
 		fd.append('action','recoverUser');
 		fd.append('email',email);
 		
+		loadSymbolOn();
 		$.ajax({
 			url: ajaxhandler,
 			data: fd,
@@ -173,6 +185,7 @@ $(function() {
 			success: function(data){
 				$('#global_error').text(data);
 				$('#global_error').css('color', 'red');
+				loadSymbolOff();
 			}
 		});
 	});
@@ -191,7 +204,7 @@ $(function() {
 		fd.append('password1',pw1);
 		fd.append('password2',pw2);
 		
-		
+		loadSymbolOn();
 		$.ajax({
 			url: ajaxhandler,
 			data: fd,
@@ -201,6 +214,7 @@ $(function() {
 			success: function(data){
 				$('#global_error').html(data);
 				$('#global_error').css('color', 'red');
+				loadSymbolOff();
 			}
 		});
 	});
@@ -223,6 +237,7 @@ $(function() {
 		fd.append('pw2',pw2);
 		fd.append('lang',lang);
 		
+		loadSymbolOn();
 		$.ajax({
 			url: ajaxhandler,
 			data: fd,
@@ -231,12 +246,14 @@ $(function() {
 			type: 'POST',
 			success: function(data){
 				ReloadUserUpdatePage(data);
+				loadSymbolOff();
 			}
 		});
 	});
 	
 	$('.registration_form').find('input[name="username"]').change(function () {
-		$.post('ajax/admin.php',{ action:"checkUsername",source:'UserFunctions', uname:$('input#username').val() },function(resp){$("#unamecheck").html(resp);}, 'html');
+		loadSymbolOn();
+		$.post('ajax/admin.php',{ action:"checkUsername",source:'UserFunctions', uname:$('input#username').val() },function(resp){$("#unamecheck").html(resp);loadSymbolOff();}, 'html');
 	});
 
 	//Not sure if this is best place, but will do for now.

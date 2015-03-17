@@ -20,7 +20,8 @@ $(function() {
 								if (answer)
 								{
 									$.ajaxSetup({ async: false });
-									$.post(ajaxhandler, {action:'deleteFile',source:'FileControl',kid:rid,pid:pid,cid:kcdiv.attr('kcid') }, function(resp){efilediv.html(resp);}, 'html');
+									loadSymbolOn();
+									$.post(ajaxhandler, {action:'deleteFile',source:'FileControl',kid:rid,pid:pid,cid:kcdiv.attr('kcid') }, function(resp){efilediv.html(resp);loadSymbolOff();}, 'html');
 									$.ajaxSetup({ async: true });
 								}
 						});
@@ -40,7 +41,8 @@ $(function() {
 						var cid = $('#colorbox .kora_control_opts').attr('cid');
 						var maxsize = c.val();
 						$.ajaxSetup({ async: false });
-						$.post(ajaxhandler, {action:'updateFileSize',source:'FileControl',pid:pid,sid:sid,cid:cid,maxsize:maxsize}, function(resp){$("#ajaxstatus").html(resp);}, 'html');
+						loadSymbolOn();
+						$.post(ajaxhandler, {action:'updateFileSize',source:'FileControl',pid:pid,sid:sid,cid:cid,maxsize:maxsize}, function(resp){$("#ajaxstatus").html(resp);loadSymbolOff();}, 'html');
 						PrintControlOpts(pid,sid,cid);
 						$.ajaxSetup({ async: true });
 					});
@@ -52,7 +54,8 @@ $(function() {
 				var cid = $('#colorbox .kora_control_opts').attr('cid');
 				var restrict = $('#colorbox .kcfcopts_restrictedtypes:checked').val();
 				$.ajaxSetup({ async: false });
-				$.post(ajaxhandler, {action:'updateFileRestrictions',source:'FileControl',pid:pid,sid:sid,cid:cid,restrict:restrict}, function(resp){$("#ajaxstatus").html(resp);}, 'html');
+				loadSymbolOn();
+				$.post(ajaxhandler, {action:'updateFileRestrictions',source:'FileControl',pid:pid,sid:sid,cid:cid,restrict:restrict}, function(resp){$("#ajaxstatus").html(resp);loadSymbolOff();}, 'html');
 				PrintControlOpts(pid,sid,cid);
 				$.ajaxSetup({ async: true });
 		});
@@ -63,7 +66,8 @@ $(function() {
 				var cid = $('#colorbox .kora_control_opts').attr('cid');
 				var archival = $('#colorbox .kcfcopts_archival:checked').val();
 				$.ajaxSetup({ async: false });
-				$.post(ajaxhandler, {action:'updateArchival',source:'FileControl',pid:pid,sid:sid,cid:cid,archival:archival}, function(resp){$("#ajaxstatus").html(resp);}, 'html');
+				loadSymbolOn();
+				$.post(ajaxhandler, {action:'updateArchival',source:'FileControl',pid:pid,sid:sid,cid:cid,archival:archival}, function(resp){$("#ajaxstatus").html(resp);loadSymbolOff();}, 'html');
 				PrintControlOpts(pid,sid,cid);
 				$.ajaxSetup({ async: true });
 		});
@@ -76,7 +80,8 @@ $(function() {
 				var value = $('#colorbox .kcfcopts_presetname').val();
 				if (answer == true) {
 					$.ajaxSetup({ async: false });
-					$.post(ajaxhandler, {action:'usePreset',source:'FileControl',pid:pid,sid:sid,cid:cid,preset:value}, function(resp){$("#ajaxstatus").html(resp);}, 'html');
+					loadSymbolOn();
+					$.post(ajaxhandler, {action:'usePreset',source:'FileControl',pid:pid,sid:sid,cid:cid,preset:value}, function(resp){$("#ajaxstatus").html(resp);loadSymbolOff();}, 'html');
 					PrintControlOpts(pid,sid,cid);
 					$.ajaxSetup({ async: true });
 				}
@@ -88,7 +93,8 @@ $(function() {
 				var cid = $('#colorbox .kora_control_opts').attr('cid');
 				var newName = $('#colorbox .kcfcopts_presetnew').val();
 				$.ajaxSetup({ async: false });
-				$.post(ajaxhandler, {action:'savePreset',source:'FileControl',pid:pid,sid:sid,cid:cid,name:newName}, function(resp){$("#ajaxstatus").html(resp);}, 'html');
+				loadSymbolOn();
+				$.post(ajaxhandler, {action:'savePreset',source:'FileControl',pid:pid,sid:sid,cid:cid,name:newName}, function(resp){$("#ajaxstatus").html(resp);loadSymbolOff();}, 'html');
 				PrintControlOpts(pid,sid,cid);
 				$.ajaxSetup({ async: true });
 		});
@@ -137,7 +143,8 @@ function KCFC_SaveMimeTypes()
 	});
 	
 	$.ajaxSetup({ async: false });
-	$.post(ajaxhandler, {action:'updateMimeTypes',source:'FileControl',pid:pid,sid:sid,cid:cid,mimetypes:mimetypes}, function(resp){$("#ajaxstatus").html(resp);}, 'html');
+	loadSymbolOn();
+	$.post(ajaxhandler, {action:'updateMimeTypes',source:'FileControl',pid:pid,sid:sid,cid:cid,mimetypes:mimetypes}, function(resp){$("#ajaxstatus").html(resp);loadSymbolOff();}, 'html');
 	$.ajaxSetup({ async: true });
 }
 

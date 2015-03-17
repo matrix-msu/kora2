@@ -97,13 +97,14 @@ define('EDIT_LAYOUT',    8);
 define('CREATE_SCHEME', 16);
 define('DELETE_SCHEME', 32);
 define('EXPORT_SCHEME', 64);
-define('MODERATOR',    128);	//permission to approve/deny publically ingested records
+define('MODERATOR',    128);
+define('VIEW_SEARCH',  256);	//permission to approve/deny publically ingested records
 
 // SYSTEM WILL BREAK EXPORT DOWNLOADS LARGER THAN THIS INTO PARTS 
 define('KORA_MAXEXPORTZIPSIZE', 4294967296); // 4GB
 
-define('KORA_VERSION', '2.6.1');
-define('LATEST_DB_VERSION', '2.6.1');
+define('KORA_VERSION', '2.6.2');
+define('LATEST_DB_VERSION', '2.6.2');
 
 //reCAPTCHA keys, used for public ingestion
 define('PUBLIC_KEY', '6LdsI_YSAAAAAJCMAC48DQh8agNipar9166E9TvZ');
@@ -141,32 +142,5 @@ $invalidControlNames = array(
 if (!defined('sessionTimeout')) define('sessionTimeout', 30*60);
 ini_set('session.gc_maxlifetime',sessionTimeout);
 @session_start();
-
-//KORA Bug List
-/*
-
- ///////////////////////////////////////////////////////////////////////
- ///////////////////KORA 2.5 Final Countdown (7-15)/////////////////////
- ///////////////////////////////////////////////////////////////////////
- - PUBLISH
- 
- ///////////////////////////////////////////////////////////////////////
- ///////////////////TODO (2.5+)/////////////////////////////////////////
- ///////////////////////////////////////////////////////////////////////
- - Text wrapped in gettext function not converting everything to set language.
-   - Might not be anything we can do on our end.
-   - find out what is happening at end of utilities file
- - Develop autofill
- - NOTE: Other TODOs scattered throughout project
-   - Most of these were determined non-critical for 2.5 or we were not able to determine their relevance
-
- ///////////////////////////////////////////////////////////////////////
- ///////////////////PLUGGINS (2.6?)/////////////////////////////////////
- ///////////////////////////////////////////////////////////////////////
- - Develop pluggin platform
- - convert dublin core to pluggin
- - convert solrAddAll to pluggin
- - convert oai-pmh to pluggin
-*/
 
 ?>

@@ -22,6 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 require_once('includes.php');
 ?>
+<img class="kora_loading_img" src="images/ajax-loader.gif" style="border:0px;visibility:hidden"></img>
 </div>
 </div> <!-- right -->
 </div> <!-- right_container -->

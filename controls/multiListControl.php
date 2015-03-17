@@ -311,7 +311,7 @@ class MultiListControl extends ListControl
 		}
 		
 		if(!empty($_REQUEST[$this->cName])){
-			$value = explode(',',$_REQUEST[$this->cName][0]);
+			$value = explode('<MLC>',$_REQUEST[$this->cName][0]);
 		}else if (!empty($this->XMLInputValue)){
 			$value = $this->XMLInputValue;
 		}else return '';
@@ -324,7 +324,7 @@ class MultiListControl extends ListControl
 			// THIS HAPPENS WHEN NOTHING IS SELECTED AND AN EMPTY ARRAY IS PASSED VIA JAVASCRIPT
 			if ($v === '') { continue; }
 			if(!in_array((string)$v,$optionArray)){
-				return '"'.htmlEscape($v).gettext('" is not an valid value for '.$this->GetName());
+				return '"'.htmlEscape($v).gettext('" is not a valid value for '.$this->GetName());
 			}
 		}
 	}

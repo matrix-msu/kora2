@@ -19,30 +19,35 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 //update the real name of a user
 function updateRealName(varuid, varrn) {
+	loadSymbolOn();
 	$.post('ajax/admin.php', {action:'updateRealName',source:'UserFunctions',uid:varuid,realname:varrn}, function(resp){$("#ajaxstatus").html(resp);}, 'html');
-	$.post('ajax/admin.php', {action:'showUsers',source:'UserFunctions'}, function(resp){$("#apmanageusers").html(resp);}, 'html');
+	$.post('ajax/admin.php', {action:'showUsers',source:'UserFunctions'}, function(resp){$("#apmanageusers").html(resp);loadSymbolOff();}, 'html');
 }
 //update the organization a user belongs to
 function updateOrganization(varuid, varorg) {
+	loadSymbolOn();
 	$.post('ajax/admin.php', {action:'updateOrganization',source:'UserFunctions',uid:varuid,organization:varorg}, function(resp){$("#ajaxstatus").html(resp);}, 'html');
-	$.post('ajax/admin.php', {action:'showUsers',source:'UserFunctions'}, function(resp){$("#apmanageusers").html(resp);}, 'html');
+	$.post('ajax/admin.php', {action:'showUsers',source:'UserFunctions'}, function(resp){$("#apmanageusers").html(resp);loadSymbolOff();}, 'html');
 }
 //update admin status of a user
 function updateAdmin(varuid, varset) {
+	loadSymbolOn();
 	$.post('ajax/admin.php', {action:'updateAdmin',source:'UserFunctions',uid:varuid,admin:varset}, function(resp){$("#ajaxstatus").html(resp);}, 'html');
-	$.post('ajax/admin.php', {action:'showUsers',source:'UserFunctions'}, function(resp){$("#apmanageusers").html(resp);}, 'html');
+	$.post('ajax/admin.php', {action:'showUsers',source:'UserFunctions'}, function(resp){$("#apmanageusers").html(resp);loadSymbolOff();}, 'html');
 }
 //update activation status of a user
 function updateActivated(varuid, varset) {
+	loadSymbolOn();
 	$.post('ajax/admin.php', {action:'updateActivated',source:'UserFunctions',uid:varuid,activated:varset}, function(resp){$("#ajaxstatus").html(resp);}, 'html');
-	$.post('ajax/admin.php', {action:'showUsers',source:'UserFunctions'}, function(resp){$("#apmanageusers").html(resp);}, 'html');
+	$.post('ajax/admin.php', {action:'showUsers',source:'UserFunctions'}, function(resp){$("#apmanageusers").html(resp);loadSymbolOff();}, 'html');
 }
 //delete a user from KORA
 function deleteUser(varuid) {
 	var answer = confirm(kgt_reallydelete);
 	if(answer) {
+		loadSymbolOn();
 		$.post('ajax/admin.php', {action:'deleteUser',source:'UserFunctions',uid:varuid}, function(resp){$("#ajaxstatus").html(resp);}, 'html');
-		$.post('ajax/admin.php', {action:'showUsers',source:'UserFunctions'}, function(resp){$("#apmanageusers").html(resp);}, 'html');
+		$.post('ajax/admin.php', {action:'showUsers',source:'UserFunctions'}, function(resp){$("#apmanageusers").html(resp);loadSymbolOff();}, 'html');
 	}
 	return; 
 }
@@ -52,48 +57,53 @@ function resetPassword() {
 	var pw1 = $('#password1').val();
 	var pw2 = $('#password2').val();
 	if (pw1 == pw2) {
+		loadSymbolOn();
 		$.post('ajax/admin.php', { uid:uid, password:pw1, action:'resetPassword',source:'UserFunctions'}, function(resp){$("#ajaxstatus").html(resp);});
 		alert(kgt_pwchanged);
-		$.post('ajax/admin.php', {action:'showUsers',source:'UserFunctions'}, function(resp){$("#apmanageusers").html(resp);}, 'html');
+		$.post('ajax/admin.php', {action:'showUsers',source:'UserFunctions'}, function(resp){$("#apmanageusers").html(resp);loadSymbolOff();}, 'html');
 	} else {
 		alert(kgt_pwdontmatch);
 	}
 }
 //Create a search token
 function createToken() {
-	console.log('here');
+	loadSymbolOn();
 	$.post('ajax/admin.php',{action:'createToken',source:'UserFunctions'},function(resp){$("#ajaxstatus").html(resp);}, 'html');
-	$.post('ajax/admin.php', {action:'PrintTokens',source:'UserFunctions'}, function(resp){$("#apmanagetokens").html(resp);}, 'html');
+	$.post('ajax/admin.php', {action:'PrintTokens',source:'UserFunctions'}, function(resp){$("#apmanagetokens").html(resp);loadSymbolOff();}, 'html');
 }
 //Delete a search token
 function deleteToken(varid) {
     var answer = confirm(kgt_reallydeltok);
     if(answer) {
+		loadSymbolOn();
 		$.post('ajax/admin.php',{action:'deleteToken',source:'UserFunctions',tokenid:varid },function(resp){$("#ajaxstatus").html(resp);}, 'html');
-		$.post('ajax/admin.php', {action:'PrintTokens',source:'UserFunctions'}, function(resp){$("#apmanagetokens").html(resp);}, 'html');
+		$.post('ajax/admin.php', {action:'PrintTokens',source:'UserFunctions'}, function(resp){$("#apmanagetokens").html(resp);loadSymbolOff();}, 'html');
     }
 }
 //Assign a project to a token
 function addProjectAccess(vartokenid,varproj) {
+	loadSymbolOn();
 	$.post('ajax/admin.php',{action:'addAccess',source:'UserFunctions',tokenid:vartokenid,tokpid:varproj},function(resp){$("#ajaxstatus").html(resp);}, 'html');
-	$.post('ajax/admin.php', {action:'PrintTokens',source:'UserFunctions'}, function(resp){$("#apmanagetokens").html(resp);}, 'html');
+	$.post('ajax/admin.php', {action:'PrintTokens',source:'UserFunctions'}, function(resp){$("#apmanagetokens").html(resp);loadSymbolOff();}, 'html');
 }
 //Remove project from a token
 function removeProjectAccess(vartokenid, varproj) {
-	console.log('tok:'+vartokenid+' - projid:'+varproj);
+	loadSymbolOn();
 	$.post('ajax/admin.php',{action:'removeAccess',source:'UserFunctions',tokenid:vartokenid,tokpid:varproj},function(resp){$("#ajaxstatus").html(resp);}, 'html');
-	$.post('ajax/admin.php', {action:'PrintTokens',source:'UserFunctions'}, function(resp){$("#apmanagetokens").html(resp);}, 'html');
+	$.post('ajax/admin.php', {action:'PrintTokens',source:'UserFunctions'}, function(resp){$("#apmanagetokens").html(resp);loadSymbolOff();}, 'html');
 }
 
 $(function() {
 	// NEED IF'S HERE FOR DIV EXISTS
 	if ($('#apmanagetokens').length > 0)
 	{
-		$.post('ajax/admin.php', {action:'PrintTokens',source:'UserFunctions'}, function(resp){$("#apmanagetokens").html(resp);}, 'html');
+		loadSymbolOn();
+		$.post('ajax/admin.php', {action:'PrintTokens',source:'UserFunctions'}, function(resp){$("#apmanagetokens").html(resp);loadSymbolOff();}, 'html');
 	}
 	if ($('#apmanageusers').length > 0)
 	{
-		$.post('ajax/admin.php', {action:'showUsers',source:'UserFunctions'}, function(resp){$("#apmanageusers").html(resp);}, 'html');
+		loadSymbolOn();
+		$.post('ajax/admin.php', {action:'showUsers',source:'UserFunctions'}, function(resp){$("#apmanageusers").html(resp);loadSymbolOff();}, 'html');
 	}
 	$("#apmanageusers" ).on( "change",'.userrn', function() {
 	    var c = $(this);
@@ -136,9 +146,10 @@ $(function() {
 		var pw1 = $('.kmu_resetpw_password1').val();
 		var pw2 = $('.kmu_resetpw_password2').val();
 		if (pw1 == pw2) {
+			loadSymbolOn();
 			$.post('ajax/admin.php', { uid:uid, password:pw1, action:'resetPassword',source:'UserFunctions'}, function(resp){$("#ajaxstatus").html(resp);});
 			alert(kgt_pwchanged);
-			$.post('ajax/admin.php', {action:'showUsers',source:'UserFunctions'}, function(resp){$("#apmanageusers").html(resp);}, 'html');
+			$.post('ajax/admin.php', {action:'showUsers',source:'UserFunctions'}, function(resp){$("#apmanageusers").html(resp);loadSymbolOff();}, 'html');
 		} else {
 			alert(kgt_pwdontmatch);
 		}
@@ -193,13 +204,15 @@ $(function() {
 	
 	$("#koraAdminSysManage").on("click",".ka_sysMgt_updateCtrlList", function() {
 		$.ajaxSetup({ async: false });
-		$.post('ajax/admin.php', {action:'UpdateControlList',source:'SystemManagement'}, function(resp){$("#ka_admin_result").text(resp);}, 'html');
+		loadSymbolOn();
+		$.post('ajax/admin.php', {action:'UpdateControlList',source:'SystemManagement'}, function(resp){$("#ka_admin_result").text(resp);loadSymbolOff();}, 'html');
 		$.ajaxSetup({ async: true });
 	});
 	
 	$("#koraAdminSysManage").on("click",".ka_sysMgt_updateStyleList", function() {
 		$.ajaxSetup({ async: false });
-		$.post('ajax/admin.php', {action:'UpdateStyleList',source:'SystemManagement'}, function(resp){$("#ka_admin_result").text(resp);}, 'html');
+		loadSymbolOn();
+		$.post('ajax/admin.php', {action:'UpdateStyleList',source:'SystemManagement'}, function(resp){$("#ka_admin_result").text(resp);loadSymbolOff();}, 'html');
 		$.ajaxSetup({ async: true });
 	});
 	

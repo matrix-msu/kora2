@@ -45,6 +45,7 @@ $(function() {
 			fd.append('sortBy',$('.advSearch_sortByKeyword').val());
 			fd.append('sortOrder',$('.sortOrder_keyword').val());
 			
+			loadSymbolOn();
 			$.ajax({
 				url: 'searchResults.php',
 				data: fd,
@@ -54,6 +55,7 @@ $(function() {
 				success: function(data){
 					document.write(data);
 					KS_InitSearchResults();
+					loadSymbolOff();
 				}
 			});	
 		});
@@ -75,9 +77,7 @@ $(function() {
 					var mon = $(this).children(".kcdc_month:first").val();
 					var day = $(this).children(".kcdc_day:first").val();
 					var year = $(this).children(".kcdc_year:first").val();
-					if(mon.length>0){
-						keywords += KS_ASKeyConversion_DC(mon,day,year,cid);
-					}
+					keywords += KS_ASKeyConversion_DC(mon,day,year,cid);
 				}
 				//MultiDateControl
 				else if($(this).attr('kcclass')=='MultiDateControl'){
@@ -108,7 +108,7 @@ $(function() {
 				//TextControl
 				else if($(this).attr('kcclass')=='TextControl'){
 					var key = $(this).children("input:first").val();
-					if(key.length>1)
+					if(key.length>0)
 						keywords += KS_ASKeyConversion(key,cid);
 				} 
 				//MultiTextControl
@@ -126,6 +126,7 @@ $(function() {
 			fd.append('sortBy',$('.advSearch_sortBy').val());
 			fd.append('sortOrder',$('.sortOrder_other').val());
 			
+			loadSymbolOn();
 			$.ajax({
 				url: 'searchResults.php',
 				data: fd,
@@ -135,6 +136,7 @@ $(function() {
 				success: function(data){
 					document.write(data);
 					KS_InitSearchResults();
+					loadSymbolOff();
 				}
 			});
 		});
@@ -151,6 +153,7 @@ $(function() {
 			fd.append('boolean',$('.ks_cps_boolean').val());
 			fd.append('projects',pids);
 			
+			loadSymbolOn();
 			$.ajax({
 				url: 'searchResults.php',
 				data: fd,
@@ -160,6 +163,7 @@ $(function() {
 				success: function(data){
 					document.write(data);
 					KS_InitSearchResults();
+					loadSymbolOff();
 				}
 			});	
 		});
@@ -183,6 +187,7 @@ $(function() {
 			fd.append('keywords',$('.ks_ps_keywords').val());
 			fd.append('boolean',$('.ks_ps_boolean').val());
 			
+			loadSymbolOn();
 			$.ajax({
 				url: 'searchResults.php',
 				data: fd,
@@ -192,6 +197,7 @@ $(function() {
 				success: function(data){
 					document.write(data);
 					KS_InitSearchResults();
+					loadSymbolOff();
 				}
 			});	
 		});
@@ -216,13 +222,14 @@ function KS_ShowPage(ksdiv, page)
 					var rid = $(this).attr('rid');
 					console.log('Loading: '+$(this).attr('rid'));
 					$.ajaxSetup({ async: false });
+					loadSymbolOn();
 					$.post($('#kora_globals').attr('baseuri')+"ajax/record.php",{
 						action:"viewRecord",
 						source:"RecordFunctions",
 						pid:pid,
 						sid:sid,
 						rid:rid},
-						function(resp){c.html(resp); c.attr('loaded', 'true'); }, 'html');
+						function(resp){c.html(resp); c.attr('loaded', 'true');loadSymbolOff(); }, 'html');
 					KS_PrintRecordActions(c,pid,sid,rid);
 					$.ajaxSetup({ async: true });
 				}
@@ -239,13 +246,14 @@ function KS_ShowPage(ksdiv, page)
 	var maxpage = ksdiv.find('.ks_results_page').size();
 	var adjacentpage = ksdiv.attr('navlinkadj');
 	$.ajaxSetup({ async: false });
+	loadSymbolOn();
 	$.post($('#kora_globals').attr('baseuri')+"ajax/search.php",{
 		action:"GetSearchNavLinks",
 		source:"SearchFunctions",
 		maxpage:maxpage,
 		adjacentpage:adjacentpage,
 		currpage:page},
-		function(resp){ksdiv.find('.ks_results_navlinks').each(function(){$(this).html(resp);});
+		function(resp){ksdiv.find('.ks_results_navlinks').each(function(){$(this).html(resp);loadSymbolOff();});
 		}, 'html');
 	$.ajaxSetup({ async: true });
 }
@@ -262,7 +270,8 @@ function KS_PrintRecordActions(ksobjdiv,pid,sid,rid)
 	else
 	{ 
 		ascheme = { };
-		$.post($('#kora_globals').attr('baseuri')+"ajax/scheme.php",{action:"GetRecordActions",source:"SchemeFunctions",pid:pid,sid:sid},function(resp){ ascheme[String(sid)] = resp; }, 'html');
+		loadSymbolOn();
+		$.post($('#kora_globals').attr('baseuri')+"ajax/scheme.php",{action:"GetRecordActions",source:"SchemeFunctions",pid:pid,sid:sid},function(resp){ ascheme[String(sid)] = resp; loadSymbolOff();}, 'html');
 		ks_projacts[String(pid)] = ascheme; 
 	}
 	
@@ -306,7 +315,10 @@ function KS_InitSearchResults()
 
 //Functions to handle converting keyword to proper MySQL calls for advanced search
 function KS_ASKeyConversion_DC(month,day,year,cid){
-	var dateKey = '%<month>'+month+'</month><day>'+day+'</day><year>'+year+'</year>%';
+	var dateKey = '';
+	if(month!=''){dateKey += '%<month>'+month+'</month>%';}
+	if(day!=''){dateKey += '%<day>'+day+'</day>%';}
+	if(year!=''){dateKey += '%<year>'+year+'</year>%';}
 	return "(cid="+cid+" AND value LIKE '"+'%'+dateKey+'%'+"')<ADVSEARCHKEY>";
 }
 

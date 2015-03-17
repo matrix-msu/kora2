@@ -30,6 +30,7 @@ Manager::PrintHeader();
 
 echo '<h2>'.gettext('Search Results').'</h2>';
 
+
 // SEVERAL SCENARIOS HERE
 // SCENARIO 1) CROSS-PROJECT-SEARCH, SHOULD PASS IN Projects[] ARRAY, KEYWORD REQUIRED, IGNORE SID ARRAY
 // SCENARIO 2) SINGLE-PROJECT SEARCH, MAY PASS IN Schemes[] ARRAY, KEYWORD REQUIRED, PID IS ASSUMED TO BE Manager::GetProject()->GetPID()
@@ -40,7 +41,7 @@ $searchok = true;
 
 $pids = null;
 if (Manager::CheckRequestsAreSet(['projects'])) 
-{ $pids = (is_array($_REQUEST['projects'])) ? $_REQUEST['projects'] : array($_REQUEST['projects']); $crossproject = true; }
+{ $pids = (is_array($_REQUEST['projects'])) ? $_REQUEST['projects'] : array($_REQUEST['projects']); $crossproject = true; $_REQUEST['display']='false';}
 elseif (Manager::GetProject()) 
 { $pids = array(Manager::GetProject()->GetPID()); }
 
@@ -48,9 +49,9 @@ $sids = null;
 if (!$crossproject)
 {
 	if (Manager::CheckRequestsAreSet(['sids'])) 
-	{ $sids = (is_array($_REQUEST['sids'])) ? $_REQUEST['sids'] : array($_REQUEST['sids']); }
+	{ $sids = (is_array($_REQUEST['sids'])) ? $_REQUEST['sids'] : array($_REQUEST['sids']);}
 	elseif (Manager::GetScheme()) 
-	{ $sids = array(Manager::GetScheme()->GetSID()); }
+	{ $sids = array(Manager::GetScheme()->GetSID());}
 }
 else { 
 	$sids = '';
@@ -73,7 +74,7 @@ if (!Manager::IsSystemAdmin())
 	foreach($pids AS $pid)
 	{
 		$proj = new Project($pid);
-		if ($proj->GetUserPermissions() <= 0) 
+		if ($proj->GetUserPermissions() < 256) 
 		{
 			Manager::PrintErrDiv(gettext('Sorry, but you do not have permission to search some of the requested projects').'.');
 			$searchok = false;
@@ -105,7 +106,28 @@ if ($searchok)
 	}
 	$_SESSION['results'] = $results;
 
-	KoraSearch::PrintSearchResultsAJAXLoad($resultsmerged);
+	if (Manager::GetScheme() != null && (!Manager::CheckRequestsAreSet(['display']) || ($_REQUEST['display'] != 'all' && $_REQUEST['display'] != 'false'))) {
+		//Display "List All Scheme Records Link at bottom of page"
+		echo '<br><br>';
+		echo '<a href="searchResults.php?pid='.Manager::GetProject()->GetPID().'&sid='.Manager::GetScheme()->GetSID().'&display=all">View All</a>';
+		echo '<br><br>';
+	}
+
+	//paginate
+	if (Manager::CheckRequestsAreSet(['display']) && $_REQUEST['display'] == 'all') {
+		//display whole search on one page
+		KoraSearch::PrintSearchResultsAJAXLoad($resultsmerged, false, 'all');
+	}
+	else {
+		KoraSearch::PrintSearchResultsAJAXLoad($resultsmerged);
+	}
+	
+	if (Manager::GetScheme() != null && (!Manager::CheckRequestsAreSet(['display']) || ($_REQUEST['display'] != 'all' && $_REQUEST['display'] != 'false'))) {
+		//Display "List All Scheme Records Link at bottom of page"
+		echo '<br><br>';
+		echo '<a href="searchResults.php?pid='.Manager::GetProject()->GetPID().'&sid='.Manager::GetScheme()->GetSID().'&display=all">View All</a>';
+		echo '<br><br>';
+	}
 }
 
 Manager::PrintFooter();

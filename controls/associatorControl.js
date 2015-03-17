@@ -42,7 +42,7 @@ $(function() {
 						//Base URI used for compatibility with public ingestion
 						$(this).find('.kcac_findrec:button').click(function() {
 								$.ajaxSetup({ async: false });
-								$.colorbox({href:$('#kora_globals').attr('baseuri')+'ajax/control.php?source=AssociatorControl&action=assocSearch&pid='+kcdiv.attr('kpid')+'&sid='+kcdiv.attr('ksid')+'&cid='+kcdiv.attr('kcid')+'&keywords='+kcdiv.find('.kcac_findrec:text').val(),onComplete: function(){$(this).colorbox.resize({width:"50%"});}});
+								$.colorbox({href:$('#kora_globals').attr('baseuri')+'ajax/control.php?source=AssociatorControl&action=assocSearch&pid='+kcdiv.attr('kpid')+'&sid='+kcdiv.attr('ksid')+'&cid='+kcdiv.attr('kcid')+'&keywords='+escape(kcdiv.find('.kcac_findrec:text').val()),onComplete: function(){$(this).colorbox.resize({width:"50%"});}});
 								$.ajaxSetup({ async: true });
 								KS_InitSearchResults();
 						});
@@ -83,7 +83,8 @@ $(function() {
 				var rid = recinfo.attr('rid');
 				console.log('Loading: '+rid);
 				$.ajaxSetup({ async: false });
-				$.post("ajax/record.php",{action:"viewRecord",source:"RecordFunctions",pid:pid,sid:sid,rid:rid},function(resp){recinfo.append(resp); recinfo.attr('loaded', 'true'); }, 'html');
+				loadSymbolOn();
+				$.post("ajax/record.php",{action:"viewRecord",source:"RecordFunctions",pid:pid,sid:sid,rid:rid},function(resp){recinfo.append(resp); recinfo.attr('loaded', 'true');loadSymbolOff(); }, 'html');
 				$.ajaxSetup({ async: true });
 			}
 			// IF WE'RE ALREADY LOADED, FUTURE CLICKS WILL TOGGLE THE VIEW OF THIS TABLE IN/OUT
@@ -150,7 +151,8 @@ $(function() {
 						schemes.push($(this).attr('sid'));
 				});
 				$.ajaxSetup({ async: false });
-				$.post(ajaxhandler, {action:'updateAllowedSchemes',source:'AssociatorControl',pid:pid,sid:sid,cid:cid,schemes:schemes}, function(resp){$("#ajaxstatus").html(resp);}, 'html');
+				loadSymbolOn();
+				$.post(ajaxhandler, {action:'updateAllowedSchemes',source:'AssociatorControl',pid:pid,sid:sid,cid:cid,schemes:schemes}, function(resp){$("#ajaxstatus").html(resp);loadSymbolOff();}, 'html');
 				PrintControlOpts(pid,sid,cid);
 				$.ajaxSetup({ async: true });						
 		});
@@ -162,7 +164,8 @@ $(function() {
 				var prevcid = $(this).attr('sid');
 				var prevval = $(this).val();
 				$.ajaxSetup({ async: false });
-				$.post(ajaxhandler, {action:'updatePreviewControl',source:'AssociatorControl',pid:pid,sid:sid,cid:cid,prevcid:prevcid,prevval:prevval}, function(resp){$("#ajaxstatus").html(resp);}, 'html');
+				loadSymbolOn();
+				$.post(ajaxhandler, {action:'updatePreviewControl',source:'AssociatorControl',pid:pid,sid:sid,cid:cid,prevcid:prevcid,prevval:prevval}, function(resp){$("#ajaxstatus").html(resp);loadSymbolOff();}, 'html');
 				PrintControlOpts(pid,sid,cid);
 				$.ajaxSetup({ async: true });						
 		});
@@ -185,7 +188,8 @@ function KCAC_SaveDefaultValue()
 	});
 	
 	$.ajaxSetup({ async: false });
-	$.post(ajaxhandler, {action:'saveDefault',source:'AssociatorControl',pid:pid,sid:sid,cid:cid,values:defvals}, function(resp){$("#ajaxstatus").html(resp);}, 'html');
+	loadSymbolOn();
+	$.post(ajaxhandler, {action:'saveDefault',source:'AssociatorControl',pid:pid,sid:sid,cid:cid,values:defvals}, function(resp){$("#ajaxstatus").html(resp);loadSymbolOff();}, 'html');
 	PrintControlOpts(pid,sid,cid);
 	$.ajaxSetup({ async: true });
 	console.log('end KCAC_SaveDefaultValue');
@@ -208,6 +212,7 @@ function KCAC_Validate(kcdiv)
 	});
 	fd.append(datadom.attr('name'), datavals);
 	
+	loadSymbolOn();
 	$.ajax({
 			url: 'ajax/control.php',
 			data: fd,
@@ -222,6 +227,7 @@ function KCAC_Validate(kcdiv)
 				}else{
 					kcdiv.attr('kcvalid','invalid');
 				}
+				loadSymbolOff();
 			}
 	});		
 	

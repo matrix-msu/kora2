@@ -66,7 +66,8 @@ function PrintRecordPresets(pid,sid)
 {
 	if (($('#colorbox').length > 0) && ($('#cboxContent').length > 0))
 	{
-		$.post('ajax/record.php',{action:"PrintForm",source:"PresetFunctions",pid:pid,sid:sid}, function(resp){$("#presetRecord").html(resp);}, 'html');
+		loadSymbolOn();
+		$.post('ajax/record.php',{action:"PrintForm",source:"PresetFunctions",pid:pid,sid:sid}, function(resp){$("#presetRecord").html(resp);loadSymbolOff();}, 'html');
 	}
 }
 
@@ -104,7 +105,8 @@ $(function() {
 	    var varnewname = $('#newName').val();
 	    
 	    $.ajaxSetup({ async: false });
-		$.post(ajaxhandler, {action:'renameRecordPreset',source:'PresetFunctions',kid:varkid,name:varnewname,pid:pid,sid:sid}, function(resp){$("#ajaxstatus").html(resp);}, 'html');
+		loadSymbolOn();
+		$.post(ajaxhandler, {action:'renameRecordPreset',source:'PresetFunctions',kid:varkid,name:varnewname,pid:pid,sid:sid}, function(resp){$("#ajaxstatus").html(resp);loadSymbolOff();}, 'html');
 		PrintRecordPresets(pid,sid);
 		$.ajaxSetup({ async: true });
 	});
@@ -115,7 +117,8 @@ $(function() {
 		var varkid = $(this).attr('name');
 		
 		$.ajaxSetup({ async: false });
-		$.post(ajaxhandler, {action:'demoteRecordPreset',source:'PresetFunctions',kid:varkid,pid:pid,sid:sid}, function(resp){$("#ajaxstatus").html(resp);}, 'html');
+		loadSymbolOn();
+		$.post(ajaxhandler, {action:'demoteRecordPreset',source:'PresetFunctions',kid:varkid,pid:pid,sid:sid}, function(resp){$("#ajaxstatus").html(resp);loadSymbolOff();}, 'html');
 		PrintRecordPresets(pid,sid);
 		$.ajaxSetup({ async: true });
 	});
@@ -127,7 +130,8 @@ $(function() {
 		var name = $('#presetName').val();
 		
 		$.ajaxSetup({ async: false });
-		$.post(ajaxhandler, {action:'addRecordPreset',source:'PresetFunctions',name:name,kid:varkid,pid:pid,sid:sid}, function(resp){$("#ajaxstatus").html(resp);}, 'html');
+		loadSymbolOn();
+		$.post(ajaxhandler, {action:'addRecordPreset',source:'PresetFunctions',name:name,kid:varkid,pid:pid,sid:sid}, function(resp){$("#ajaxstatus").html(resp);loadSymbolOff();}, 'html');
 		$.ajaxSetup({ async: true });
 	});
 	
@@ -170,6 +174,7 @@ $(function() {
 					fd.append($(this).attr('name'), $(this).val());
 				}
 				
+				loadSymbolOn();
 				$.ajax({
 					url: 'ajax/control.php',
 					data: fd,
@@ -183,6 +188,7 @@ $(function() {
 						}else{
 							kcdiv.attr('kcvalid','invalid');
 						}
+						loadSymbolOff();
 					}
 				});	
 				
@@ -295,7 +301,7 @@ $(function() {
 		fd.append('action','RecordIngest');
 
 		// MAYBE COULD USE INTERJECT A PROGRESS HANDLER HERE TOO?
-		
+		loadSymbolOn();
 		$.ajax({
 			url: 'ajax/control.php',
 			data: fd,
@@ -304,7 +310,9 @@ $(function() {
 			type: 'POST',
 			success: function(data){
 				var splstr = data.split("%");
-				$('#ajaxstatus').html(splstr[0]+"<meta http-equiv='refresh' content='1;url=viewObject.php?rid="+splstr[1]+"'>");
+				var baseURI = $('#kora_globals').attr('baseURI');
+				window.location.replace(baseURI+'viewObject.php?rid='+splstr[1]);
+				loadSymbolOff();
 			}
 		});		
 		
@@ -354,6 +362,7 @@ $(function() {
 		var sid = $('#kora_globals').attr('sid');
 		var data = 'rid='+rid+'&pid='+pid+'&sid='+sid+'&approved=1';
 		$('div.record'+rid).block({ message: '<h1>'+kgt_pi_approving_data+'</h1>'});
+		loadSymbolOn();
 		$.ajax({
 			url: "ingestApprovedData.php",
 			type: "GET",
@@ -362,7 +371,7 @@ $(function() {
 			success: function () {
 				$('div.record').unblock();
 				$("div.record"+rid).showHtml("Approved", 400);
-				
+				loadSymbolOff();
 				//Find a way to return results from ingestApprovedData.php
 				//Shouldn't be a string "Approved" should be from .php
 			}
@@ -381,6 +390,7 @@ $(function() {
 		var sid = $('#kora_globals').attr('sid');
 		var data = 'rid='+rid+'&pid='+pid+'&sid='+sid+'&approved=0';
 			$('div.record'+rid).block({ message: '<h1>'+kgt_pi_denying_data+'</h1>'});
+			loadSymbolOn();
 			$.ajax({
 				url: "ingestApprovedData.php",
 				type: "GET",
@@ -388,6 +398,7 @@ $(function() {
 				cache: false,
 				success: function () {
 					$("div.record"+rid).showHtml("Denied", 400);
+					loadSymbolOff();
 				}
 			});
 		}
@@ -404,6 +415,7 @@ $(function() {
 		var sid = $('#kora_globals').attr('sid');
 		var data = 'rid=all'+'&pid='+pid+'&sid='+sid+'&approved=0';
 			$.blockUI({ message: '<h1>'+kgt_pi_denying_all_data+'</h1>' });
+			loadSymbolOn();
 			$.ajax({
 				url: "ingestApprovedData.php",
 				type: "GET",
@@ -411,7 +423,8 @@ $(function() {
 				cache: false,
 				success: function () {
 					$.unblockUI();
-					$("div.recordAll").showHtml("Denied All", 400); 
+					$("div.recordAll").showHtml("Denied All", 400);
+					loadSymbolOff();					
 				}
 			});
 		}
@@ -436,7 +449,8 @@ $(function() {
 		var rid = $('#kora_globals').attr('rid');
 	    
 	    $.ajaxSetup({ async: false });
-		$.post(ajaxhandler, {action:'deleteRecord',rid:rid,pid:pid,sid:sid}, function(resp){$("#ajaxstatus").html(resp);}, 'html');
+		loadSymbolOn();
+		$.post(ajaxhandler, {action:'deleteRecord',rid:rid,pid:pid,sid:sid}, function(resp){$("#ajaxstatus").html(resp);loadSymbolOff();}, 'html');
 		$.ajaxSetup({ async: true });
 		
 		window.location = 'searchResults.php?pid='+pid+'&sid='+sid;

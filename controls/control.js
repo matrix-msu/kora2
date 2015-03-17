@@ -13,7 +13,8 @@ $(function() {
 				$.ajaxSetup({ async: false });					
 				if (answer == true) {
 					var cname = $(this).parents('.kora_control_opts').first().find('.ctrlopt_name').val();
-					$.post(ajaxhandler, {action:"SetName",source:"Control",pid:pid,sid:sid,cid:cid,cname:cname},function(resp){$("#global_error").append(resp);}, 'html');
+					loadSymbolOn();
+					$.post(ajaxhandler, {action:"SetName",source:"Control",pid:pid,sid:sid,cid:cid,cname:cname},function(resp){$("#global_error").append(resp);loadSymbolOff();}, 'html');
 				}
 				PrintControlOpts(pid,sid,cid);
 				$.ajaxSetup({ async: true });
@@ -26,7 +27,8 @@ $(function() {
 						var sid = $('#kora_globals').attr('sid');
 						var cid = $(this).parents('.kora_control_opts').first().attr('cid');
 						$.ajaxSetup({ async: false });
-						$.post(ajaxhandler, {action:"SetDesc",source:"Control",pid:pid,sid:sid,cid:cid,cdesc:$(this).val()},function(resp){$("#global_error").append(resp);}, 'html');
+						loadSymbolOn();
+						$.post(ajaxhandler, {action:"SetDesc",source:"Control",pid:pid,sid:sid,cid:cid,cdesc:$(this).val()},function(resp){$("#global_error").append(resp);loadSymbolOff();}, 'html');
 						PrintControlOpts(pid,sid,cid);
 						$.ajaxSetup({ async: true });
 				});
@@ -38,7 +40,8 @@ $(function() {
 				var sid = $('#kora_globals').attr('sid');
 				var cid = $(this).parents('.kora_control_opts').first().attr('cid');
 				$.ajaxSetup({ async: false });
-				$.post(ajaxhandler, {action:"SetStdOption",source:"Control",pid:pid,sid:sid,cid:cid,ctrlopt:"required",ctrloptval:$(this).is(':checked')},function(resp){$("#global_error").append(resp);}, 'html');
+				loadSymbolOn();
+				$.post(ajaxhandler, {action:"SetStdOption",source:"Control",pid:pid,sid:sid,cid:cid,ctrlopt:"required",ctrloptval:$(this).is(':checked')},function(resp){$("#global_error").append(resp);loadSymbolOff();}, 'html');
 				PrintControlOpts(pid,sid,cid);
 				$.ajaxSetup({ async: true });
 		});
@@ -49,7 +52,8 @@ $(function() {
 				var sid = $('#kora_globals').attr('sid');
 				var cid = $(this).parents('.kora_control_opts').first().attr('cid');
 				$.ajaxSetup({ async: false });
-				$.post(ajaxhandler, {action:"SetStdOption",source:"Control",pid:pid,sid:sid,cid:cid,ctrlopt:"searchable",ctrloptval:$(this).is(':checked')},function(resp){$("#global_error").append(resp);}, 'html');
+				loadSymbolOn();
+				$.post(ajaxhandler, {action:"SetStdOption",source:"Control",pid:pid,sid:sid,cid:cid,ctrlopt:"searchable",ctrloptval:$(this).is(':checked')},function(resp){$("#global_error").append(resp);loadSymbolOff();}, 'html');
 				PrintControlOpts(pid,sid,cid);
 				$.ajaxSetup({ async: true });
 		});
@@ -60,7 +64,8 @@ $(function() {
 				var sid = $('#kora_globals').attr('sid');
 				var cid = $(this).parents('.kora_control_opts').first().attr('cid');
 				$.ajaxSetup({ async: false });
-				$.post(ajaxhandler, {action:"SetStdOption",source:"Control",pid:pid,sid:sid,cid:cid,ctrlopt:"advsearchable",ctrloptval:$(this).is(':checked')},function(resp){$("#global_error").append(resp);}, 'html');
+				loadSymbolOn();
+				$.post(ajaxhandler, {action:"SetStdOption",source:"Control",pid:pid,sid:sid,cid:cid,ctrlopt:"advsearchable",ctrloptval:$(this).is(':checked')},function(resp){$("#global_error").append(resp);loadSymbolOff();}, 'html');
 				PrintControlOpts(pid,sid,cid);
 				$.ajaxSetup({ async: true });
 		});
@@ -71,7 +76,8 @@ $(function() {
 				var sid = $('#kora_globals').attr('sid');
 				var cid = $(this).parents('.kora_control_opts').first().attr('cid');
 				$.ajaxSetup({ async: false });
-				$.post(ajaxhandler, {action:"SetStdOption",source:"Control",pid:pid,sid:sid,cid:cid,ctrlopt:"showinresults",ctrloptval:$(this).is(':checked')},function(resp){$("#global_error").append(resp);}, 'html');
+				loadSymbolOn();
+				$.post(ajaxhandler, {action:"SetStdOption",source:"Control",pid:pid,sid:sid,cid:cid,ctrlopt:"showinresults",ctrloptval:$(this).is(':checked')},function(resp){$("#global_error").append(resp);loadSymbolOff();}, 'html');
 				PrintControlOpts(pid,sid,cid);
 				$.ajaxSetup({ async: true });
 		});
@@ -82,7 +88,8 @@ $(function() {
 				var sid = $('#kora_globals').attr('sid');
 				var cid = $(this).parents('.kora_control_opts').first().attr('cid');
 				$.ajaxSetup({ async: false });
-				$.post(ajaxhandler, {action:"SetStdOption",source:"Control",pid:pid,sid:sid,cid:cid,ctrlopt:"publicentry",ctrloptval:$(this).is(':checked')},function(resp){$("#global_error").append(resp);}, 'html');
+				loadSymbolOn();
+				$.post(ajaxhandler, {action:"SetStdOption",source:"Control",pid:pid,sid:sid,cid:cid,ctrlopt:"publicentry",ctrloptval:$(this).is(':checked')},function(resp){$("#global_error").append(resp);loadSymbolOff();}, 'html');
 				PrintControlOpts(pid,sid,cid);
 				$.ajaxSetup({ async: true });
 		});
@@ -96,6 +103,7 @@ function PrintControlOpts(pid,sid,cid)
 	
 	if (($('#colorbox').length > 0) && ($('#cboxContent').length > 0))
 	{
-		$.post(ajaxhandler,{action:"ShowDialog",source:"Control",pid:pid,sid:sid,cid:cid}, function(resp){$("#cboxContent").html(resp);}, 'html');
+		loadSymbolOn();
+		$.post(ajaxhandler,{action:"ShowDialog",source:"Control",pid:pid,sid:sid,cid:cid}, function(resp){$("#cboxContent").html(resp);loadSymbolOff();}, 'html');
 	}
 }

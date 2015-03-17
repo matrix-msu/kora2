@@ -58,7 +58,7 @@ class Manager {
 		Manager::AddJS('//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js', Manager::JS_CORE);
 		Manager::AddJS('javascripts/gettext.js.php', Manager::JS_CORE);
 		Manager::AddJS('includes/thickbox/thickbox.js', Manager::JS_LIB);
-		//Manager::AddJS('javascripts/common.js', Manager::JS_CORE);
+		Manager::AddJS('javascripts/loading.js', Manager::JS_CORE);
 		
 		// ADD STYLE FOR SELECTED PROJECT (OR DEFAULT IF NO PROJ)
 		if (Manager::GetProject()) { Manager::AddCSS(Manager::GetProject()->GetStylePath(), Manager::CSS_THEME); }

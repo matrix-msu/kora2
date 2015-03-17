@@ -885,6 +885,7 @@ class Project
 		<th>'.gettext('Delete Scheme').'</th>
 		<th>'.gettext('Export Scheme').'</th>
 		<th>'.gettext('Moderate Public Ingestion').'</th>
+		<th>'.gettext('View Search').'</th>
 		<th>'.gettext('Action').'</th>';
 		while($array = $results->fetch_assoc()) {
 			echo '<tr><td><div style="width: 200px; overflow: hidden;">'.htmlEscape($array['name']).'</td>
@@ -921,8 +922,15 @@ class Project
 			echo ' /></td><td><input type="checkbox"  name="gpexportscheme" gid="'.$array['gid'].'" perm="'.EXPORT_SCHEME.'"';
 			if($array['permissions'] & EXPORT_SCHEME )
 				echo ' checked="true" ';
+			if($array['gid'] == $this->GetAdminGID())
+				echo ' disabled="true" ';
 			echo ' /></td><td><input type="checkbox"  name="gpmoderator" gid="'.$array['gid'].'" perm="'.MODERATOR.'"';
 			if($array['permissions'] & MODERATOR )
+				echo ' checked="true" ';
+			if($array['gid'] == $this->GetAdminGID())
+				echo ' disabled="true" ';
+			echo ' /></td><td><input type="checkbox"  name="gpviewsearch" gid="'.$array['gid'].'" perm="'.VIEW_SEARCH.'"';
+			if($array['permissions'] & VIEW_SEARCH )
 				echo ' checked="true" ';
 			if($array['gid'] == $this->GetAdminGID())
 				echo ' disabled="true" ';
@@ -941,6 +949,7 @@ class Project
 		<td><input type="checkbox" name="newdelscheme" id="newdelscheme" /></td>
 		<td><input type="checkbox" name="newexport" id="newexport"/></td>
 		<td><input type="checkbox" name="newmoderator" id="newmoderator"/></td>
+		<td><input type="checkbox" name="newviewsearch" id="newviewsearch"/></td>
 		<td><a class="link addgroup" onclick="addGroup()">'.gettext('Add').'</a></tr>
 		</table>';
 	}
@@ -1020,10 +1029,11 @@ class Project
 	  * @param string $delscheme
 	  * @param string $export
 	  * @param string $moderator
+	  * @param string $viewsearch
 	  *
 	  * @return result string on success
 	  */
-	public function addGroup($name,$admin,$ingestobj,$delobj,$edit,$create,$delscheme,$export,$moderator) {
+	public function addGroup($name,$admin,$ingestobj,$delobj,$edit,$create,$delscheme,$export,$moderator,$viewsearch) {
 		global $db;
 		$perms = 0;
 		if(!empty($name)) {
@@ -1043,6 +1053,8 @@ class Project
 				$perms += EXPORT_SCHEME;
 			if($moderator == "true")
 				$perms += MODERATOR;
+			if($viewsearch == "true")
+				$perms += VIEW_SEARCH;
 			
 			print DoQueryPrintError("INSERT INTO permGroup (pid,name,permissions) VALUES ({$this->GetPID()},".escape($name).",$perms)",
 				gettext('Group added to project'),

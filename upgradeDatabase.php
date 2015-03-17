@@ -1383,6 +1383,36 @@ if(version_compare($systemInfo['version'], '2.6.1', '<'))
 	echo '<br />';
 	flush();
 }
+if(version_compare($systemInfo['version'], '2.6.2', '<'))
+{
+	// THERE WERE NO DATABASE UPDATES BETWEEN 2.6.1 AND 2.6.2
+	$allUpdated = true;
+	
+	if($allUpdated)
+	{
+		echo gettext('Successful');
+	}
+	else
+	{
+		echo '<font color="#ff0000">'.gettext('Failed').'</font>';
+		$allTestsPassed = false;
+	}
+	echo "</strong><br/>";
+	
+	//Change version number
+	if ($allTestsPassed)
+	{
+		$result = $db->query("UPDATE systemInfo SET version='2.6.2' WHERE baseURL=".escape(baseURI).' LIMIT 1');
+		if (isset($_SESSION['dbVersion']))
+		{
+			$_SESSION['dbVersion'] = '2.6.2';
+		}
+	}
+	//Mark anyUpdatesDone as true
+	$anyUpdatesDone = true;
+	echo '<br />';
+	flush();
+}
 
 
 if (!$anyUpdatesDone)

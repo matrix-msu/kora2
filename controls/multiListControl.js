@@ -54,7 +54,8 @@ $(function() {
 			
 			//send them
 			$.ajaxSetup({ async: false });
-			$.post(ajaxhandler, {action:'updateMultiDef',source:'MultiListControl',pid:pid,sid:sid,cid:cid,options:options,defVal:defVal}, function(resp){$("#ajaxstatus").html(resp);}, 'html');
+			loadSymbolOn();
+			$.post(ajaxhandler, {action:'updateMultiDef',source:'MultiListControl',pid:pid,sid:sid,cid:cid,options:options,defVal:defVal}, function(resp){$("#ajaxstatus").html(resp);loadSymbolOff();}, 'html');
 			PrintControlOpts(pid,sid,cid);
 			$.ajaxSetup({ async: true });
 		}
@@ -72,12 +73,19 @@ function KCMLC_Validate(kcdiv)
 	fd.append('pid',kcdiv.attr('kpid'));
 	fd.append('sid',kcdiv.attr('ksid'));
 	fd.append('cid',kcdiv.attr('kcid'));
-	var datavals = [];
+	var datavals = '';
+	var first = true;
 	datadom.find('option:selected').each(function() {
-			datavals.push(this.value);
+			if(first){
+				datavals += this.value;
+				first = false;
+			}else{
+				datavals += '<MLC>'+this.value;
+			}
 	});
 	fd.append(datadom.attr('name'), datavals);
 	
+	loadSymbolOn();
 	$.ajax({
 			url: 'ajax/control.php',
 			data: fd,
@@ -92,6 +100,7 @@ function KCMLC_Validate(kcdiv)
 				}else{
 					kcdiv.attr('kcvalid','invalid');
 				}
+				loadSymbolOff();
 			}
 	});		
 	

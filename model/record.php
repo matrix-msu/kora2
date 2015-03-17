@@ -223,9 +223,14 @@ class Record
 			$assocQuery = $assocQuery->fetch_assoc();
 			$xml = simplexml_load_string($assocQuery['value']);
 			
-			if (isset($xml->assoc->kid))
-				{ $this->associatedrecords[] = $xml->assoc->kid; }
+			if (isset($xml->assoc->kid)){ 
+				$kids = (array)$xml;
+				for($i=0;$i<sizeof($kids['assoc']);$i++){
+					array_push($this->associatedrecords,$kids['assoc'][$i]->kid);
+				}
+			}
 		}
+		
 		return $this->associatedrecords;
 	}
 	
@@ -437,13 +442,19 @@ class Record
 		
 		if (sizeof($this->GetAssociatedRecords()) > 0)
 		{
-			echo '<tr><td colspan="2"><strong>'.gettext('The following records associate to this record').':</strong><br /><br />';
-			foreach($this->GetAssociatedRecords() as $assockid)
-			{
-				echo '<a href="viewObject.php?rid='.(string)$assockid.'">'.(string)$assockid.'</a><br />';
+			$assockids = array();
+			foreach($this->GetAssociatedRecords() as $assockid){
+				array_push($assockids,$assockid);
 			}
-			echo '<br /><em>'.gettext('Note: You may not have authorization to view any or all of these records').'</em><br />';
-			echo '</td></tr>';    	
+			if(sizeof($assockids)>0){
+				echo '<tr><td colspan="2"><strong>'.gettext('The following records associate to this record').':</strong><br /><br />';
+				foreach(array_unique($assockids) as $assockid)
+				{
+					echo '<a href="viewObject.php?rid='.(string)$assockid.'">'.(string)$assockid.'</a><br />';
+				}
+				echo '<br /><em>'.gettext('Note: You may not have authorization to view any or all of these records').'</em><br />';
+				echo '</td></tr>';    
+			}				
 		}
 		echo '</table>';
 	}

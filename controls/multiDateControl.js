@@ -165,7 +165,8 @@ function KCMDC_SaveDefaultValue()
 	});
 	
 	$.ajaxSetup({ async: false });
-	$.post(ajaxhandler, {action:'saveMDDefault',source:'MultiDateControl',pid:pid,sid:sid,cid:cid,values:defdates}, function(resp){$("#ajaxstatus").html(resp);}, 'html');
+	loadSymbolOn();
+	$.post(ajaxhandler, {action:'saveMDDefault',source:'MultiDateControl',pid:pid,sid:sid,cid:cid,values:defdates}, function(resp){$("#ajaxstatus").html(resp);loadSymbolOff();}, 'html');
 	$.ajaxSetup({ async: true });
 }
 
@@ -186,6 +187,7 @@ function KCMDC_Validate(kcdiv)
 	});
 	fd.append(datadom.attr('name'), datavals);
 	
+	loadSymbolOn();
 	$.ajax({
 			url: 'ajax/control.php',
 			data: fd,
@@ -200,6 +202,7 @@ function KCMDC_Validate(kcdiv)
 				}else{
 					kcdiv.attr('kcvalid','invalid');
 				}
+				loadSymbolOff();
 			}
 	});		
 	

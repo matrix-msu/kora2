@@ -138,6 +138,7 @@ class AssociatorControl extends Control {
 		echo '<table border="0">';
 		echo '<tr><td><input type="text" class="kcac_findrec" name="Search'.$this->cid.'" value="" /></td>';
 		echo '<td><input type="button" class="kcac_findrec" value="'.gettext('Find a Record').'" /></td></tr>';
+		echo gettext('Search using exact KID. Partial or incorrect KIDs will produce no results.');
 		echo '<tr><td>';
 		echo '<select id="'.$this->cName.'" name="'.$this->cName.'[]" class="kcac_curritems fullsizemultitext" multiple="multiple" size="5">'."\n";
 		if (isset($this->value->kid))

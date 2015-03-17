@@ -1147,7 +1147,7 @@ class KORA_Clause
                  
                     else if(strtoupper($this->operator)=='LIKE'){
 						//If it s LIKE. find a cid because it's control specific
-						$controlQuery = "SELECT cid FROM p".$projectID."Control WHERE name = '$this->arg1'";
+						$controlQuery = "SELECT cid FROM p".$projectID."Control WHERE schemeid=".$schemeID." AND name = '$this->arg1'";
 						$controlResult = $db->query($controlQuery)->fetch_assoc();
 						//add specific cid for LIKE comparison to main query
 						$query .='cid = "'.$controlResult['cid'].'" AND ';

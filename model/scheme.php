@@ -934,6 +934,11 @@ class Scheme
 			Manager::PrintErrDiv($name." ".gettext('is not a valid control name'));
 			return false;
 		}
+		$xmlInvalids = array('&', '<', '>', '"', "'");
+		if (count(array_intersect($xmlInvalids, str_split($name))) != 0) {
+			Manager::PrintErrDiv(gettext('You should not use invalid<br> XML characters (&, <, >, ", '."'".') for the name.'));
+			return false;
+		}
 		$nameQuery  = "SELECT cid FROM p".$this->pid."Control ";
 		$nameQuery .= "WHERE schemeid=".$this->sid;
 		$nameQuery .= " AND name='".trim($name)."'";

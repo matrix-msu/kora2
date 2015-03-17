@@ -359,7 +359,6 @@ var MappingManager = new function() {
 			{
 				ingestdata.push(obj[key]);
 				ingestmap.push(mapping[key]);
-				//console.log('key['+key+']:ingestdata ['+mapping[key]+']:['+obj[key]+']');
 			}
 	
 			var ingestdiv = '<div class="pending_ingest" id="pending_ingest_'+index+'" ki_index="'+index+'">Ingesting ...';
@@ -382,8 +381,10 @@ var MappingManager = new function() {
 		$('#'+continueButtonId)[0].disabled = true;
 		$('#'+cancelButtonId)[0].disabled = true;
 		$('#'+indicatorId).show();
+		$('.importer_table_keys').attr('hidden','');
 		
 		var count = 0;
+		var succ = 0;
 		
 		$.each(allingestdata, function(index, obj) {
 			var thedata = allingestdata[index];
@@ -406,20 +407,21 @@ var MappingManager = new function() {
 						$('#pending_ingest_'+index).append('<div class="link kri_showdata">Click here to show/hide data</div>'); 
 					}
 					else
-					{ $('#pending_ingest_'+index).addClass('pending_ingest_good'); }
+					{ 
+						$('#pending_ingest_'+index).addClass('pending_ingest_good'); 
+						succ++;
+					}
 					count++;
 					$('.kora_import_progress').text("Ingested record "+count+" of "+allingestdata.length);
-					if(count>=(allingestdata.length-1)){
-						$('.kora_import_progress').text("Finished.");
+					if(count>=(allingestdata.length)){
 						var pid = $('#kora_globals').attr('pid');
 						var sid = $('#kora_globals').attr('sid');
-						window.location.href = "searchResults.php?pid="+pid+"&sid="+sid;
+						$('.kora_import_progress').html("Finished. "+succ+ " out of "+allingestdata.length+" ingested. <a href='searchResults.php?pid="+pid+"&sid="+sid+"'>View Scheme Records</a>");
 					}
 				},
 				error: function(data) {
 					$('#pending_ingest_'+index).append(data);
 					$('#pending_ingest_'+index).addClass('pending_ingest_fail');
-					console.log(data);
 				}
 			});
 		});

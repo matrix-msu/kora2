@@ -84,7 +84,7 @@ $(function() {
 			fd.append('action','CreateControl');
 			fd.append('source','SchemeFunctions');
 			
-			
+			loadSymbolOn();
 			$.ajax({
 				url: 'ajax/scheme.php',
 				data: fd,
@@ -96,11 +96,13 @@ $(function() {
 					if (resp == ""){ check_error = 1; }
 					$("#cbox_error").html(resp);
 					$.colorbox.resize();
+					loadSymbolOff();
 				}
 			});
 			
 			if ( check_error == 1){ $.colorbox.close(); } //If no error, close cbox
-			$.post('ajax/scheme.php', {action:'PrintSchemeLayout',source:'SchemeFunctions',pid:pid,sid:sid}, function(resp){$("#apschemecontrols").html(resp);}, 'html');
+			loadSymbolOn();
+			$.post('ajax/scheme.php', {action:'PrintSchemeLayout',source:'SchemeFunctions',pid:pid,sid:sid}, function(resp){$("#apschemecontrols").html(resp);loadSymbolOff();}, 'html');
 		});
 	});
 	
@@ -123,6 +125,7 @@ $(function() {
 			fd.append('action','CreateCollection');
 			fd.append('source','SchemeFunctions');
 			
+			loadSymbolOn();
 			$.ajax({
 				url: 'ajax/scheme.php',
 				data: fd,
@@ -134,11 +137,13 @@ $(function() {
 					if (resp == ""){ check_error = 1; }
 					$("#cbox_error").append(resp);
 					$.colorbox.resize();
+					loadSymbolOff();
 				}
 			});
 			
 			if ( check_error == 1){ $.colorbox.close(); } //If no error, close cbox
-			$.post('ajax/scheme.php', {action:'PrintSchemeLayout',source:'SchemeFunctions',pid:pid,sid:sid}, function(resp){$("#apschemecontrols").html(resp);}, 'html');
+			loadSymbolOn();
+			$.post('ajax/scheme.php', {action:'PrintSchemeLayout',source:'SchemeFunctions',pid:pid,sid:sid}, function(resp){$("#apschemecontrols").html(resp);loadSymbolOff();}, 'html');
 		});
 	});
 	
@@ -163,6 +168,7 @@ $(function() {
 			fd.append('action','UpdateCollection');
 			fd.append('source','SchemeFunctions');
 			
+			loadSymbolOn();
 			$.ajax({
 				url: 'ajax/scheme.php',
 				data: fd,
@@ -174,11 +180,13 @@ $(function() {
 					if (resp == ""){ check_error = 1; }
 					$("#cbox_error").append(resp);
 					$.colorbox.resize();
+					loadSymbolOff();
 				}
 			});
 			
 			if ( check_error == 1){ $.colorbox.close(); } //If no error, close cbox
-			$.post('ajax/scheme.php', {action:'PrintSchemeLayout',source:'SchemeFunctions',pid:pid,sid:sid}, function(resp){$("#apschemecontrols").html(resp);}, 'html');
+			loadSymbolOn();
+			$.post('ajax/scheme.php', {action:'PrintSchemeLayout',source:'SchemeFunctions',pid:pid,sid:sid}, function(resp){$("#apschemecontrols").html(resp);loadSymbolOff();}, 'html');
 		});
 	});
 	
@@ -199,8 +207,9 @@ $(function() {
 		var sid = $('#kora_globals').attr('sid');
 		var cid = c.parents('.scheme_collection').first().attr('kcollid');
 		$.ajaxSetup({ async: false });
+		loadSymbolOn();
 		$.post("ajax/scheme.php",{action:"MoveSchemeCollection",source:"SchemeFunctions",pid:pid,sid:sid,movecid:cid,direction:"up"},function(resp){$("#global_error").append(resp);}, 'html');
-		$.post('ajax/scheme.php', {action:'PrintSchemeLayout',source:'SchemeFunctions',pid:pid,sid:sid}, function(resp){$("#apschemecontrols").html(resp);}, 'html');
+		$.post('ajax/scheme.php', {action:'PrintSchemeLayout',source:'SchemeFunctions',pid:pid,sid:sid}, function(resp){$("#apschemecontrols").html(resp);loadSymbolOff();}, 'html');
 		$.ajaxSetup({ async: true });
 	});
 
@@ -210,8 +219,9 @@ $(function() {
 		var sid = $('#kora_globals').attr('sid');
 		var cid = c.parents('.move_collection').prevAll('.scheme_collection').first().attr('kcollid');
 		$.ajaxSetup({ async: false });
+		loadSymbolOn();
 		$.post("ajax/scheme.php", {action:"MoveSchemeCollection",source:"SchemeFunctions",pid:pid,sid:sid,movecid:cid,direction:"down"},function(resp){$("#global_error").append(resp);}, 'html');
-		$.post('ajax/scheme.php', {action:'PrintSchemeLayout',source:'SchemeFunctions',pid:pid,sid:sid}, function(resp){$("#apschemecontrols").html(resp);}, 'html');
+		$.post('ajax/scheme.php', {action:'PrintSchemeLayout',source:'SchemeFunctions',pid:pid,sid:sid}, function(resp){$("#apschemecontrols").html(resp);loadSymbolOff();}, 'html');
 		$.ajaxSetup({ async: true });
 	});
 
@@ -221,8 +231,9 @@ $(function() {
 		var sid = $('#kora_globals').attr('sid');
 		var cid = c.parents('.scheme_control').first().attr('kcid');
 		$.ajaxSetup({ async: false });
+		loadSymbolOn();
 		$.post("ajax/scheme.php",{action:"MoveSchemeControl",source:"SchemeFunctions",pid:pid,sid:sid,movecid:cid,direction:"up"},function(resp){$("#global_error").append(resp);}, 'html');
-		$.post('ajax/scheme.php', {action:'PrintSchemeLayout',source:'SchemeFunctions',pid:pid,sid:sid}, function(resp){$("#apschemecontrols").html(resp);}, 'html');
+		$.post('ajax/scheme.php', {action:'PrintSchemeLayout',source:'SchemeFunctions',pid:pid,sid:sid}, function(resp){$("#apschemecontrols").html(resp);loadSymbolOff();}, 'html');
 		$.ajaxSetup({ async: true });
 	});
 
@@ -232,8 +243,9 @@ $(function() {
 		var sid = $('#kora_globals').attr('sid');
 		var cid = c.parents('.scheme_control').first().attr('kcid');
 		$.ajaxSetup({ async: false });
+		loadSymbolOn();
 		$.post("ajax/scheme.php", {action:"MoveSchemeControl",source:"SchemeFunctions",pid:pid,sid:sid,movecid:cid,direction:"down"},function(resp){$("#global_error").append(resp);}, 'html');
-		$.post('ajax/scheme.php', {action:'PrintSchemeLayout',source:'SchemeFunctions',pid:pid,sid:sid}, function(resp){$("#apschemecontrols").html(resp);}, 'html');
+		$.post('ajax/scheme.php', {action:'PrintSchemeLayout',source:'SchemeFunctions',pid:pid,sid:sid}, function(resp){$("#apschemecontrols").html(resp);loadSymbolOff();}, 'html');
 		$.ajaxSetup({ async: true });
 	});
 
@@ -251,7 +263,8 @@ $(function() {
 		var sid = $('#kora_globals').attr('sid');
 		var cid = c.parents('.scheme_control').first().attr('kcid');
 		$.ajaxSetup({ async: false });
-		$.post("ajax/control.php", {action:"SetStdOption",source:"SchemeFunctions",pid:pid,sid:sid,cid:cid,ctrlopt:"required",ctrloptval:$(this).is(':checked')},function(resp){$("#global_error").append(resp);}, 'html');
+		loadSymbolOn();
+		$.post("ajax/control.php", {action:"SetStdOption",source:"SchemeFunctions",pid:pid,sid:sid,cid:cid,ctrlopt:"required",ctrloptval:$(this).is(':checked')},function(resp){$("#global_error").append(resp);loadSymbolOff();}, 'html');
 		DisablePublicIngest();
 		$.ajaxSetup({ async: true });
 	});
@@ -262,7 +275,8 @@ $(function() {
 		var sid = $('#kora_globals').attr('sid');
 		var cid = c.parents('.scheme_control').first().attr('kcid');
 		$.ajaxSetup({ async: false });
-		$.post("ajax/control.php", {action:"SetStdOption",source:"SchemeFunctions",pid:pid,sid:sid,cid:cid,ctrlopt:"searchable",ctrloptval:$(this).is(':checked')},function(resp){$("#global_error").append(resp);}, 'html');
+		loadSymbolOn();
+		$.post("ajax/control.php", {action:"SetStdOption",source:"SchemeFunctions",pid:pid,sid:sid,cid:cid,ctrlopt:"searchable",ctrloptval:$(this).is(':checked')},function(resp){$("#global_error").append(resp);loadSymbolOff();}, 'html');
 		DisablePublicIngest();
 		$.ajaxSetup({ async: true });
 	});
@@ -273,7 +287,8 @@ $(function() {
 		var sid = $('#kora_globals').attr('sid');
 		var cid = c.parents('.scheme_control').first().attr('kcid');
 		$.ajaxSetup({ async: false });
-		$.post("ajax/control.php", {action:"SetStdOption",source:"SchemeFunctions",pid:pid,sid:sid,cid:cid,ctrlopt:"advsearchable",ctrloptval:$(this).is(':checked')},function(resp){$("#global_error").append(resp);}, 'html');
+		loadSymbolOn();
+		$.post("ajax/control.php", {action:"SetStdOption",source:"SchemeFunctions",pid:pid,sid:sid,cid:cid,ctrlopt:"advsearchable",ctrloptval:$(this).is(':checked')},function(resp){$("#global_error").append(resp);loadSymbolOff();}, 'html');
 		DisablePublicIngest();
 		$.ajaxSetup({ async: true });
 	});
@@ -284,7 +299,8 @@ $(function() {
 		var sid = $('#kora_globals').attr('sid');
 		var cid = c.parents('.scheme_control').first().attr('kcid');
 		$.ajaxSetup({ async: false });
-		$.post("ajax/control.php", {action:"SetStdOption",source:"SchemeFunctions",pid:pid,sid:sid,cid:cid,ctrlopt:"showinresults",ctrloptval:$(this).is(':checked')},function(resp){$("#global_error").append(resp);}, 'html');
+		loadSymbolOn();
+		$.post("ajax/control.php", {action:"SetStdOption",source:"SchemeFunctions",pid:pid,sid:sid,cid:cid,ctrlopt:"showinresults",ctrloptval:$(this).is(':checked')},function(resp){$("#global_error").append(resp);loadSymbolOff();}, 'html');
 		DisablePublicIngest();
 		$.ajaxSetup({ async: true });
 	});
@@ -295,7 +311,8 @@ $(function() {
 		var sid = $('#kora_globals').attr('sid');
 		var cid = c.parents('.scheme_control').first().attr('kcid');
 		$.ajaxSetup({ async: false });
-		$.post("ajax/control.php", {action:"SetStdOption",source:"SchemeFunctions",pid:pid,sid:sid,cid:cid,ctrlopt:"publicentry",ctrloptval:$(this).is(':checked')},function(resp){$("#global_error").append(resp);}, 'html');
+		loadSymbolOn();
+		$.post("ajax/control.php", {action:"SetStdOption",source:"SchemeFunctions",pid:pid,sid:sid,cid:cid,ctrlopt:"publicentry",ctrloptval:$(this).is(':checked')},function(resp){$("#global_error").append(resp);loadSymbolOff();}, 'html');
 		DisablePublicIngest();
 		$.ajaxSetup({ async: true });
 	});
@@ -308,8 +325,9 @@ $(function() {
 			var sid = $('#kora_globals').attr('sid');
 			var cid = c.parents('.scheme_control').first().attr('kcid');
 			$.ajaxSetup({ async: false });
+			loadSymbolOn();
 			$.post("ajax/scheme.php",{action:"DeleteSchemeControl",source:"SchemeFunctions",pid:pid,sid:sid,delcid:cid},function(resp){$("#global_error").append(resp);}, 'html');
-			$.post('ajax/scheme.php', {action:'PrintSchemeLayout',source:'SchemeFunctions',pid:pid,sid:sid}, function(resp){$("#apschemecontrols").html(resp);}, 'html');
+			$.post('ajax/scheme.php', {action:'PrintSchemeLayout',source:'SchemeFunctions',pid:pid,sid:sid}, function(resp){$("#apschemecontrols").html(resp);loadSymbolOff();}, 'html');
 			$.ajaxSetup({ async: true });
 		}
 	});
@@ -322,8 +340,9 @@ $(function() {
 			var sid = $('#kora_globals').attr('sid');
 			var cid = c.parents('.scheme_collection').first().attr('kcollid');
 			$.ajaxSetup({ async: false });
+			loadSymbolOn();
 			$.post("ajax/scheme.php",{action:"DeleteSchemeCollection",source:"SchemeFunctions",pid:pid,sid:sid,delcid:cid},function(resp){$("#global_error").append(resp);}, 'html');
-			$.post('ajax/scheme.php', {action:'PrintSchemeLayout',source:'SchemeFunctions',pid:pid,sid:sid}, function(resp){$("#apschemecontrols").html(resp);}, 'html');
+			$.post('ajax/scheme.php', {action:'PrintSchemeLayout',source:'SchemeFunctions',pid:pid,sid:sid}, function(resp){$("#apschemecontrols").html(resp);loadSymbolOff();}, 'html');
 			$.ajaxSetup({ async: true });
 		}
 	});
@@ -337,8 +356,9 @@ $(function() {
 			var tarpid = c.parents('.scheme_allowed_assoc').first().attr('pid');
 			var tarsid = c.parents('.scheme_allowed_assoc').first().attr('sid');
 			$.ajaxSetup({ async: false });
+			loadSymbolOn();
 			$.post("ajax/scheme.php", {action:"DeleteAllowedAssoc",source:"SchemeFunctions",pid:globalpid,sid:globalsid,delpid:tarpid,delsid:tarsid},function(resp){$("#global_error").append(resp);}, 'html');
-			$.post('ajax/scheme.php', {action:'PrintAllowedAssoc',source:'SchemeFunctions',pid:globalpid,sid:globalsid}, function(resp){$("#apschemeallowedassoc").html(resp);}, 'html');
+			$.post('ajax/scheme.php', {action:'PrintAllowedAssoc',source:'SchemeFunctions',pid:globalpid,sid:globalsid}, function(resp){$("#apschemeallowedassoc").html(resp);loadSymbolOff();}, 'html');
 			$.ajaxSetup({ async: true });
 		}
 	});
@@ -383,9 +403,10 @@ $(function() {
 		}
 		
 		$.ajaxSetup({ async: false });
+		loadSymbolOn();
 		for (var i=0; i<addsids.length; i++)
 		{ $.post("ajax/scheme.php", {action:"AddAllowedAssoc",source:"SchemeFunctions",pid:globalpid,sid:globalsid,addpid:addsids[i].attr('pid'),addsid:addsids[i].val()},function(resp){$("#global_error").append(resp);}, 'html'); }
-		$.post('ajax/scheme.php', {action:'PrintAllowedAssoc',source:'SchemeFunctions',pid:globalpid,sid:globalsid}, function(resp){$("#apschemeallowedassoc").html(resp);}, 'html');
+		$.post('ajax/scheme.php', {action:'PrintAllowedAssoc',source:'SchemeFunctions',pid:globalpid,sid:globalsid}, function(resp){$("#apschemeallowedassoc").html(resp);loadSymbolOff();}, 'html');
 		$.ajaxSetup({ async: true });
 	});
 	
@@ -395,8 +416,9 @@ $(function() {
 		var preset = $(this).is(':checked');
 		
 		$.ajaxSetup({ async: false });
+		loadSymbolOn();
 		$.post('ajax/scheme.php', {action:'UpdateSchemePreset',source:'SchemeFunctions',pid:pid,sid:sid,preset:preset}, function(resp){$("#apschemecontrols").html(resp);/*checkSelectAlls();*/}, 'html');
-		$.post('ajax/scheme.php', {action:'PrintSchemeLayout',source:'SchemeFunctions',pid:pid,sid:sid}, function(resp){$("#apschemecontrols").html(resp);/*checkSelectAlls();*/}, 'html');
+		$.post('ajax/scheme.php', {action:'PrintSchemeLayout',source:'SchemeFunctions',pid:pid,sid:sid}, function(resp){$("#apschemecontrols").html(resp);loadSymbolOff();/*checkSelectAlls();*/}, 'html');
 		$.ajaxSetup({ async: true });
 	});
 	
@@ -408,6 +430,7 @@ $(function() {
 		fd.append('action','SchemeXMLUpload');
 		fd.append('source','SchemeFunctions');
 		
+		loadSymbolOn();
 		$.ajax({
 			url: 'ajax/scheme.php',
 			data: fd,
@@ -417,6 +440,7 @@ $(function() {
 			type: 'POST',
 			success: function(resp) { 
 				$("#global_error").text(resp);
+				loadSymbolOff();
 			}
 		});
 	});
@@ -431,6 +455,7 @@ $(function() {
 		fd.append('action','MultiRecordXMLUpload');
 		fd.append('source','SchemeFunctions');
 		
+		loadSymbolOn();
 		$.ajax({
 			url: 'ajax/scheme.php',
 			data: fd,
@@ -441,10 +466,12 @@ $(function() {
 			success: function(resp) { 
 				$('#ingestXMLerror').html('');
 				$('#xmlActionDisplay').html(resp);
+				loadSymbolOff();
 			},
 			error: function() {
 				$('#ingestXMLerror').html('Invalid XML File');
 				$('#xmlActionDisplay').html();
+				loadSymbolOff();
 			}
 		});
 	});
@@ -454,7 +481,8 @@ $(function() {
 		var pid = $('#kora_globals').attr('pid');
 		var sid = $('#kora_globals').attr('sid');
 		$.ajaxSetup({ async: false });
-		$.post('ajax/scheme.php', {action:'PrintSchemeLayout',source:'SchemeFunctions',pid:pid,sid:sid}, function(resp){$("#apschemecontrols").html(resp);/*checkSelectAlls();*/}, 'html');
+		loadSymbolOn();
+		$.post('ajax/scheme.php', {action:'PrintSchemeLayout',source:'SchemeFunctions',pid:pid,sid:sid}, function(resp){$("#apschemecontrols").html(resp);loadSymbolOff();/*checkSelectAlls();*/}, 'html');
 		DisablePublicIngest();
 		$.ajaxSetup({ async: true });
 	}
@@ -464,7 +492,8 @@ $(function() {
 		var pid = $('#kora_globals').attr('pid');
 		var sid = $('#kora_globals').attr('sid');
 		$.ajaxSetup({ async: false });
-		$.post('ajax/scheme.php', {action:'PrintSetAllowedAssoc',source:'SchemeFunctions',pid:pid,sid:sid}, function(resp){$("#apschemesetallowedassoc").html(resp);}, 'html');
+		loadSymbolOn();
+		$.post('ajax/scheme.php', {action:'PrintSetAllowedAssoc',source:'SchemeFunctions',pid:pid,sid:sid}, function(resp){$("#apschemesetallowedassoc").html(resp);loadSymbolOff();}, 'html');
 		$("#apschemesetallowedassoc").find('.add_allowed_assoc_proj').trigger('change');
 		$.ajaxSetup({ async: true });
 	}
@@ -474,7 +503,8 @@ $(function() {
 		var pid = $('#kora_globals').attr('pid');
 		var sid = $('#kora_globals').attr('sid');
 		$.ajaxSetup({ async: false });
-		$.post('ajax/scheme.php', {action:'PrintAllowedAssoc',source:'SchemeFunctions',pid:pid,sid:sid}, function(resp){$("#apschemeallowedassoc").html(resp);}, 'html');
+		loadSymbolOn();
+		$.post('ajax/scheme.php', {action:'PrintAllowedAssoc',source:'SchemeFunctions',pid:pid,sid:sid}, function(resp){$("#apschemeallowedassoc").html(resp);loadSymbolOff();}, 'html');
 		$.ajaxSetup({ async: true });
 	}
 	
