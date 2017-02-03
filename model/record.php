@@ -1,5 +1,9 @@
 <?php
+namespace KORA;
 
+use KORA\Manager;
+use KORA\Scheme;
+use Exception;
 /**
 Copyright (2008) Matrix: Michigan State University
 
@@ -58,7 +62,7 @@ class Record
 	  *
 	  * @return void
 	  */
-	function Record($pid_, $sid_, $rid_=null)
+	function __construct($pid_, $sid_, $rid_=null)
 	{
 		global $db; $this->db = $db;
 		
@@ -110,7 +114,7 @@ class Record
 		$this->controlcollections = [ 0 => ['name' => 'Internal', 'description' => 'Kora Record Data', [] ] ];
 		
 		// get a list of the collections in the scheme
-		$collectionQuery = $this->db->query('SELECT collid, name, description, sequence FROM collection WHERE schemeid='.escape($this->sid).' ORDER BY sequence');
+		$collectionQuery = $this->db->query('SELECT collid, name, description, sequence FROM collection WHERE schemeid='.escape($this->sid).' ORDER BY sequence DESC');
 		while($coll = $collectionQuery->fetch_assoc())
 		{
 			$this->controlcollections[$coll['collid']] = array('name' => $coll['name'], 'description' => $coll['description'], 'controls' => array());
@@ -225,8 +229,12 @@ class Record
 			
 			if (isset($xml->assoc->kid)){ 
 				$kids = (array)$xml;
-				for($i=0;$i<sizeof($kids['assoc']);$i++){
-					array_push($this->associatedrecords,$kids['assoc'][$i]->kid);
+				if(!is_array($kids['assoc'])){
+					array_push($this->associatedrecords,$kids['assoc']->kid);
+				}else{
+					for($i=0;$i<sizeof($kids['assoc']);$i++){
+						array_push($this->associatedrecords,$kids['assoc'][$i]->kid);
+					}
 				}
 			}
 		}
@@ -324,11 +332,23 @@ class Record
  		
  		echo '<br /><strong>';
  		printf(gettext('Controls marked with a %s are required'),'<font color="#FF0000">*</font>');
- 		echo '</strong><br /><br />';
+ 		echo '</strong>';
+		
+		if(Manager::CheckRequestsAreSet(['preset'])){
+			echo "<br />".gettext("File and image fields do not populate during the cloning process. In order to clone files or images, you must download them from the original record and upload them into the appropriate field of the cloned record.");
+		}
+		
+		echo "<br /><br />";
 
 		// BEGIN OUTPUT HERE
  		$currpagecount = 0;
  		$collDivs = array();
+		//controllcollection is displayed in DESC order, ingestion uses ASC order, so we
+		// are reversing the order, however the recordowner/timestamp still needs to be hidden
+		//  so the second line puts those fields back at the first place of the array.
+		$this->controlcollections = array_reverse($this->controlcollections);
+		array_unshift($this->controlcollections, array_pop($this->controlcollections));
+		
  		foreach ($this->controlcollections as $coll)
  		{
  			// DON'T EVEN PRINT A PAGE WITH NO CONTROLS IN IT'S COLLECTION
@@ -339,8 +359,8 @@ class Record
 			ob_start();     
 			echo '<div class="'.'id'.$currpagecount.' controlCollection">'."\n";
 			echo '<h3>'.htmlEscape($coll['name']).'</h3>';
-			echo '<p id="thickboxDescrip">'.htmlEscape($coll['description']).'</p>'."<br/><br/>\n";
-			
+			echo '<p id="thickboxDescrip">'.htmlEscape($coll['description']).'</p>'."\n";
+			echo '<br/><input type="submit" class=kcri_submit value="'.gettext('Submit Data').'" /><br/><br/>';
 			foreach($coll['controls'] as $ctrl)
 			{
 				$display = false;
@@ -360,8 +380,9 @@ class Record
 				
 				if($display){
 					// THIS OUTPUTS THE ACTUAL COLUMNS
-					echo '<div class="ctrlEdit"><strong>'.htmlEscape($ctrl->GetName()).'</strong>';
+					echo '<div class="ctrlEdit"><div><strong>'.htmlEscape($ctrl->GetName()).'</strong>';
 					if ($ctrl->GetRequired()) echo ' <font color="#FF0000" class="kc_required">*</font> ';
+					echo '</div><br>';
 					echo '<div id="inlineInput">';
 					$ctrl->display();
 					echo '</div>';
@@ -450,7 +471,23 @@ class Record
 				echo '<tr><td colspan="2"><strong>'.gettext('The following records associate to this record').':</strong><br /><br />';
 				foreach(array_unique($assockids) as $assockid)
 				{
-					echo '<a href="viewObject.php?rid='.(string)$assockid.'">'.(string)$assockid.'</a><br />';
+					$parts = explode('-',$assockid);
+					$apid = hexdec($parts[0]);
+					$asid = hexdec($parts[1]);
+					
+					$collection = $db->query('SELECT * FROM collection WHERE schemeid='.$asid.' AND sequence=1');
+					if ($collection->num_rows > 0){
+						$acollid = $collection->fetch_assoc()['collid'];
+					}
+					
+					$control = $db->query('SELECT * FROM p'.$apid.'Control WHERE schemeid='.$asid.' AND collid='.$acollid.' AND sequence=1');
+					if ($control->num_rows > 0){
+						$acid = $control->fetch_assoc()['cid'];
+					}
+					
+					$ctrlprev = Manager::GetControl($apid,$acid, $assockid);
+
+					echo '<a href="viewObject.php?rid='.(string)$assockid.'">'.(string)$assockid.'</a> ['.$ctrlprev->showData().']<br />';
 				}
 				echo '<br /><em>'.gettext('Note: You may not have authorization to view any or all of these records').'</em><br />';
 				echo '</td></tr>';    
@@ -791,12 +828,12 @@ class Record
 		
 		foreach ($this->GetControls() as $ctrl)
 			{ 
-				AssociatorControl::RemoveReverseAssociation($rid,$kid,$ctrl->GetCID());
+				\AssociatorControl::RemoveReverseAssociation($rid,$kid,$ctrl->GetCID());
 				$ctrl->delete(); 
 			}
 			
 		// Clean the associations
-		AssociatorControl::CleanUpAssociatorOnDelete($rid);
+		\AssociatorControl::CleanUpAssociatorOnDelete($rid);
 		
 		return false;
 		
@@ -844,7 +881,7 @@ class Record
 			die('<div class="error">'.gettext('You cannot have an empty name').'</div>');
 		}
 		
-		if (Manager::GetUser()->HasProjectPermissions(EDIT_LAYOUT))
+		if (!Manager::GetUser()->HasProjectPermissions(EDIT_LAYOUT))
 		{
 			die('<div class="error">'.gettext('You do not have permission to create presets').'.</div>');
 		}

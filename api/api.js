@@ -33,17 +33,22 @@ var MappingManager = new function() {
 		
 	/**
 	 * Ingest the record data using the assumed xml mapping 
+	 * Base URI needed for restful api 
 	 */
-	instance.postSubmit = function (pid, sid, recordArray) {
+	instance.postSubmit = function (pid, sid, recordArray, baseURI) {
 		recordArray.forEach(function(record) {
 			$.each(record, function(index, obj) {
 				allingestmaps.push(index);
 				allingestdata.push(obj[0]);
 			});
 			
+			if(baseURI==null | baseURI==""){
+				baseURI = "../";
+			}
+			
 			$.ajax({
 				type: "POST",
-				url:  '../handleRecord.php',
+				url:  baseURI+'handleRESTRecord.php',
 				data: { pid: pid, sid: sid, ingestdata: allingestdata, ingestmap: allingestmaps },
 				datatype: 'html',
 				async: true,
@@ -61,15 +66,24 @@ var MappingManager = new function() {
 		});
 	}
 	
-	instance.putSubmit = function (pid, sid, rid, recordArray) {
+	instance.putSubmit = function (pid, sid, rid, recordArray, baseURI) {
 		$.each(recordArray[0], function(index, obj) {
 			allingestmaps.push(index);
 			allingestdata.push(obj[0]);
 		});
-		kid = pid+'-'+sid+'-'+rid;
+		
+		pid_int = parseInt(pid,10);
+		sid_int = parseInt(sid,10);
+		rid_int = parseInt(rid,10);
+		kid = pid_int.toString(16).toUpperCase()+'-'+sid_int.toString(16).toUpperCase()+'-'+rid_int.toString(16).toUpperCase();
+		
+		if(baseURI==null | baseURI==""){
+			baseURI = "../";
+		}
+		
 		$.ajax({
 			type: "POST",
-			url:  '../handleRecord.php',
+			url:  baseURI+'handleRESTRecord.php',
 			data: { pid: pid, sid: sid, rid: kid, ingestdata: allingestdata, ingestmap: allingestmaps },
 			datatype: 'html',
 			async: true,

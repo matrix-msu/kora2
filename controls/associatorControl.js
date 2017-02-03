@@ -83,8 +83,8 @@ $(function() {
 				var rid = recinfo.attr('rid');
 				console.log('Loading: '+rid);
 				$.ajaxSetup({ async: false });
-				loadSymbolOn();
-				$.post("ajax/record.php",{action:"viewRecord",source:"RecordFunctions",pid:pid,sid:sid,rid:rid},function(resp){recinfo.append(resp); recinfo.attr('loaded', 'true');loadSymbolOff(); }, 'html');
+				
+				$.post("ajax/record.php",{action:"viewRecord",source:"RecordFunctions",pid:pid,sid:sid,rid:rid},function(resp){recinfo.append(resp); recinfo.attr('loaded', 'true'); }, 'html');
 				$.ajaxSetup({ async: true });
 			}
 			// IF WE'RE ALREADY LOADED, FUTURE CLICKS WILL TOGGLE THE VIEW OF THIS TABLE IN/OUT
@@ -151,8 +151,8 @@ $(function() {
 						schemes.push($(this).attr('sid'));
 				});
 				$.ajaxSetup({ async: false });
-				loadSymbolOn();
-				$.post(ajaxhandler, {action:'updateAllowedSchemes',source:'AssociatorControl',pid:pid,sid:sid,cid:cid,schemes:schemes}, function(resp){$("#ajaxstatus").html(resp);loadSymbolOff();}, 'html');
+				
+				$.post(ajaxhandler, {action:'updateAllowedSchemes',source:'AssociatorControl',pid:pid,sid:sid,cid:cid,schemes:schemes}, function(resp){$("#ajaxstatus").html(resp);}, 'html');
 				PrintControlOpts(pid,sid,cid);
 				$.ajaxSetup({ async: true });						
 		});
@@ -164,8 +164,8 @@ $(function() {
 				var prevcid = $(this).attr('sid');
 				var prevval = $(this).val();
 				$.ajaxSetup({ async: false });
-				loadSymbolOn();
-				$.post(ajaxhandler, {action:'updatePreviewControl',source:'AssociatorControl',pid:pid,sid:sid,cid:cid,prevcid:prevcid,prevval:prevval}, function(resp){$("#ajaxstatus").html(resp);loadSymbolOff();}, 'html');
+				
+				$.post(ajaxhandler, {action:'updatePreviewControl',source:'AssociatorControl',pid:pid,sid:sid,cid:cid,prevcid:prevcid,prevval:prevval}, function(resp){$("#ajaxstatus").html(resp);}, 'html');
 				PrintControlOpts(pid,sid,cid);
 				$.ajaxSetup({ async: true });						
 		});
@@ -188,8 +188,8 @@ function KCAC_SaveDefaultValue()
 	});
 	
 	$.ajaxSetup({ async: false });
-	loadSymbolOn();
-	$.post(ajaxhandler, {action:'saveDefault',source:'AssociatorControl',pid:pid,sid:sid,cid:cid,values:defvals}, function(resp){$("#ajaxstatus").html(resp);loadSymbolOff();}, 'html');
+	
+	$.post(ajaxhandler, {action:'saveDefault',source:'AssociatorControl',pid:pid,sid:sid,cid:cid,values:defvals}, function(resp){$("#ajaxstatus").html(resp);}, 'html');
 	PrintControlOpts(pid,sid,cid);
 	$.ajaxSetup({ async: true });
 	console.log('end KCAC_SaveDefaultValue');
@@ -212,7 +212,7 @@ function KCAC_Validate(kcdiv)
 	});
 	fd.append(datadom.attr('name'), datavals);
 	
-	loadSymbolOn();
+	
 	$.ajax({
 			url: 'ajax/control.php',
 			data: fd,
@@ -227,7 +227,7 @@ function KCAC_Validate(kcdiv)
 				}else{
 					kcdiv.attr('kcvalid','invalid');
 				}
-				loadSymbolOff();
+				
 			}
 	});		
 	

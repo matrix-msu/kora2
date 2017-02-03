@@ -1,4 +1,5 @@
 <?php
+use KORA\Manager;
 /**
  Copyright (2008) Matrix: Michigan State University
 
@@ -54,48 +55,48 @@ if(!Manager::CheckRequestsAreSet(['download']))
 		
 	$z = 0;//initialize index for # of zip files (files can only be 4gb)
 	$zipSize = 0;//initialize size of current zip being prepared
+	$zipFileNum = 0;//while size is too much, amount of files is an issue as well (max 128)
 	$sizeArray = array();//to keep track of each zip files size
 	$zipArray = array();//array to hold the arrays of zip paths
 	$zipFiles = array();//array to hold the zip paths
 	$id = '';
 	
-	$results = KoraSearch::SortedInternalSearchResults(Manager::GetProject()->GetPID(), Manager::GetScheme()->GetSID());
+	//query for all files in the scheme
+	//originally done through models but the process was too slow when dealing with larger record sets;
+	$fileQuery = $db->query("SELECT value FROM p".$pid."Data where schemeid=".$sid." AND value like '<file>%</file>'");
 	
-	foreach ($results as $kid)
-	{
-		$r = new Record(Manager::GetProject()->GetPID(), Manager::GetScheme()->GetSID(), $kid);
+	while($result = $fileQuery->fetch_assoc()['value']){
+		$resultXML = simplexml_load_string($result);
 		
-		foreach ($r->GetControls() as $c)
-		{ 
-			if ($c->HasFileStored() && $c->HasData())
+		$fileSize = (string)$resultXML->size;
+		$zipSize += $fileSize;
+		
+		$path = basePath.fileDir.$pid."/".$sid."/".(string)$resultXML->localName;
+		$fileArray = ["path" => $path, "name" => $resultXML->localName ];
+		
+		$zipFileNum++;
+		
+		if($zipSize < KORA_MAXEXPORTZIPSIZE && $zipFileNum<256)//check if zip will be less than 4gb
+		{
+			if(!array_key_exists($z, $zipArray))
 			{
-				
-
-				$fileSize = filesize($c->GetPath());
-				$zipSize += $fileSize;
-				$fileArray = ["path" => $c->GetPath(), "name" => $c->GetLocalName() ];
-				if($zipSize < KORA_MAXEXPORTZIPSIZE)//check if zip will be less than 4gb
-				{
-					if(!array_key_exists($z, $zipArray))
-					{
-						$zipArray[$z] = array();
-					}
-					if(file_exists($c->GetPath()))
-					{
-						$zipArray[$z][] = $fileArray;
-					}
-				}
-				else//zip size is greater than 4gb and we need a new array (new zip)
-				{
-					$sizeArray[$z] = $zipSize - $fileSize;
-					$z++;
-					$zipArray[$z] = array();
-					$zipArray[$z][] = $fileArray;//we also need to add the current filepath
-					$zipSize = $fileSize;//zip size is now current file size
-				}
-				$sizeArray[$z] = $zipSize;
+				$zipArray[$z] = array();
+			}
+			if(file_exists($path))
+			{
+				$zipArray[$z][] = $fileArray;
 			}
 		}
+		else//zip size is greater than 4gb and we need a new array (new zip)
+		{
+			$sizeArray[$z] = $zipSize - $fileSize;
+			$z++;
+			$zipFileNum = 0;
+			$zipArray[$z] = array();
+			$zipArray[$z][] = $fileArray;//we also need to add the current filepath
+			$zipSize = $fileSize;//zip size is now current file size
+		}
+		$sizeArray[$z] = $zipSize;
 	}
 }
 
@@ -115,7 +116,7 @@ if(Manager::CheckRequestsAreSet(['zip']))
 	$zip->open($dest, ZIPARCHIVE::CREATE | ZIPARCHIVE::OVERWRITE);
 	foreach($zipArray[$zipIndex] as $file)
 	{
-		$zip->addFile($file['path'],$name.$zipNum."/".$file['name']);
+		$zip->addFile($file['path'],$file['name']);
 	}
 	$zip->close();
 

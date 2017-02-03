@@ -1,4 +1,6 @@
 <?php
+use KORA\Manager;
+use KORA\Record;
 /*
 Copyright (2008) Matrix: Michigan State University
 
@@ -126,6 +128,8 @@ if ($showrecord)
 	{
 	?>
 	<br />
+	<div id='ajaxstatus'></div>
+	<br>
 	<form id="preset" action="">
 	<table class="table" id="AddPresetTable">
 	<tr>

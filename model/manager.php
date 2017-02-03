@@ -1,4 +1,11 @@
 <?php
+namespace KORA;
+
+use Kora\Plugin;
+use Kora\Project;
+use Kora\Record;
+use Kora\Scheme;
+use Kora\User;
 /**
 Copyright (2008) Matrix: Michigan State University
 
@@ -54,11 +61,13 @@ class Manager {
 		
 		Manager::AddCSS('css/all.css', Manager::CSS_CORE);
 		Manager::AddCSS('includes/thickbox/thickbox.css', Manager::CSS_LIB);
+        Manager::AddCSS('includes/mediaelement/build/mediaelementplayer.css', Manager::CSS_LIB);
 		
 		Manager::AddJS('//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js', Manager::JS_CORE);
 		Manager::AddJS('javascripts/gettext.js.php', Manager::JS_CORE);
 		Manager::AddJS('includes/thickbox/thickbox.js', Manager::JS_LIB);
 		Manager::AddJS('javascripts/loading.js', Manager::JS_CORE);
+        Manager::AddJS('includes/mediaelement/build/mediaelement-and-player.min.js', Manager::JS_LIB);
 		
 		// ADD STYLE FOR SELECTED PROJECT (OR DEFAULT IF NO PROJ)
 		if (Manager::GetProject()) { Manager::AddCSS(Manager::GetProject()->GetStylePath(), Manager::CSS_THEME); }
@@ -260,11 +269,30 @@ class Manager {
 		print "<div class='$cl'>$msg_</div>";
 	}
 
-	public static function PrintBreadcrumbs()
+	public static function PrintBreadcrumbs($NoProj=false)
 	{
 		if(Manager::GetProject()){
 			//echo '<a href="selectScheme.php?pid='.Manager::GetProject()->GetPID().'">'.Manager::GetProject()->GetName().'</a>';
 			Manager::GetProject()->PrintQuickJump();
+		}else if($NoProj){
+			$authProjs = Manager::GetUser()->GetAuthorizedProjects();
+			if (count($authProjs) > 1) {
+				//multiple projects = drop down menu
+				?>
+				<select class='kpquickjump' size="1">
+				<?php
+				foreach($authProjs as $apid) {
+					$aproj = new Project($apid);
+					echo '<option value="'.$aproj->GetPID().'">'.htmlEscape($aproj->GetName()).'</option>';
+				}
+				?>
+				</select>
+				<?php
+			} else if($authProjs==1){
+				//single project = link
+				$aproj = new Project($authProjs[0]);
+				echo '<a href="'.baseURI.'selectProject.php?pid='.$this->GetPID().'">'.htmlEscape($aproj->GetName()).'</a>';
+			}
 		}
 		if(Manager::GetScheme()){
 			echo '&mdash;&gt;';
@@ -385,6 +413,8 @@ class Manager {
 	*/
 	public static function GetBreadCrumbsHTML($maxPage, $currentPage, $adjacents, $pageLink, $linkclass = '')
 	{
+		//2.7.0 pagination forces 5 links out
+		$adjacents = 5;
 		$crumbs = '';
 		if ($maxPage > 1)
 		{
@@ -395,12 +425,10 @@ class Manager {
 			{ $crumbs .= gettext('Prev').' | ';	}
 			else
 			{ $crumbs .= '<a '.$aclass.' '.sprintf($pageLink, ($currentPage - 1) ).'>'.gettext('Prev').'</a> | '; }
-			
-			if ($maxPage < (7 + $adjacents * 2))
+		
+			if ($maxPage < (7 + $adjacents * 2)) // < 17
 			{
-				// There's not enough pages to bother breaking it up, so
-				// display them all
-				
+				// There's few pages, display them all
 				for($i=1; $i <= $maxPage; $i++)
 				{
 					if ($i != $currentPage)
@@ -409,57 +437,58 @@ class Manager {
 					{ $crumbs .= "$i | "; }
 				}
 			}
-			else   // if lastpage > (6 + ADJACENTS * 2)
+			else //Use pages
 			{
-				if ($currentPage < (1 + $adjacents * 2))
+				if ($currentPage < (1 + $adjacents * 2)) // < 11
 				{
 					// we're near the beginning
-					
-					// show the early pages
-					for($i=1; $i <= (4 + $adjacents * 2); $i++)
-					{
-						if ($i != $currentPage)
-						{ $crumbs .= '<a '.$aclass.' '.sprintf($pageLink, $i).">$i</a> | "; }
-						else
-						{ $crumbs .= "$i | "; }
+					// show the first 10 pages
+					for($i=1; $i <= 11; $i++) {
+						if ($i != $currentPage) { 
+							$crumbs .= '<a '.$aclass.' '.sprintf($pageLink, $i).">$i</a> | ";
+						} else {
+							$crumbs .= "$i | ";
+						}
 					}
 					
-					// show the ... and the last two pages
-					$crumbs .= '... | <a '.$aclass.' '.sprintf($pageLink, ($maxPage - 1)).'>'.($maxPage - 1).'</a> | <a '.$aclass.' '.sprintf($pageLink, $maxPage).'>'.$maxPage.'</a> | ';
+					// show the ... and the last page
+					$crumbs .= '... | <a '.$aclass.' '.sprintf($pageLink, $maxPage).'>'.$maxPage.'</a> | ';
 				}
-				else if ((($maxPage - $adjacents * 2) > $currentPage) && ($currentPage > ($adjacents * 2)))
+				else if ((($maxPage - $adjacents * 2) > $currentPage) && ($currentPage > ($adjacents * 2))) // 10pgs < currentPage < max-10pgs
 				{
 					// we're in the middle
+					// display the first page and ...
+					$crumbs .= '<a '.$aclass.' '.sprintf($pageLink, 1).'>1</a> | ... | ';
 					
-					// display the first two pages and ...
-					$crumbs .= '<a '.$aclass.' '.sprintf($pageLink, 1).'>1</a> | <a '.$aclass.' '.sprintf($pageLink, 2).'>2</a> | ... | ';
-					
-					// display the middle pages
-					for($i=$currentPage-$adjacents; $i <= ($currentPage + $adjacents); $i++)
-					{
-						if ($i != $currentPage)
-						{ $crumbs .= '<a '.$aclass.' '.sprintf($pageLink, $i).">$i</a> | "; }
-						else
-						{ $crumbs .= "$i | "; }
+					// display the middle pages by increments of 10
+					for($i=$currentPage-($adjacents*10); $i <= ($currentPage + $adjacents*10); $i+=10) {
+						if ($i != $currentPage) {	
+							if (round($i, -1) == 0) {
+								$crumbs .= '<a '.$aclass.' '.sprintf($pageLink, 10).">10</a> | ";
+							} else if (round($i, -1) > 0 && $i < $maxPage){
+								$crumbs .= '<a '.$aclass.' '.sprintf($pageLink, round($i, -1)).">".round($i, -1)."</a> | ";
+							}
+						} else {
+							$crumbs .= "$i | ";
+						}
 					}
 					
-					// show the ... and the last two pages
-					$crumbs .= '... | <a '.$aclass.' '.sprintf($pageLink,($maxPage - 1)).'>'.($maxPage - 1).'</a> | <a '.$aclass.' '.sprintf($pageLink,$maxPage).'>'.$maxPage.'</a> | ';
+					// show the ... and the last page
+					$crumbs .= '... | <a '.$aclass.' '.sprintf($pageLink,$maxPage).'>'.$maxPage.'</a> | ';
 				}
-				else
+				else //last 10 pages
 				{
 					// we're at the end
+					// display the first page and ...
+					$crumbs .= '<a '.$aclass.' '.sprintf($pageLink,1).'>1</a> | ... | ';
 					
-					// display the first two pages and ...
-					$crumbs .= '<a '.$aclass.' '.sprintf($pageLink,1).'>1</a> | <a '.$aclass.' '.sprintf($pageLink,2).'>2</a> | ... | ';
-					
-					// display the final pages
-					for($i=($maxPage - (2 + $adjacents * 2)); $i <= $maxPage; $i++)
-					{
-						if ($i != $currentPage)
-						{ $crumbs .= '<a '.$aclass.' '.sprintf($pageLink,$i).">$i</a> | "; }
-						else
-						{ $crumbs .= "$i | "; }
+					// display the final 10 pages
+					for($i=($maxPage - 11); $i <= $maxPage; $i++) {
+						if ($i != $currentPage) {
+							$crumbs .= '<a '.$aclass.' '.sprintf($pageLink,$i).">$i</a> | ";
+						} else {
+							$crumbs .= "$i | ";
+						}
 					}
 				}
 			}
@@ -474,7 +503,7 @@ class Manager {
 		return $crumbs;
 	}
 
-	public static function PrintHeader()
+	public static function PrintHeader($NoProj=false)
 	{ 
 		include_once(basePath.'includes/header.php');
 	}
@@ -580,6 +609,8 @@ class Manager {
 	{
 		if (!Manager::IsLoggedIn())
 		{
+			$link = "$_SERVER[REQUEST_URI]";
+			$location .= '?redirect='.urlencode($link);
 			header("Location: $location");
 			die();
 		}

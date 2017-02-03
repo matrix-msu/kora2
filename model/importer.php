@@ -1,4 +1,8 @@
 <?php 
+namespace KORA;
+
+use KORA\Manager;
+use XMLReader;
 /**
 Copyright (2008) Matrix: Michigan State University
 
@@ -37,7 +41,7 @@ class Importer {
 	protected $autoMappingArray = array( "All File Controls"=>array('ImageControl','FileControl') );
 	public $associationArray = array();
 	
-	public function Importer($pid,$sid,$uploadedFiles = false) {
+	function __construct($pid,$sid,$uploadedFiles = false) {
 		$this->uploadedFiles = $uploadedFiles;
 		$this->pid = $pid;
 		$this->sid = $sid;

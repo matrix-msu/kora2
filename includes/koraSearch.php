@@ -1,4 +1,5 @@
 <?php
+use KORA\Record;
 //Need access to the orderBy and dictionary tables from KORA_Search in the external sorting function
 $KORA_Search_order;
 $KORA_Search_dict;
@@ -277,8 +278,11 @@ $limitNum = 0
 		// Make sure all the requested order-by fields are valid, as are the sort directions
 		foreach($orderBy as $orderField)
 		{
-			if (!(in_array($orderField['field'], $fieldsToReturn) ||
-			(in_array('ALL', $fieldsToReturn) && in_array($orderField['field'], $dictionary)) || $orderField['field'] == 'kid'))
+			if (!(
+				(in_array('ALL', $fieldsToReturn) && array_key_exists($orderField['field'], $dictionary)) || 
+				in_array($orderField['field'], $fieldsToReturn) ||
+				$orderField['field'] == 'kid'
+			 ))
 			{
 				$validSortFields = false;
 			}
@@ -959,7 +963,7 @@ $controlName)
 class KORA_Clause
 {
 	function __construct($argument1, $op, $argument2)
-	{
+	{	
 		$this->arg1 = $argument1;
 		$this->arg2 = $argument2;
 		$this->operator = $op;
@@ -1004,7 +1008,7 @@ class KORA_Clause
 		{
 			$this->operator = "=";
 		}
-
+		
 		$dataTable = "p$projectID"."Data";
 		$query = "SELECT DISTINCT id FROM $dataTable WHERE schemeid = '$schemeID' AND ";
 		if($this->clauseType == 'Logical'){
@@ -1099,7 +1103,7 @@ class KORA_Clause
 							$query .= ' AND value '.$this->operator." '".$this->arg2."') ";
 						}
 					}
-					else if (in_array($this->operator, array('!=', '<>')))
+					else if (in_array($this->operator, array('<>')))
 					{
 						$query  .= ' (cid = '.$controlDictionary[$this->arg1]['cid'];
 						// handle XML-packed data fields
@@ -1128,6 +1132,32 @@ class KORA_Clause
 						{
 							$query  = $query.' OR ';
 							$query .= ' id NOT IN (SELECT DISTINCT id FROM p'.$projectID.'Data WHERE cid='.$controlDictionary[$this->arg1]['cid'].')';
+						}
+						
+						echo $query;
+					}
+					else if ($this->operator == "!="){
+						$query  .= ' (cid = '.$controlDictionary[$this->arg1]['cid'];
+						// handle XML-packed data fields
+						if ($controlDictionary[$this->arg1]['xmlPacked'])
+						{
+							if(!empty($this->arg2)){
+								// We presume that people using exact operators realize
+								// such operators don't care about things like %, so we just
+								// throw the brackets right on the outside
+								$query .= ' AND value NOT LIKE \''.KORA_Clause::xmlFormatted($this->arg2, false)."') ";
+							}else{
+								// We can't check if xmlPacked controls are 'not empty' with the same method
+								// because the generated string will look like "NOT LIKE '% ><%'",
+								// which will match all xml with more than one tag in it.
+								// Instead, we just check if the row exists because an 'empty'
+								// control will not be set in the db.
+								$query .=' )';
+							}
+						}
+						else
+						{
+							$query .= ' AND value '.$this->operator." '".$this->arg2."') ";
 						}
 					}
 					else if (strtoupper($this->operator) == 'NOT LIKE')
@@ -1159,14 +1189,15 @@ class KORA_Clause
 						return sprintf("&#x%s;", ltrim(strtoupper(bin2hex($utf)), "0"));
 						}, $this->arg2);
 						
-						$query .= ' (value LIKE '.escape($this->arg2).' OR value LIKE '.escape($encoded_keyword).') ';
-							
+						$htmlKey = htmlspecialchars($this->arg2);
+						
+						$query .= ' (value LIKE '.escape($this->arg2).' OR value LIKE '.escape($encoded_keyword).' OR value LIKE '.escape($htmlKey).') ';
+						//var_dump($query);
 					
                     }
               
 					else // we assume they're using something else where
 					{    // they know what they're doing
-                      
 						$query .= ' (cid = '.$controlDictionary[$this->arg1]['cid'];
 						$query .= ' AND value '.$this->operator." '".$this->arg2."') ";
                      
@@ -1254,9 +1285,9 @@ class KORA_Clause
 		return $arg;
 	}
 
-	private $arg1;
-	private $operator;
-	private $arg2;
+	public $arg1;
+	public $operator;
+	public $arg2;
 	private $clauseType;
 }
 
@@ -1272,21 +1303,97 @@ function joinKORAClauses($clauses, $boolean)
 	{
 		return false;
 	}
+	
+	//filter out duplicates
+	$fclauses = filterClause($clauses);
 
 	// Otherwise, we presume we're good
 	//
 	// Basic Algorithm: While there's more than one
 	// Query left in the array, pop two, merge them,
 	// and add them to the end
-	while(count($clauses) > 1)
+	
+	while(count($fclauses) > 1)
 	{
-		$clause1 = array_shift($clauses);
-		$clause2 = array_shift($clauses);
-		$clauses[] = new KORA_Clause($clause1, $boolean, $clause2);
+		$clause1 = array_shift($fclauses);
+		$clause2 = array_shift($fclauses);
+		$fclauses[] = new KORA_Clause($clause1, $boolean, $clause2);
 	}
 
 	// There should be only one clause left, which is what we need
-	return array_pop($clauses);
+	return array_pop($fclauses);
+}
+
+function filterClause($master){
+	$uniqueClauses = array();
+	
+	for($i=0;$i<sizeof($master);$i++){
+		$c = $master[$i];
+		$unique = true;
+		
+		for($j=$i+1;$j<sizeof($master);$j++){
+			$cc = $master[$j];
+			
+			$same = compareClauses($c,$cc);
+			
+			if($same){
+				$unique = false;
+				break;
+			}
+		}
+		
+		if($unique){
+			array_push($uniqueClauses,$c);
+		}
+	}
+	
+	return $uniqueClauses;
+}
+
+function compareClauses($one,$two){
+	//check if $arg1s are clauses
+	$oneArgOneKC = is_a($one->arg1,'KORA_Clause');
+	$twoArgOneKC = is_a($two->arg1,'KORA_Clause');
+	//if both
+	if($oneArgOneKC && $twoArgOneKC){
+		$same = compareClauses($one->arg1,$two->arg1);
+		if(!$same)
+			return false;
+	}
+	//if one
+	else if($oneArgOneKC | $twoArgOneKC){
+		return false;
+	}
+	//if none
+	else{
+		if($one->arg1 != $two->arg1)
+			return false;
+	}
+	
+	//string compare operator
+	if($one->operator != $two->operator)
+			return false;
+	
+	//check if $arg2s are clauses
+	$oneArgTwoKC = is_a($one->arg2,'KORA_Clause');
+	$twoArgTwoKC = is_a($two->arg2,'KORA_Clause');
+	//if both
+	if($oneArgTwoKC && $twoArgTwoKC){
+		$same = compareClauses($one->arg2,$two->arg2);
+		if(!$same)
+			return false;
+	}
+	//if one
+	else if($oneArgTwoKC | $twoArgTwoKC){
+		return false;
+	}
+	//if none
+	else{
+		if($one->arg2 != $two->arg2)
+			return false;
+	}
+	
+	return true;
 }
 
 //Use this to do complex sorting

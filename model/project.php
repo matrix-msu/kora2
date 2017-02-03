@@ -1,5 +1,9 @@
 <?php
+namespace KORA;
 
+use KORA\Manager;
+use KORA\Scheme;
+use Exception;
 /**
 Copyright (2008) Matrix: Michigan State University
 

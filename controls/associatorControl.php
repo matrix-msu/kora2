@@ -1,4 +1,9 @@
 <?php
+use KORA\Manager;
+use KORA\ControlCollection;
+use KORA\Record;
+use KORA\Scheme;
+use KORA\KoraSearch;
 /**
 Copyright (2008) Matrix: Michigan State University
 
@@ -129,7 +134,7 @@ class AssociatorControl extends Control {
 	  *
 	  * @return void
 	  */
-	public function display() {
+	public function display($defaultValue=true) {
 		global $db;
 
 		if (!$this->StartDisplay()) { return false; }
@@ -955,6 +960,8 @@ class AssociatorControl extends Control {
 				foreach ($cpap as $cpas)
 				{
 					$cpasobj = new Scheme($cppid, $cpas);
+					
+					if($cpasobj->GetPID()==0){continue;}
 					
 					print '<tr><td>'.$cpasobj->GetProject()->GetName().'\\'.$cpasobj->GetName().'</td>';
 					print '<td>'.'<input type="checkbox" class="kcacopts_cpallowed" pid="'.$cppid.'" sid="'.$cpas.'"';

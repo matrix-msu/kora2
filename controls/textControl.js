@@ -21,8 +21,8 @@ $(function() {
 						var rows = $('#colorbox .kctcopts_rows').val();
 						var cols = $('#colorbox .kctcopts_cols').val();
 						$.ajaxSetup({ async: false });
-						loadSymbolOn();
-						$.post(ajaxhandler, {action:'updateSize',source:'TextControl',pid:pid,sid:sid,cid:cid,rows:rows,cols:cols}, function(resp){$("#ajaxstatus").html(resp);loadSymbolOff();}, 'html');
+						
+						$.post(ajaxhandler, {action:'updateSize',source:'TextControl',pid:pid,sid:sid,cid:cid,rows:rows,cols:cols}, function(resp){$("#ajaxstatus").html(resp);}, 'html');
 						PrintControlOpts(pid,sid,cid);
 						$.ajaxSetup({ async: true });
 					});
@@ -38,8 +38,8 @@ $(function() {
 						var rows = $('#colorbox .kctcopts_rows').val();
 						var cols = $('#colorbox .kctcopts_cols').val();
 						$.ajaxSetup({ async: false });
-						loadSymbolOn();
-						$.post(ajaxhandler, {action:'updateSize',source:'TextControl',pid:pid,sid:sid,cid:cid,rows:rows,cols:cols}, function(resp){$("#ajaxstatus").html(resp);loadSymbolOff();}, 'html');
+						
+						$.post(ajaxhandler, {action:'updateSize',source:'TextControl',pid:pid,sid:sid,cid:cid,rows:rows,cols:cols}, function(resp){$("#ajaxstatus").html(resp);}, 'html');
 						PrintControlOpts(pid,sid,cid);
 						$.ajaxSetup({ async: true });
 					});
@@ -51,8 +51,8 @@ $(function() {
 				var cid = $('#colorbox .kora_control_opts').attr('cid');
 				var regex = $('#colorbox .kctcopts_regex').val();
 				$.ajaxSetup({ async: false });
-				loadSymbolOn();
-				$.post(ajaxhandler, {action:'updateRegEx',source:'TextControl',pid:pid,sid:sid,cid:cid,regex:regex}, function(resp){$("#ajaxstatus").html(resp);loadSymbolOff();}, 'html');
+				
+				$.post(ajaxhandler, {action:'updateRegEx',source:'TextControl',pid:pid,sid:sid,cid:cid,regex:regex}, function(resp){$("#ajaxstatus").html(resp);}, 'html');
 				PrintControlOpts(pid,sid,cid);
 				$.ajaxSetup({ async: true });
 		});
@@ -63,8 +63,8 @@ $(function() {
 				var cid = $('#colorbox .kora_control_opts').attr('cid');
 				var editor = $('#colorbox .kctcopts_editor:checked').val();
 				$.ajaxSetup({ async: false });
-				loadSymbolOn();
-				$.post(ajaxhandler, {action:'updateEditor',source:'TextControl',pid:pid,sid:sid,cid:cid,editor:editor}, function(resp){$("#ajaxstatus").html(resp);loadSymbolOff();}, 'html');
+				
+				$.post(ajaxhandler, {action:'updateEditor',source:'TextControl',pid:pid,sid:sid,cid:cid,editor:editor}, function(resp){$("#ajaxstatus").html(resp);}, 'html');
 				PrintControlOpts(pid,sid,cid);
 				$.ajaxSetup({ async: true });
 		});
@@ -75,8 +75,8 @@ $(function() {
 				var cid = $('#colorbox .kora_control_opts').attr('cid');
 				var defaultValue = $('#colorbox .kctcopts_defval').val();
 				$.ajaxSetup({ async: false });
-				loadSymbolOn();
-				$.post(ajaxhandler, {action:'updateDefaultValue',source:'TextControl',pid:pid,sid:sid,cid:cid,defaultV:defaultValue}, function(resp){$("#ajaxstatus").html(resp);loadSymbolOff();}, 'html');
+				
+				$.post(ajaxhandler, {action:'updateDefaultValue',source:'TextControl',pid:pid,sid:sid,cid:cid,defaultV:defaultValue}, function(resp){$("#ajaxstatus").html(resp);}, 'html');
 				PrintControlOpts(pid,sid,cid);
 				$.ajaxSetup({ async: true });
 		});
@@ -89,8 +89,8 @@ $(function() {
 				var value = $('#colorbox .kctcopts_presetname').val();
 				if (answer == true) {
 					$.ajaxSetup({ async: false });
-					loadSymbolOn();
-					$.post(ajaxhandler, {action:'usePreset',source:'TextControl',pid:pid,sid:sid,cid:cid,preset:value}, function(resp){$("#ajaxstatus").html(resp);loadSymbolOff();}, 'html');
+					
+					$.post(ajaxhandler, {action:'usePreset',source:'TextControl',pid:pid,sid:sid,cid:cid,preset:value}, function(resp){$("#ajaxstatus").html(resp);}, 'html');
 					PrintControlOpts(pid,sid,cid);
 					$.ajaxSetup({ async: true });
 				}
@@ -103,8 +103,8 @@ $(function() {
 				var regExValue = $('#colorbox .kctcopts_regex').val();
 				var newName = $('#colorbox .kctcopts_presetnew').val();
 				$.ajaxSetup({ async: false });
-				loadSymbolOn();
-				$.post(ajaxhandler, {action:'savePreset',source:'TextControl',pid:pid,sid:sid,cid:cid,regex:regExValue,name:newName}, function(resp){$("#ajaxstatus").html(resp);loadSymbolOff();}, 'html');
+				
+				$.post(ajaxhandler, {action:'savePreset',source:'TextControl',pid:pid,sid:sid,cid:cid,regex:regExValue,name:newName}, function(resp){$("#ajaxstatus").html(resp);}, 'html');
 				PrintControlOpts(pid,sid,cid);
 				$.ajaxSetup({ async: true });
 		});

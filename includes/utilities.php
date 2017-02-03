@@ -1,5 +1,7 @@
 <?php
-
+use KORA\Manager;
+use KORA\Record;
+use KORA\Scheme;
 /**
 Copyright (2008) Matrix: Michigan State University
 
@@ -477,6 +479,21 @@ function DoQueryPrintError($sql_, $okmsg_ = 'OK', $errmsg_ = 'ERROR')
 	{ return "<div class='noerror'>OK: $okmsg_</div>"; }
 	else
 	{ Manager::PrintErrDiv($errmsg_); }
+}
+
+/*
+
+ */
+function encodeValue($value)
+{
+	//Convert special chars to match the encoded values in the db.
+	$encoded_keyword = preg_replace_callback('/[\x{80}-\x{10FFFF}]/u', function ($m) {
+	$char = current($m);
+	$utf = iconv('UTF-8', 'UCS-4', $char);
+	return sprintf("&#x%s;", ltrim(strtoupper(bin2hex($utf)), "0"));
+	}, $value);
+	
+	return $encoded_keyword;
 }
 
 

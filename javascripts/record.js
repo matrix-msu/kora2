@@ -66,8 +66,8 @@ function PrintRecordPresets(pid,sid)
 {
 	if (($('#colorbox').length > 0) && ($('#cboxContent').length > 0))
 	{
-		loadSymbolOn();
-		$.post('ajax/record.php',{action:"PrintForm",source:"PresetFunctions",pid:pid,sid:sid}, function(resp){$("#presetRecord").html(resp);loadSymbolOff();}, 'html');
+		
+		$.post('ajax/record.php',{action:"PrintForm",source:"PresetFunctions",pid:pid,sid:sid}, function(resp){$("#presetRecord").html(resp);}, 'html');
 	}
 }
 
@@ -94,48 +94,57 @@ $(function() {
 	enableValidIngestion();
 	
 	$("#ingestprogress").on( "click", '.kri_showdata', function() {
+		loadSymbolOn();
 		$(this).parents('.pending_ingest').first().find('.pending_ingest_alldata').first().toggle();
+		loadSymbolOff();
 	});
 	
 	///this handles rename of a record preset
 	$("#presetRecord").on( "click",".preset_record_rename", function() {
+		loadSymbolOn();
 		var pid = $('#kora_globals').attr('pid');
 		var sid = $('#kora_globals').attr('sid');
 		var varkid = $('#oldName').find('option:selected').val();
 	    var varnewname = $('#newName').val();
 	    
 	    $.ajaxSetup({ async: false });
-		loadSymbolOn();
-		$.post(ajaxhandler, {action:'renameRecordPreset',source:'PresetFunctions',kid:varkid,name:varnewname,pid:pid,sid:sid}, function(resp){$("#ajaxstatus").html(resp);loadSymbolOff();}, 'html');
+		
+		$.post(ajaxhandler, {action:'renameRecordPreset',source:'PresetFunctions',kid:varkid,name:varnewname,pid:pid,sid:sid}, function(resp){$("#ajaxstatus").html(resp);}, 'html');
 		PrintRecordPresets(pid,sid);
 		$.ajaxSetup({ async: true });
+		loadSymbolOff();
 	});
 	
 	$("#presetRecord").on( "click",".preset_record_demote", function() {
+		loadSymbolOn();
 		var pid = $('#kora_globals').attr('pid');
 		var sid = $('#kora_globals').attr('sid');
 		var varkid = $(this).attr('name');
 		
 		$.ajaxSetup({ async: false });
-		loadSymbolOn();
-		$.post(ajaxhandler, {action:'demoteRecordPreset',source:'PresetFunctions',kid:varkid,pid:pid,sid:sid}, function(resp){$("#ajaxstatus").html(resp);loadSymbolOff();}, 'html');
+		
+		$.post(ajaxhandler, {action:'demoteRecordPreset',source:'PresetFunctions',kid:varkid,pid:pid,sid:sid}, function(resp){$("#ajaxstatus").html(resp);}, 'html');
 		PrintRecordPresets(pid,sid);
 		$.ajaxSetup({ async: true });
+		loadSymbolOff();
 	});
 	
 	$("#AddPresetTable").on( "click",".preset_record_create", function() {
+		loadSymbolOn();
 		var pid = $('#kora_globals').attr('pid');
 		var sid = $('#kora_globals').attr('sid');
 		var varkid = $('#kora_globals').attr('rid');
 		var name = $('#presetName').val();
 		
 		$.ajaxSetup({ async: false });
-		loadSymbolOn();
-		$.post(ajaxhandler, {action:'addRecordPreset',source:'PresetFunctions',name:name,kid:varkid,pid:pid,sid:sid}, function(resp){$("#ajaxstatus").html(resp);loadSymbolOff();}, 'html');
+		
+		$.post(ajaxhandler, {action:'addRecordPreset',source:'PresetFunctions',name:name,kid:varkid,pid:pid,sid:sid}, function(resp){$("#ajaxstatus").html(resp);}, 'html');
 		$.ajaxSetup({ async: true });
+		loadSymbolOff();
 	});
 	
 	$('.krusepreset').click( function() {
+		loadSymbolOn();
 		if (confirm(kgt_schemeusepreset)){
 			var pid = $('#kora_globals').attr('pid');
 			var sid = $('#kora_globals').attr('sid');
@@ -145,12 +154,15 @@ $(function() {
 	});
 	
 	$(".kora_navNumbers" ).on("click",'.navpage', function() {
+		loadSymbolOn();
 		GetPage($(this).parents('.ingestionForm').first(), $(this).attr('page'));
+		loadSymbolOff();
 	});
 	
 	////////////////////////////////////////////VALIDATION CHECKS///////////////////
 	// THIS TRIGGERS VALIDATION FOR ALL INPUT FIELDS
 	$(".ingestionForm" ).on( "change",':input', function() {
+		loadSymbolOn();
 		var c = $(this);
 		$.when(
 			c.focusout()).then(function() {
@@ -174,7 +186,6 @@ $(function() {
 					fd.append($(this).attr('name'), $(this).val());
 				}
 				
-				loadSymbolOn();
 				$.ajax({
 					url: 'ajax/control.php',
 					data: fd,
@@ -188,17 +199,19 @@ $(function() {
 						}else{
 							kcdiv.attr('kcvalid','invalid');
 						}
-						loadSymbolOff();
+						
 					}
 				});	
 				
 				enableValidIngestion();
 			});
+			loadSymbolOff();
 	});
 	
 	//this fires off everytime editor is checked or unchecked
 	//will validate if statement if there is something in the editor
 	CKEDITOR.on('currentInstance', function(){
+		loadSymbolOn();
         $('.kora_rText').each(function(){
             var kcdiv = $(this).parents('.kora_control').first();
             if(CKEDITOR.instances[$(this).attr('id')].getData()!=''){
@@ -210,10 +223,12 @@ $(function() {
             }
             enableValidIngestion();
         });
+		loadSymbolOff();
 	});
 	
 	//validates a MLC
 	$(".ingestionForm" ).on( "click",'.kcmlc_curritems', function() {
+		loadSymbolOn();
 		var kcdiv = $(this).parents('.kora_control').first();
 		KCMLC_Validate(kcdiv);
 		if($(this).val()==null){
@@ -225,25 +240,39 @@ $(function() {
 			}
 		}
 		enableValidIngestion();
+		loadSymbolOff();
 	});
 	
-	//validates a MTC
+	//validates a MTC when option selected
 	$(".ingestionForm" ).on( "click",'.kcmtc_curritems', function() {
+		loadSymbolOn();
 		var kcdiv = $(this).parents('.kora_control').first();
 		KCMTC_Validate(kcdiv);
-		if($(this).val()==null){
-			if($(this).parents('.kc_required').first()!=null){
-				kcdiv.attr('kcvalid','valid');
-			}
-			else{
-				kcdiv.attr('kcvalid','invalid');
-			}
-		}
 		enableValidIngestion();
+		loadSymbolOff();
+	});
+	
+	//validates a MTC when option added
+	$(".ingestionForm" ).on( "click",'.kcmtc_additem', function() {
+		loadSymbolOn();
+		var kcdiv = $(this).parents('.kora_control').first();
+		KCMTC_Validate(kcdiv);
+		enableValidIngestion();
+		loadSymbolOff();
+	});
+	
+	//validates a MTC when option added
+	$(".ingestionForm" ).on( "click",'.kcmtc_removeitem', function() {
+		loadSymbolOn();
+		var kcdiv = $(this).parents('.kora_control').first();
+		KCMTC_Validate(kcdiv);
+		enableValidIngestion();
+		loadSymbolOff();
 	});
 	
 	//validates a MDC
 	$(".ingestionForm" ).on( "change",'.kcmdc_curritems', function() {
+		loadSymbolOn();
 		var kcdiv = $(this).parents('.kora_control').first();
 		KCMDC_Validate(kcdiv);
 		if($(this).val()==null){
@@ -255,10 +284,12 @@ $(function() {
 			}
 		}
 		enableValidIngestion();
+		loadSymbolOff();
 	});
 	
 	//validates a RAC
 	$(".ingestionForm" ).on( "click",'.kcac_curritems', function() {
+		loadSymbolOn();
 		var kcdiv = $(this).parents('.kora_control').first();
 		KCAC_Validate(kcdiv);
 		if($(this).val()==null){
@@ -270,12 +301,14 @@ $(function() {
 			}
 		}
 		enableValidIngestion();
+		loadSymbolOff();
 	});
 	
 	/////////////////////////////////END VALIDATION CHECKS////////////////////////////
 	
 	//Handles front end submission of an ingestion form
 	$( ".ingestionForm" ).submit(function( event ) {
+		loadSymbolOn();
 		
 		event.preventDefault();
 
@@ -286,13 +319,13 @@ $(function() {
         });
 		
 		// WE NEED TO SELECT EVERY OPTION ADDED TO THESE LISTS BEFORE SUBMIT
-		var multiselects = ['Date (Multi-Input)', 'Text (Multi-Input)', 'Record Associator'];
+		var multiselects = ['Date (Multi-Input)', 'Record Associator','Text (Multi-Input)'];
 		$(this).find('.kora_control').each(function() {
 			if ($.inArray($(this).attr('kctype'), multiselects) > -1)
 			{
-				$(this).find('select option').each(function() {
-					$(this).attr('selected', 'selected');
-				});
+				$('.kcmtc_curritems option').prop('selected', true);
+				$('.kcmdc_curritems option').prop('selected', true);
+				$('.kcac_curritems option').prop('selected', true);
 			}
 		});
 		
@@ -301,7 +334,7 @@ $(function() {
 		fd.append('action','RecordIngest');
 
 		// MAYBE COULD USE INTERJECT A PROGRESS HANDLER HERE TOO?
-		loadSymbolOn();
+		$.ajaxSetup({ async: true });
 		$.ajax({
 			url: 'ajax/control.php',
 			data: fd,
@@ -312,9 +345,10 @@ $(function() {
 				var splstr = data.split("%");
 				var baseURI = $('#kora_globals').attr('baseURI');
 				window.location.replace(baseURI+'viewObject.php?rid='+splstr[1]);
-				loadSymbolOff();
+				
 			}
-		});		
+		});
+		$.ajaxSetup({ async: true });		
 		
 		// WE NEED TO HANDLE LEGACY SUBMITS TO THE LEGACY-SUBMIT FORM
 	});
@@ -357,12 +391,13 @@ $(function() {
 	
 	//Public Ingestion Approval
 	$('.public_ingest_approve').click( function(event) {
+		loadSymbolOn();
 		var rid = $(this).attr("rid");
 		var pid = $('#kora_globals').attr('pid');
 		var sid = $('#kora_globals').attr('sid');
 		var data = 'rid='+rid+'&pid='+pid+'&sid='+sid+'&approved=1';
 		$('div.record'+rid).block({ message: '<h1>'+kgt_pi_approving_data+'</h1>'});
-		loadSymbolOn();
+		
 		$.ajax({
 			url: "ingestApprovedData.php",
 			type: "GET",
@@ -371,7 +406,7 @@ $(function() {
 			success: function () {
 				$('div.record').unblock();
 				$("div.record"+rid).showHtml("Approved", 400);
-				loadSymbolOff();
+				
 				//Find a way to return results from ingestApprovedData.php
 				//Shouldn't be a string "Approved" should be from .php
 			}
@@ -380,17 +415,19 @@ $(function() {
 		
 		//return false;
 		event.preventDefault();
+		loadSymbolOff();
 	});
 	
 	//Public Ingestion Deny
 	$('.public_ingest_deny').click( function(event) {
+		loadSymbolOn();
 		if (confirm(kgt_pi_confirm_denying_data)){
 		var rid = $(this).attr("rid");
 		var pid = $('#kora_globals').attr('pid');
 		var sid = $('#kora_globals').attr('sid');
 		var data = 'rid='+rid+'&pid='+pid+'&sid='+sid+'&approved=0';
 			$('div.record'+rid).block({ message: '<h1>'+kgt_pi_denying_data+'</h1>'});
-			loadSymbolOn();
+			
 			$.ajax({
 				url: "ingestApprovedData.php",
 				type: "GET",
@@ -398,24 +435,26 @@ $(function() {
 				cache: false,
 				success: function () {
 					$("div.record"+rid).showHtml("Denied", 400);
-					loadSymbolOff();
+					
 				}
 			});
 		}
 		
 		//return false;
 		event.preventDefault();
+		loadSymbolOff();
 	});
 	
 	//Public Ingestion Deny ALL
 	$('.public_ingest_deny_ALL').click( function(event) {
+		loadSymbolOn();
 		if (confirm(kgt_pi_confim_denying_all_data)){
 		var rid = $(this).attr("rid");
 		var pid = $('#kora_globals').attr('pid');
 		var sid = $('#kora_globals').attr('sid');
 		var data = 'rid=all'+'&pid='+pid+'&sid='+sid+'&approved=0';
 			$.blockUI({ message: '<h1>'+kgt_pi_denying_all_data+'</h1>' });
-			loadSymbolOn();
+			
 			$.ajax({
 				url: "ingestApprovedData.php",
 				type: "GET",
@@ -424,15 +463,17 @@ $(function() {
 				success: function () {
 					$.unblockUI();
 					$("div.recordAll").showHtml("Denied All", 400);
-					loadSymbolOff();					
+										
 				}
 			});
 		}
 		
 		event.preventDefault();
+		loadSymbolOff();
 	});
 	
 	$('.kora_export_zip').click( function() {
+		loadSymbolOn();
 		var pid = $('#kora_globals').attr('pid');
 		var sid = $('#kora_globals').attr('sid');
 		var zipindex = $(this).attr('zipindex');
@@ -441,28 +482,32 @@ $(function() {
 
 		$("#dlmsg").html('<strong>'+kgt_exportgeneratingfile+'</strong>');
 		window.location = "schemeExportLanding.php?pid="+pid+"&sid="+sid+"&zip="+zipindex;
+		loadSymbolOff();
 	});
 	
 	$('.kr_delete_form').on('click','.kr_delete_yes',function(){
+		loadSymbolOn();
 		var pid = $('#kora_globals').attr('pid');
 		var sid = $('#kora_globals').attr('sid');
 		var rid = $('#kora_globals').attr('rid');
 	    
-	    $.ajaxSetup({ async: false });
-		loadSymbolOn();
-		$.post(ajaxhandler, {action:'deleteRecord',rid:rid,pid:pid,sid:sid}, function(resp){$("#ajaxstatus").html(resp);loadSymbolOff();}, 'html');
+	    $.ajaxSetup({ async: true });
+		
+		$.post(ajaxhandler, {action:'deleteRecord',rid:rid,pid:pid,sid:sid}, function(resp){$("#ajaxstatus").html(resp);window.location = 'deleteObject.php?pid='+pid+'&sid='+sid+'&deleted=true';}, 'html');
 		$.ajaxSetup({ async: true });
 		
-		window.location = 'searchResults.php?pid='+pid+'&sid='+sid;
+		
 	});
 	
 	$('.kr_delete_form').on('click','.kr_delete_no',function(){
+		loadSymbolOn();
 		var rid = $('#kora_globals').attr('rid');
 		
 		window.location = 'viewObject.php?rid='+rid;
 	});
 	
 	$('.koraglobal_recordSearch_form').keypress(function(e) {
+		loadSymbolOn();
 	    if(e.which == 13) {
 	        var rid = $('.koraglobal_recordSearch_rid').val();
 	        window.location = $('#kora_globals').attr("baseuri")+'viewObject.php?rid='+rid;

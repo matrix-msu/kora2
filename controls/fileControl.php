@@ -1,4 +1,6 @@
 <?php
+use KORA\Manager;
+use KORA\Record;
 /**
 Copyright (2008) Matrix: Michigan State University
 
@@ -21,7 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 // Refactor: Joe Deming, Anthony D'Onofrio 2013
 
 require_once(__DIR__.'/../includes/includes.php');
-require_once(basePath.'includes/fixity.php');
+require_once(__DIR__.'/../includes/fixity.php');
 if (defined('basePath') && @$solr_enabled)
 {
 	require_once(basePath."includes/solrUtilities.php");
@@ -176,7 +178,7 @@ class FileControl extends Control {
 	  *
 	  * @return void
 	  */
-	public function display() {
+	public function display($defaultValue=true) {
 		global $db;
 		
 		if (!$this->StartDisplay()) { return false; }
@@ -187,14 +189,18 @@ class FileControl extends Control {
 		<span><i>To upload a file, click below or drag from desktop to gray area <br/> (javascript must be enabled for drag-and-drop to work)</i></span>';
 		if($this->value) {  
 			echo '<div><input type="file" name="'.$this->cName.'" id="'.$this->cName.'" class="filespace"></div>';
-			echo '<div id="existing'.$this->cName.'" class="kcfc_existingfile"><br />'.gettext('Existing File').': <a href="';
-			echo $this->GetURL();
-			echo '" class="kcfc_file_existing"><strong>'.$this->value->originalName.'</strong></a><br/><strong>'.gettext('Size').':</strong> '.$this->value->size;
-			echo '<br /><br /><a class="link kcfc_delfile">'.gettext('Delete this File').'</a>';
-			echo '</div>';
+			if(Manager::GetRecord() != null){
+				echo '<div id="existing'.$this->cName.'" class="kcfc_existingfile"><br />'.gettext('Existing File').': <a href="';
+				echo $this->GetURL();
+				echo '" class="kcfc_file_existing"><strong>'.$this->value->originalName.'</strong></a><br/><strong>'.gettext('Size').':</strong> '.$this->value->size;
+				echo '<br /><br />';
+				echo '<a class="link kcfc_delfile">'.gettext('Delete this File').'</a>';
+				echo '</div>';
+			}
 		} else{
 			echo '<div><input type="file" name="'.$this->cName.'" id="'.$this->cName.'" class="filespace"></div>';
 		}
+		echo "<i>Note: Video Playback supported for MP4 videos</i>";
 		$this->EndDisplay();
 		//echo '</table>';
 	}
@@ -248,6 +254,7 @@ class FileControl extends Control {
 	  */
 	public function ingest($publicIngest = false) {
 		global $db;
+		
 		if (empty($this->rid)) {
 			echo '<div class="error">'.gettext('No Record ID Specified').'.</div>';
 			return;
@@ -458,6 +465,22 @@ class FileControl extends Control {
 			
 			$returnString .= "<div class='kc_file_size'>".gettext('Size').': '.$this->value->size.' bytes</div>';
 			$returnString .= "<div class='kc_file_type'>".gettext('Type').': '.$this->value->type.'</div>';
+            if(strpos($this->value->type , "video/") !== false) { // Type contains video.
+                $returnString .= "<div class='kc_file_video'>".gettext('Video').': <br>';
+                if ($this->inPublicTable) {
+                    $returnString .= "<video src='" . publicGetURLFromRecordID($this->pid, $this->sid, $this->cid, $this->rid) . "' width='320' height='240'>";
+                } else {
+                    $returnString .= "<video src='" . getURLFromRecordID($this->rid, $this->cid) . "' width='320' height='240'>";
+                }
+            }
+			if(strpos($this->value->type , "audio/") !== false) { // Type contains audio.
+				$returnString .= "<div class='kc_file_video'>".gettext('Audio').': <br>';
+				if ($this->inPublicTable) {
+					$returnString .= "<audio src='" . publicGetURLFromRecordID($this->pid, $this->sid, $this->cid, $this->rid) . "' width='320' height='30'>";
+				} else {
+					$returnString .= "<audio src='" . getURLFromRecordID($this->rid, $this->cid) . "' width='320' height='30'>";
+				}
+			}
 			return $returnString;
 		}
 	}

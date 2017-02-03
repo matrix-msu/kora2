@@ -1,4 +1,6 @@
 <?php
+use KORA\Manager;
+use KORA\User;
 /**
 Copyright (2008) Matrix: Michigan State University
 
@@ -33,7 +35,11 @@ if (Manager::IsLoggedIn())
 
 Manager::PrintHeader();
 
-User::PrintLoginForm();
+if(Manager::CheckRequestsAreSet(array('redirect'))){
+	User::PrintLoginForm($_REQUEST['redirect']);
+}else{
+	User::PrintLoginForm();
+}
 
 Manager::PrintFooter();
 

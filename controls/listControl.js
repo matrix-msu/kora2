@@ -32,9 +32,20 @@ $(function() {
 		
 		//remove
 		$("#colorbox").on( "click",".kclcopts_loBtnRemove", function() {
-			$('#colorbox .kclcopts_listOpt').find('option:selected').each(function() {
-				$(this).remove();
-			});
+			if(confirm('Are you sure you would like to remove these list options?')){
+				$('#colorbox .kclcopts_listOpt').find('option:selected').each(function() {
+					valueOpt = $(this).text();
+					$(this).remove();
+				});
+				$('#colorbox .kcmlcopts_unSelDef').find('option').each(function() {
+					if($(this).text() ==valueOpt)
+						$(this).remove();
+				});
+				$('#colorbox .kclcopts_defOpt').find('option').each(function() {
+					if($(this).text() ==valueOpt)
+						$(this).remove();
+				});
+			}
 			
 			saveListOptions();
 		});
@@ -43,6 +54,8 @@ $(function() {
 		$("#colorbox").on( "click",".kclcopts_noBtnAddOption", function() {
 			var value = '<option>'+$('#colorbox .kclcopts_newOpt').val()+'</option>';
 			$('#colorbox .kclcopts_listOpt').append(value);
+			$('#colorbox .kcmlcopts_unSelDef').append(value);
+			$('#colorbox .kclcopts_defOpt').append(value);
 			
 			saveListOptions();
 		});
@@ -65,8 +78,8 @@ $(function() {
 			
 			//send them
 			$.ajaxSetup({ async: false });
-			loadSymbolOn();
-			$.post(ajaxhandler, {action:'updateDefValue',source:'ListControl',pid:pid,sid:sid,cid:cid,defVal:defVal}, function(resp){$("#ajaxstatus").html(resp);loadSymbolOff();}, 'html');
+			
+			$.post(ajaxhandler, {action:'updateDefValue',source:'ListControl',pid:pid,sid:sid,cid:cid,defVal:defVal}, function(resp){$("#ajaxstatus").html(resp);}, 'html');
 			PrintControlOpts(pid,sid,cid);
 			$.ajaxSetup({ async: true });
 		});
@@ -83,8 +96,8 @@ $(function() {
 			
 			//send them
 			$.ajaxSetup({ async: false });
-			loadSymbolOn();
-			$.post(ajaxhandler, {action:'updatePresets',source:'ListControl',pid:pid,sid:sid,cid:cid,selPre:selPre}, function(resp){$("#ajaxstatus").html(resp);loadSymbolOff();}, 'html');
+			
+			$.post(ajaxhandler, {action:'updatePresets',source:'ListControl',pid:pid,sid:sid,cid:cid,selPre:selPre}, function(resp){$("#ajaxstatus").html(resp);}, 'html');
 			PrintControlOpts(pid,sid,cid);
 			$.ajaxSetup({ async: true });
 		});
@@ -100,8 +113,8 @@ $(function() {
 			
 			//send them
 			$.ajaxSetup({ async: false });
-			loadSymbolOn();
-			$.post(ajaxhandler, {action:'saveNewPreset',source:'ListControl',pid:pid,sid:sid,cid:cid,name:name}, function(resp){$("#ajaxstatus").html(resp);loadSymbolOff();}, 'html');
+			
+			$.post(ajaxhandler, {action:'saveNewPreset',source:'ListControl',pid:pid,sid:sid,cid:cid,name:name}, function(resp){$("#ajaxstatus").html(resp);}, 'html');
 			PrintControlOpts(pid,sid,cid);
 			$.ajaxSetup({ async: true });
 		});
@@ -115,8 +128,8 @@ $(function() {
 			
 			//send them
 			$.ajaxSetup({ async: false });
-			loadSymbolOn();
-			$.post(ajaxhandler, {action:'setAutoFill',source:'ListControl',pid:pid,sid:sid,cid:cid,afCid:afCid}, function(resp){$("#ajaxstatus").html(resp);loadSymbolOff();}, 'html');
+			
+			$.post(ajaxhandler, {action:'setAutoFill',source:'ListControl',pid:pid,sid:sid,cid:cid,afCid:afCid}, function(resp){$("#ajaxstatus").html(resp);}, 'html');
 			PrintControlOpts(pid,sid,cid);
 			$.ajaxSetup({ async: true });
 		});
@@ -160,8 +173,8 @@ $(function() {
 			
 			//send them
 			$.ajaxSetup({ async: false });
-			loadSymbolOn();
-			$.post(ajaxhandler, {action:'addAutoFillRule',source:'ListControl',pid:pid,sid:sid,cid:cid,fillVal:fillVal,params:params,numRules:numRules}, function(resp){$("#ajaxstatus").html(resp);loadSymbolOff();}, 'html');
+			
+			$.post(ajaxhandler, {action:'addAutoFillRule',source:'ListControl',pid:pid,sid:sid,cid:cid,fillVal:fillVal,params:params,numRules:numRules}, function(resp){$("#ajaxstatus").html(resp);}, 'html');
 			PrintControlOpts(pid,sid,cid);
 			$.ajaxSetup({ async: true });
 		});
@@ -181,8 +194,8 @@ function saveListOptions()
 	
 	//send them
 	$.ajaxSetup({ async: false });
-	loadSymbolOn();
-	$.post(ajaxhandler, {action:'updateListOpts',source:'ListControl',pid:pid,sid:sid,cid:cid,options:options}, function(resp){$("#ajaxstatus").html(resp);loadSymbolOff();}, 'html');
+	
+	$.post(ajaxhandler, {action:'updateListOpts',source:'ListControl',pid:pid,sid:sid,cid:cid,options:options}, function(resp){$("#ajaxstatus").html(resp);}, 'html');
 	//PrintControlOpts(pid,sid,cid);
 	$.ajaxSetup({ async: true });
 }

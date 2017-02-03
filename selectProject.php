@@ -1,4 +1,6 @@
 <?php
+use KORA\Manager;
+use KORA\Project;
 /**
 Copyright (2008) Matrix: Michigan State University
 
@@ -32,7 +34,10 @@ if (sizeof(Manager::GetUser()->GetAuthorizedProjects()) == 1)
 	die();
 }
 
-Manager::PrintHeader();
+if(Manager::GetProject())
+	Manager::PrintHeader();
+else
+	Manager::PrintHeader(true);
 
 if(isset($_REQUEST['err']) && $_REQUEST['err']=='1'){
 	Manager::PrintErrDiv(gettext('You either tried to view a non existant record, or do not have permission to view the requested record.'));

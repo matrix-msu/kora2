@@ -1,4 +1,5 @@
 <?php
+use KORA\Manager;
 /**
 Copyright (2008) Matrix: Michigan State University
 
@@ -27,8 +28,11 @@ if(Manager::CheckRequestsAreSet(['action', 'source','pid','cid']) && $_REQUEST['
 		$ctrlopts = Manager::GetControl($_REQUEST['pid'], $_REQUEST['cid']);
 		
 		//Handle updating of list options for LC
-		if($action == 'updateListOpts' && Manager::CheckRequestsAreSet(['options'])) {
-			$ctrlopts->updateListOpts($_REQUEST['options']);
+		if($action == 'updateListOpts') {
+			if(Manager::CheckRequestsAreSet(['options']))
+				$ctrlopts->updateListOpts($_REQUEST['options']);
+			else
+				$ctrlopts->updateListOpts(array());
 		} 
 		//Handle updating of default value for LC
 		else if ($action == 'updateDefValue' && Manager::CheckRequestsAreSet(['defVal'])) {

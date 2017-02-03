@@ -437,7 +437,7 @@ var MappingManager = new function() {
 	instance.exportresults = function (strselector) {
 		
 		// THIS SHOULD PROBABLY BE DONE VIA AJAX TO GET THIS HEADER INFO SOMEDAY...
-		var xmlout = '<?xml version="1.0" encoding="ISO-8859-1"?><Data>';
+		var xmlout = '<?xml version="1.0" encoding="UTF-8"?><Data>';
 		xmlout += '<ConsistentData></ConsistentData>';
 		
 		$(strselector).each(function( index ) {
@@ -461,6 +461,7 @@ var MappingManager = new function() {
 						atts += prop+'="'+ingestdata[i]._attributes[prop]+'" ';
 					}														
 				}
+				ingestmap[i] = ingestmap[i].replace(" ","_");
 				// IF IT IS ARRAY, ASSUME WE HAVE MULTIPLE EVENTS
 				if (($.type(ingestdata[i]) === "array") || ($.type(ingestdata[i]) === "object"))
 				{
@@ -468,8 +469,11 @@ var MappingManager = new function() {
 					{
 						if (!isNaN(parseInt(ii)))
 						{
-							xmlout += '<'+ingestmap[i]+' '+atts+'>';
-							xmlout += '<![CDATA['+ingestdata[i][ii]+']]>';
+							if (atts!="")
+								xmlout += '<'+ingestmap[i]+' '+atts+'>';
+							else
+								xmlout += '<'+ingestmap[i]+'>';
+							xmlout += ingestdata[i][ii];
 							xmlout += '</'+ingestmap[i]+'>';
 						}
 					}
@@ -477,8 +481,11 @@ var MappingManager = new function() {
 				// ELSE IS IS JUST PLAIN TEXT FOR SINGLE-FIELD ENTRIES
 				else
 				{
-					xmlout += '<'+ingestmap[i]+' '+atts+'>';
-					xmlout += '<![CDATA['+ingestdata[i]+']]>';
+					if (atts!="")
+						xmlout += '<'+ingestmap[i]+' '+atts+'>';
+					else
+						xmlout += '<'+ingestmap[i]+'>';
+					xmlout += ingestdata[i][ii];
 					xmlout += '</'+ingestmap[i]+'>';
 				}
 			}
@@ -490,7 +497,7 @@ var MappingManager = new function() {
 		console.log(xmlout);
 		
 		
-		var datauri = 'data:application/octet-stream;charset=ISO-8859-4,' + encodeURIComponent(xmlout);
+		var datauri = 'data:application/octet-stream;charset=UTF-8,' + encodeURIComponent(xmlout);
 		
 		var downloadLink = document.createElement("a");
 		downloadLink.href = datauri;

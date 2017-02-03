@@ -21,8 +21,8 @@ $(function() {
 						var twidth = $('#colorbox .kcicopt_thumbwidth').val();
 						var theight = $('#colorbox .kcicopt_thumbheight').val();
 						$.ajaxSetup({ async: false });
-						loadSymbolOn();
-						$.post(ajaxhandler, {action:'updateThumbnailSize',source:'ImageControl',pid:pid,sid:sid,cid:cid,twidth:twidth,theight:theight}, function(resp){$("#ajaxstatus").html(resp);loadSymbolOff();}, 'html');
+						
+						$.post(ajaxhandler, {action:'updateThumbnailSize',source:'ImageControl',pid:pid,sid:sid,cid:cid,twidth:twidth,theight:theight}, function(resp){$("#ajaxstatus").html(resp);}, 'html');
 						PrintControlOpts(pid,sid,cid);
 						$.ajaxSetup({ async: true });
 					});
@@ -39,8 +39,8 @@ $(function() {
 						var twidth = $('#colorbox .kcicopt_thumbwidth').val();
 						var theight = $('#colorbox .kcicopt_thumbheight').val();
 						$.ajaxSetup({ async: false });
-						loadSymbolOn();
-						$.post(ajaxhandler, {action:'updateThumbnailSize',source:'ImageControl',pid:pid,sid:sid,cid:cid,twidth:twidth,theight:theight}, function(resp){$("#ajaxstatus").html(resp);loadSymbolOff();}, 'html');
+						
+						$.post(ajaxhandler, {action:'updateThumbnailSize',source:'ImageControl',pid:pid,sid:sid,cid:cid,twidth:twidth,theight:theight}, function(resp){$("#ajaxstatus").html(resp);}, 'html');
 						PrintControlOpts(pid,sid,cid);
 						$.ajaxSetup({ async: true });
 					});

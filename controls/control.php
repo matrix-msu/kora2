@@ -1,4 +1,5 @@
 <?php
+use KORA\Manager;
 /**
 Copyright (2008) Matrix: Michigan State University
 
@@ -55,7 +56,7 @@ abstract class Control {
 	 * <input type="whatever" name="p#c#"> or
 	 * <input type="whatever" name="p#c#_suffix">
 	 */
-	abstract function display();
+	abstract function display($defaultValue);
 	
 	abstract function displayXML();
 	
@@ -203,7 +204,7 @@ abstract class Control {
 		
 		$validtext = ($this->GetRequired()) ? 'invalid' : 'valid';
 		
-		if($this->HasData() | $prevalid){
+		if($this->HasData() | $prevalid | Manager::CheckRequestsAreSet(['preset'])){
 			$validtext = 'valid';
 		}
 	
@@ -354,7 +355,7 @@ abstract class Control {
 	{
 		global $db;
 		
-		$result = $db->query("UPDATE p".$this->pid."Control SET description='".$val_."' WHERE cid=".$this->cid);
+		$result = $db->query("UPDATE p".$this->pid."Control SET description=\"".$val_."\" WHERE cid=".$this->cid);
 		
 		if(!$result) {
 			Manager::PrintErrDiv(gettext("Error setting description for cid").' ['.$this->cid.'] '.gettext("to value").' ['.$val_.']');

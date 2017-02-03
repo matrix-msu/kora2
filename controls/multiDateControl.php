@@ -1,4 +1,5 @@
 <?php
+use KORA\Manager;
 /**
 Copyright (2008) Matrix: Michigan State University
 
@@ -61,11 +62,11 @@ class MultiDateControl extends DateControl
 	/**
 	  * Prints control view for public ingestion
 	  *
-	  * @param bool $isSearchForm Is this for a search form instead
+	  * @param bool $defaultValue, if true, use the default if selected, else it's blank at first
 	  *
 	  * @return void
 	  */
-	public function display()
+	public function display($defaultValue=true)
 	{
 		global $db;
 		

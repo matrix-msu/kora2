@@ -20,6 +20,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 // Refactor: Joe Deming, Anthony D'Onofrio 2013
 
 // THESE SHOULD BE CONSTANT
+
+//This statement blocks out the includes file for when the system has yet to be installed.
+
 require_once(__DIR__.'/conf.php');
 require_once(__DIR__.'/utilities.php');
 require_once(__DIR__.'/gettextSupport.php');
@@ -63,22 +66,22 @@ if (get_magic_quotes_gpc()) die(gettext('Error').': '.gettext('Magic Quotes are 
 if (isset($dbhost) && isset($dbuser) && isset($dbpass) && isset($dbname))
 {
 	global $db;
-    $db = new mysqli($dbhost, $dbuser, $dbpass, $dbname);
+	$db = new mysqli($dbhost, $dbuser, $dbpass, $dbname);
 
-    if (mysqli_connect_errno())
-    {
-        die(gettext('Cannot connect to the database.  Please verify your configuration settings.'));
-    }
-    else
-    {
-        $db->set_charset('utf8');
-        $mysql_version = $db->query('SELECT VERSION() as version');
-        $mysql_version = $mysql_version->fetch_assoc();
-        if (!version_compare($mysql_version['version'], '5.0.3', '>='))
-        {
-            die(gettext('You must have at least MySQL 5.0.3 installed to use KORA.  You currently have version ').$mysql_version['version']);
-        }
-    }
+	if (mysqli_connect_errno())
+	{
+		die(gettext('Cannot connect to the database.  Please verify your configuration settings.'));
+	}
+	else
+	{
+		$db->set_charset('utf8');
+		$mysql_version = $db->query('SELECT VERSION() as version');
+		$mysql_version = $mysql_version->fetch_assoc();
+		if (!version_compare($mysql_version['version'], '5.0.3', '>='))
+		{
+			die(gettext('You must have at least MySQL 5.0.3 installed to use KORA.  You currently have version ').$mysql_version['version']);
+		}
+	}
 }
 
 //some semi-configurable options
@@ -101,10 +104,10 @@ define('MODERATOR',    128);
 define('VIEW_SEARCH',  256);	//permission to approve/deny publically ingested records
 
 // SYSTEM WILL BREAK EXPORT DOWNLOADS LARGER THAN THIS INTO PARTS 
-define('KORA_MAXEXPORTZIPSIZE', 4294967296); // 4GB
+define('KORA_MAXEXPORTZIPSIZE', 45000000); // 45mb
 
-define('KORA_VERSION', '2.6.2');
-define('LATEST_DB_VERSION', '2.6.2');
+define('KORA_VERSION', '2.7.0');
+define('LATEST_DB_VERSION', '2.7.0');
 
 //reCAPTCHA keys, used for public ingestion
 define('PUBLIC_KEY', '6LdsI_YSAAAAAJCMAC48DQh8agNipar9166E9TvZ');
@@ -132,12 +135,12 @@ if(!defined('MAX_INT_MYSQL')){
 // to avoid confusion with case-sensitive variations of reserved keywords.
 // Also, always document why a keyword is reserved.
 $invalidControlNames = array(
-    'ANY',      // reserved keyword for searching
-    'ALL',      // reserved keyword for searching
-    'KID',      // reserved keyword for searching
-    'LINKERS',  // reserved keyword for search results
-    'PID',      // reserved keyword for search results
-    'SCHEMEID', // reserved keyword for search results
+	'ANY',      // reserved keyword for searching
+	'ALL',      // reserved keyword for searching
+	'KID',      // reserved keyword for searching
+	'LINKERS',  // reserved keyword for search results
+	'PID',      // reserved keyword for search results
+	'SCHEMEID', // reserved keyword for search results
 );
 if (!defined('sessionTimeout')) define('sessionTimeout', 30*60);
 ini_set('session.gc_maxlifetime',sessionTimeout);

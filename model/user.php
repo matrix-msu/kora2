@@ -1,4 +1,9 @@
 <?php
+namespace KORA;
+
+use KORA\Manager;
+use KORA\Project;
+use Exception;
 /**
 Copyright (2008) Matrix: Michigan State University
 
@@ -461,7 +466,7 @@ class User {
 	  * @return void
 	  */
 	// TODO: REVIEW THIS...
-	public static function PrintLoginForm()
+	public static function PrintLoginForm($redirect='')
 	{
 		echo '<h2>'.gettext('Log In to KORA').'</h2>';
 		
@@ -471,10 +476,11 @@ class User {
 		
 		<div class='kora_login_form'>
 		<label for="Username"><?php echo gettext("Username").":";?></label>
-		<input type="text" class="kora_login_user" id="textfield" <?php  if (isset($_REQUEST['username'])) echo 'value="'.$_REQUEST['username'].'"';?>/>
+		<input autofocus type="text" class="kora_login_user" id="textfield" <?php  if (isset($_REQUEST['username'])) echo 'value="'.$_REQUEST['username'].'"';?>/>
 		<label for="Password"><?php echo gettext("Password").":";?></label>
 		<input type="password" class="kora_login_pass" id="textfield" />
 		<button  type="button" class="kora_login_submit"><?php echo gettext('Log In');?></button>
+		<input type="hidden" value="<?php echo urldecode($redirect); ?>" id="kora_login_redirect">
 		<button  type="button" class="kora_login_new"><?php echo gettext('New Account');?></button>
 		<button  type="button" class="kora_login_activate"><?php echo gettext('Activate Account');?></button>
 		</div>

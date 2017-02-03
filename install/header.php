@@ -33,7 +33,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		</div>
 		<div id="content_container">
 			<div id="left">
-			<h3>Help!</h3>
-			extra install directions can go here...
+			<h3 style="color:red">NOTE!</h3>
+			<div>Please make sure that the following folders have write permissions:</div>
+			<li>includes</li>
+			<li>files</li>
+			<br>
+			<div>After installation, you will need to manually add Recaptcha keys to your conf.php file for user registration to funciton</div>
 			</div>
 			<div id="right_container"><div id="right">

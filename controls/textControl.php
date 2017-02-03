@@ -1,4 +1,5 @@
 <?php
+use KORA\Manager;
 /**
 Copyright (2008) Matrix: Michigan State University
 
@@ -83,25 +84,26 @@ class TextControl extends Control {
 	/**
 	  * Prints control view for public ingestion
 	  *
-	  * @param bool $isSearchForm Is this for a search form instead
+	  * @param bool $defaultValue Is this for a search form instead
 	  *
 	  * @return void
 	  */
-	public function display($isSearchForm=false)
+	public function display($defaultValue=true)
 	{
+		
 		$hasDef = false;
 		if($this->value != ''){
 			$hasDef = true;
 		}
 	
 		if (!$this->StartDisplay($hasDef)) { return false; }
-		if($isSearchForm){
+		if(!$defaultValue){
 			echo '<input name="'.$this->cName.'" id="'.$this->cName.'" size="25"/>';
 		}
 		else{
 			if ((int) $this->options->rows < 2 && @(string)$this->options->textEditor != 'rich')
 			{
-				print '<input type="text" name="'.$this->cName.'" id="something" size="'.(int)$this->options->columns.'" value="'.htmlEscape($this->value).'"/>';
+				echo '<input type="text" name="'.$this->cName.'" id="something" size="'.(int)$this->options->columns.'" value="'.htmlEscape($this->value).'"/>';
 			}else if (@(string)$this->options->textEditor != 'rich'){
 				echo '<textarea ';
                 if ((string)$this->options->textEditor == 'rich') echo 'id="'.$this->cid.'" ';

@@ -1,5 +1,12 @@
 <?php
+namespace KORA;
 
+use KORA\Manager;
+use KORA\ControlCollection;
+use KORA\Importer;
+use KORA\Project;
+use KORA\Record;
+use Exception;
 /**
 Copyright (2008) Matrix: Michigan State University
 
@@ -455,7 +462,10 @@ class Scheme
 				continue;
 			}
 			
-			$schemes[] = new Scheme((string)$entry->project, (string)$entry->scheme);
+			$s = new Scheme((string)$entry->project, (string)$entry->scheme);
+			if($s->GetPID()!=0){
+				$schemes[] = $s;
+			}
 		}
 		
 		if (empty($xml->to) || empty($xml->to->entry)){
@@ -636,6 +646,7 @@ class Scheme
 			//        WE CAN THEN DIFFERENTIATE ON IMPORT WHEN TO STRIP THAT PREFIX BACK OFF
 			//        TRY IT:  CREATE A CONTROL STARTING WITH A NUMBER, EXPORT IT, THEN TRY TO IMPORT
 			$tag_name = $_cName = str_replace(" ","_",$ctrl->GetName());
+			$tag_name = str_replace("/","_",$tag_name);
 			$node = $schemesimplexml->Controls->addChild($tag_name);
 			$node->addChild('CollId',$ctrl->GetGroup());
 			$node->addChild('Type',$ctrl->GetClass());
@@ -910,10 +921,10 @@ class Scheme
 			$type = $_REQUEST['type'];
 			$collid = $_REQUEST['collectionid'];
 			$description = $_REQUEST['description'];
-			$required = (isset($_REQUEST['required']) && $_REQUEST['required'] == "on") ? 1 : 0;
-			$searchable = (isset($_REQUEST['searchable']) && $_REQUEST['searchable'] == "on") ? 1 : 0;
-			$advanced = (isset($_REQUEST['advanced']) && $_REQUEST['advanced'] == "on") ? 1 : 0;
-			$showinresults = (isset($_REQUEST['showinresults']) && $_REQUEST['showinresults'] == "on") ? 1 : 0;
+			$required = (isset($_REQUEST['required']) && $_REQUEST['required'] == "true") ? 1 : 0;
+			$searchable = (isset($_REQUEST['searchable']) && $_REQUEST['searchable'] == "true") ? 1 : 0;
+			$advanced = (isset($_REQUEST['advanced']) && $_REQUEST['advanced'] == "true") ? 1 : 0;
+			$showinresults = (isset($_REQUEST['showinresults']) && $_REQUEST['showinresults'] == "true") ? 1 : 0;
 			$showinpublic = (isset($_REQUEST['showinpublicresults']) && $_REQUEST['showinpublicresults'] == "on") ? 1 : 0;
 			$publicentry = (isset($_REQUEST['publicentry']) && $_REQUEST['publicentry'] == "on") ? 1 : 0;
 	
@@ -1310,7 +1321,7 @@ class Scheme
    				foreach($xml->kid as $kid)
    				{
    					// remove the association from $kid to $a['id']
-   					AssociatorControl::RemoveAllAssociations($kid, $a['id']);
+   					\AssociatorControl::RemoveAllAssociations($kid, $a['id']);
    				}
    			}
    		}
@@ -1360,7 +1371,6 @@ class Scheme
 		$xmlObject = simplexml_load_file($_FILES['xmlFileName']['tmp_name']);
 		if (!$xmlObject) {
 			echo gettext("Failed to parse XML file.");
-			Manager::PrintFooter();
 			die();
 			
 		}

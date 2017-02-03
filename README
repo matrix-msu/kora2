@@ -1,4 +1,4 @@
-KORA 2.6.2 Installation Instructions
+KORA 2.7.0 Installation Instructions
 
 Requirements:
 
@@ -7,16 +7,31 @@ KORA requires a web server, PHP 5.1.3 or newer, MySQL 5.0.3 or newer, and a mail
 To install KORA do the following:
 
 1. Move the KORA folder to a web accesible location
-2. Make sure the web server can write to the includes directory
-3. Navigate to install_path/install/databaseInstall.php in your web browser
-4. Fill out all the information and click the 'generate configuration' box, click submit
-5. Check in includes/conf.php to verify that the settings are correct
-6. Log in to KORA using your web browser.  You can use the koraadmin user and the password you chose (or generated) for you.  Make sure you 
+2. Make sure the web server can write to the includes directory and the files directory
+3. Navigate to the KORA root path in your web browser
+4. If you have your own MySQL DB, select 'Use Existing Database'
+5. Fill out all the information and click the 'generate configuration' box, click submit
+6. Check in includes/conf.php to verify that the settings are correct
+7. Log in to KORA using your web browser.  You can use the koraadmin user and the password you chose (or generated) for you.  Make sure you 
    make a user and fix any problems with your MTA before you continue using the system.  KORA must be able to send email in order for new
    users to register.
-7. Delete the install directory.
-8. Remove write permissions from the includes directory for the web server.
+8. Delete the install directory.
+9. Remove write permissions from the includes directory for the web server.
 
-To upgrade KORA from a previous version, see the instructions located at install_path/install/readme.
+NOTE: If you plan on supporting plugins, you will have to manually create the config from the distribution 
+	in the plugins folder. This file takes four values that you can copy over from your new KORA config file.
 
-KORA is now ready to use.  Please see the user documentation in the install_path/docs/ directory for information on how to use KORA.
+KORA is now ready to use.
+
+What's New in Kora 2.7.0
+----------------------------
+Features
+- Transistioned XML usage to UTF-8 encoding to define standard for special characters in data
+- Added URL redirecting when relogging in after session ends.
+- Added KORA namespace to the model classes
+
+Bug Fixes
+- Added authentication requirement to plugin settings page
+- Fixed an issue where adding/removing values from list/multi-list control did not update the default values list
+- Fixed layout of response message from importing a scheme through xml
+- ReCAPTCHA keys can now be entered in the install process

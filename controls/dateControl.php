@@ -1,4 +1,5 @@
 <?php
+use KORA\Manager;
 /**
 Copyright (2008) Matrix: Michigan State University
 
@@ -114,7 +115,7 @@ class DateControl extends Control
 	  *
 	  * @return void
 	  */
-	public function display()
+	public function display($defaultValue=true)
 	{
 	
 		$hasDef = false;
@@ -124,7 +125,7 @@ class DateControl extends Control
 		
 		if (!$this->StartDisplay($hasDef)) { return false; }
 		
-		$this->PrintDateSelectDivs();
+		$this->PrintDateSelectDivs($defaultValue);
 
 		$this->EndDisplay();
 	}
@@ -382,7 +383,12 @@ class DateControl extends Control
 		$this->XMLInputValue[$this->cName.'day'] = $day;
 		$this->XMLInputValue[$this->cName.'year'] = $year;
 		$this->XMLInputValue[$this->cName.'era'] = isset($dateData[1]) ? $dateData[1] : '';
-
+		if(isset($value['_attributes']['prefix'])){
+			$this->XMLInputValue[$this->cName.'prefix'] = $value['_attributes']['prefix'];
+		}
+		if(isset($value['_attributes']['suffix'])){
+			$this->XMLInputValue[$this->cName.'prefix'] = $value['_attributes']['suffix'];
+		}
 	}
 	
 	/**
@@ -613,13 +619,12 @@ class DateControl extends Control
 	  */
 	public function ExportToSimpleXML(&$simplexml) 
 	{
-		
 		$dateString = $this->value->month.'/'.$this->value->day.'/'.$this->value->year;
-		if (isset($this->value['era'])) { $dateString.= ' '.$this->value->era; }
+		if (isset($this->value->era)) { $dateString.= ' '.$this->value->era; }
 		$node = $simplexml->addChild(str_replace(' ', '_', $this->GetName()), xmlEscape($dateString));
 		
-		if (isset($this->value['prefix'])) { $node->addAttribute('prefix', xmlEscape($this->value->prefix)); }
-		if (isset($this->value['suffix'])) { $node->addAttribute('suffix', xmlEscape($this->value->suffix)); }
+		if (isset($this->value->prefix) && $this->value->prefix!="") { $node->addAttribute('prefix', xmlEscape($this->value->prefix)); }
+		if (isset($this->value->suffix) && $this->value->suffix!="") { $node->addAttribute('suffix', xmlEscape($this->value->suffix)); }
 
 		return $simplexml;					
 	}
@@ -1173,7 +1178,7 @@ class DateControl extends Control
 	  *
 	  * @return void
 	  */
-	protected function PrintDateSelectDivs()
+	protected function PrintDateSelectDivs($defaultValue=true)
 	{
 		$month = $day = $year = $prefix = $suffix = '';
 		if (isset($this->value->month)) $month = (string) $this->value->month;
@@ -1189,12 +1194,12 @@ class DateControl extends Control
 		ob_start();
 		echo "<select class='kcdc_month' name='".$this->cName."month' id='".$this->cName."month'>";
 		echo '<option value=""';
-		if (empty($month)) echo ' selected="selected"';
+		if (empty($month) && !$defaultValue) echo ' selected="selected"';
 		echo '>&nbsp;</option>';
 		for ($i=1; $i <= 12; $i++)
 		{
 			echo "<option value=\"$i\"";
-			if ($i == $month) echo ' selected="selected"';
+			if ($i == $month && $defaultValue) echo ' selected="selected"';
 			echo '>'.gettext(DateControl::$months[$i]['name']).'</option>';
 		}
 		echo '</select>';
@@ -1204,12 +1209,12 @@ class DateControl extends Control
 		ob_start();
 		echo "<select class='kcdc_day' name='".$this->cName."day' id='".$this->cName."day'>";
 		echo '<option value=""';
-		if (empty($day) || $day == 0) echo ' selected="selected"';
+		if ((empty($day) || $day == 0) && !$defaultValue) echo ' selected="selected"';
 		echo '>&nbsp;</option>';
 		for ($i=1; $i <= 31; $i++)
 		{
 			echo "<option value=\"$i\"";
-			if ($i == $day) echo ' selected="selected"';
+			if ($i == $day && $defaultValue) echo ' selected="selected"';
 			echo ">$i</option>";
 		}
 		echo '</select>';
@@ -1220,7 +1225,7 @@ class DateControl extends Control
 		
 		echo "<select class='kcdc_year' name='".$this->cName."year' id='".$this->cName."year'>";
 		echo '<option value=""';
-		if (empty($year) || $year == 0) echo ' selected="selected"';
+		if ((empty($year) || $year == 0) && !$defaultValue) echo ' selected="selected"';
 		echo '>&nbsp;</option>';
 		
 		$startYear = (int) $this->options->startYear;
@@ -1237,7 +1242,7 @@ class DateControl extends Control
 		for ($i=$startYear; $i <= $endYear; $i++)
 		{
 			echo "<option value=\"$i\"";
-			if ($i == $year) echo ' selected="selected"';
+			if ($i == $year && $defaultValue) echo ' selected="selected"';
 			echo ">$i</option>";
 		}
 		echo '</select>';

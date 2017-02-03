@@ -1,4 +1,5 @@
 <?php
+use KORA\Manager;
 /**
 Copyright (2008) Matrix: Michigan State University
 
@@ -24,32 +25,42 @@ require_once('includes/includes.php');
 Manager::Init();
 
 Manager::RequireLogin();
-Manager::RequireRecord();
 
-// Make sure the user has permissions to delete this object
-if (!Manager::GetUser()->HasProjectPermissions(DELETE_RECORD, Manager::GetRecord()->GetPID()))
-{
-	header('Location: schemeLayout.php');
-	die();
+if( !Manager::CheckRequestsAreSet(['deleted'])){
+	Manager::RequireRecord();
+
+	// Make sure the user has permissions to delete this object
+	if (!Manager::GetUser()->HasProjectPermissions(DELETE_RECORD, Manager::GetRecord()->GetPID()))
+	{
+		header('Location: schemeLayout.php');
+		die();
+	}
+
+	Manager::PrintHeader();
+
+	$rid = Manager::GetRecord()->GetRID();
+	echo '<h2>'.gettext('Delete Record').': '.$rid.'</h2>';
+
+	echo gettext('Warning').': '.gettext('This will permanently delete all data within this record. Are you sure you really want to delete this record?').'<br /><br />';
+
+	if (sizeof(Manager::GetRecord()->GetAssociatedRecords()) > 0)
+	{
+		Manager::PrintErrDiv(gettext('Warning').': '
+			.gettext('At least one record associates to this record.  Any such associations will be lost if this record is deleted.')
+			.'<br /><br />');
+	}
+
+	Manager::GetRecord()->PrintRecordDeleteForm();
+
+	Manager::GetRecord()->PrintRecordView();
+
 }
-
-Manager::PrintHeader();
-
-$rid = Manager::GetRecord()->GetRID();
-echo '<h2>'.gettext('Delete Record').': '.$rid.'</h2>';
-
-echo gettext('Warning').': '.gettext('This will permanently delete all data within this record. Are you sure you really want to delete this record?').'<br /><br />';
-
-if (sizeof(Manager::GetRecord()->GetAssociatedRecords()) > 0)
-{
-    Manager::PrintErrDiv(gettext('Warning').': '
-    	.gettext('At least one record associates to this record.  Any such associations will be lost if this record is deleted.')
-    	.'<br /><br />');
+else{
+	Manager::PrintHeader();
+	
+	echo '<h2>'.gettext('Delete Record').'</h2>';
+	echo gettext('Record successfully deleted.');
 }
-
-Manager::GetRecord()->PrintRecordDeleteForm();
-
-Manager::GetRecord()->PrintRecordView();
 
 Manager::PrintFooter();
 ?>

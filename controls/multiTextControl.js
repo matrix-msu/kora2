@@ -16,7 +16,7 @@ $(function() {
 								{
 									if (ValidateListItem(valname, val, kcdiv))
 										{ 
-											kcdiv.find('.kcmtc_curritems').append('<option value="'+val+'">'+val+'</option>'); 
+											kcdiv.find('.kcmtc_curritems').append('<option value="'+val+'" selected>'+val+'</option>'); 
 										} 
 								}
 						});
@@ -57,7 +57,7 @@ $(function() {
 						{
 							if (ValidateListItem(valname, val, kcdiv))
 								{ 
-									kcdiv.find('.kcmtc_curritems').append('<option value="'+val+'">'+val+'</option>'); 
+									kcdiv.find('.kcmtc_curritems').append('<option value="'+val+'" selected>'+val+'</option>'); 
 								} 
 						}
 				});
@@ -95,10 +95,12 @@ $(function() {
 		});
 		
 		$("#colorbox").on( "click",".kcmtcopts_defremove", function() {
-				$('#colorbox .kcmtcopts_defval > option:selected').each(function() {
-						$(this).remove();
-				});
-				KCMTC_SaveDefaultValue();
+				if(confirm('Are you sure you would like to remove these list options?')){
+					$('#colorbox .kcmtcopts_defval > option:selected').each(function() {
+							$(this).remove();
+					});
+					KCMTC_SaveDefaultValue();
+				}
 		});
 		
 		$("#colorbox").on( "click",".kcmtcopts_defmoveup", function() {
@@ -131,8 +133,8 @@ function KCMTC_SaveDefaultValue()
 	});
 	
 	$.ajaxSetup({ async: false });
-	loadSymbolOn();
-	$.post(ajaxhandler, {action:'saveDefault',source:'MultiTextControl',pid:pid,sid:sid,cid:cid,values:defvals}, function(resp){$("#ajaxstatus").html(resp);loadSymbolOff();}, 'html');
+	
+	$.post(ajaxhandler, {action:'saveDefault',source:'MultiTextControl',pid:pid,sid:sid,cid:cid,values:defvals}, function(resp){$("#ajaxstatus").html(resp);}, 'html');
 	$.ajaxSetup({ async: true });
 }
 
@@ -148,12 +150,12 @@ function KCMTC_Validate(kcdiv)
 	fd.append('sid',kcdiv.attr('ksid'));
 	fd.append('cid',kcdiv.attr('kcid'));
 	var datavals = [];
-	datadom.find('option:selected').each(function() {
+	datadom.find('option').each(function() {
 			datavals.push(this.value);
 	});
 	fd.append(datadom.attr('name'), datavals);
 	
-	loadSymbolOn();
+	
 	$.ajax({
 			url: 'ajax/control.php',
 			data: fd,
@@ -168,7 +170,7 @@ function KCMTC_Validate(kcdiv)
 				}else{
 					kcdiv.attr('kcvalid','invalid');
 				}
-				loadSymbolOff();
+				
 			}
 	});		
 	

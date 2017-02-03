@@ -1,4 +1,8 @@
 <?php
+namespace KORA;
+
+use KORA\Manager;
+use KORA\Record;
 /**
 Copyright (2008) Matrix: Michigan State University
 
@@ -393,10 +397,17 @@ class KoraSearch {
 		$totalRecords = 0;
 		// A stored list of all the queries to get objects from the various projects
 		$objectQueries = array();
+		//Maintaining the keyword structure so manipulation will not effect it 
+		$keywords_orig = $keywords;
+		//make a list of all the cid's that are DateControl's
+		$dateControlArray = array();
+		//array of results
+		$idArray = array();
 		
 		// Loop through the projects; build the object queries for each
 		foreach($pid as $project)
 		{
+			$keywords = $keywords_orig;
 			// $objectQuery gets the list of IDs of records to pull data for.
 			// The 1=1 is needed so that if no schemeid or keywords are sent
 			// the query is still valid
@@ -506,31 +517,30 @@ class KoraSearch {
 			$totalRecords += $pageNumQuery['numRecords'];
 			
 			// store the Object Query in the List
-			$objectQueries[] = array('pid' => $project,
+			/* $objectQueries[] = array('pid' => $project,
 									 'query' => 'SELECT DISTINCT id '.$objectQuery,
-									 'count' => $pageNumQuery['numRecords']);
+									 'count' => $pageNumQuery['numRecords']); */
+									 
+			$projControl = "p".$project."Control";
+			$datesQuery = "SELECT cid FROM $projControl WHERE type='DateControl'";
+			$datesQuery = $db->query($datesQuery);
+			while($dateControl = $datesQuery->fetch_assoc())
+			{
+				$dateControlArray[] = $dateControl['cid'];
+			}
+			
+			//query objectQuery and put results into an array of id's
+			$objectQuery = 'SELECT DISTINCT id '.$objectQuery;
+			$ids = $db->query($objectQuery);
+			
+			while($id = $ids->fetch_assoc())
+			{
+				$idArray[] = $id['id'];
+			}
 		}
 		
 		/*** STEP 3: Create an array of sorted KID's ***/
 		
-		//make a list of all the cid's that are DateControl's
-		$dateControlArray = array();
-		$projControl = "p".$project."Control";
-		$datesQuery = "SELECT cid FROM $projControl WHERE type='DateControl'";
-		$datesQuery = $db->query($datesQuery);
-		while($dateControl = $datesQuery->fetch_assoc())
-		{
-			$dateControlArray[] = $dateControl['cid'];
-		}
-		
-		//query objectQuery and put results into an array of id's
-		$objectQuery = 'SELECT DISTINCT id '.$objectQuery;
-		$ids = $db->query($objectQuery);
-		$idArray = array();
-		while($id = $ids->fetch_assoc())
-		{
-			$idArray[] = $id['id'];
-		}
 		$idString = "('".implode("','",$idArray)."')";
 		
 		//*****Here we will query and sort everything that has a value in the sortBy control********
@@ -601,61 +611,44 @@ class KoraSearch {
 	 */
 	public static function PrintSearchResultsAJAXLoad($results_, $isAssociatorSearch=false, $displayRange=null)
 	{
-		//Display all results on one page
-		if ($displayRange == 'all') {
-			print "<div class='ks_results'><div class='ks_results_numresults'>Num Results</div><br /><br />";
-			foreach ($results_ as $kid)
-			{
-				$recinfo = Record::ParseRecordID($kid);
-				if (!$recinfo) { continue; }
-				
-				print "<div class='ks_results_page' page='1' >";
-				
-				if($isAssociatorSearch){
-					print "<div class='ks_results_assoc' kid='".$kid."'><a>Associated this record (".$kid.")</a></div>";
-				}
-				
-				print "<div class='ks_result_item' pid='${recinfo['pid']}' sid='${recinfo['sid']}' rid='${recinfo['rid']}' loaded='false' >$kid</div>";
-				print"</div>";
-			}
-			print "</div>";
-		//Display paginated version of results	
-		} else {
-			// TODO: MAYBE FIND A BETTER WAY TO PASS THIS ADJACENT_PAGES_SHOWN VAR TO JAVASCRIPT?
-			print "<div class='ks_results' navlinkadj='".ADJACENT_PAGES_SHOWN."' >";
-			print "<div class='ks_results_navlinks'></div><div class='ks_results_numresults'>Num Results</div><br /><br />";
-			$currpage = 1;
-			$currpagecount = 0;
-			foreach ($results_ as $kid)
-			{
-				$recinfo = Record::ParseRecordID($kid);
-				if (!$recinfo) { continue; }
-				
-				// PAGE SEPARATION
-				if ($currpagecount == 0)
-				{ print "<div class='ks_results_page' page='$currpage' >"; }
-				
-				
-				if($isAssociatorSearch){
-					print "<div class='ks_results_assoc' kid='".$kid."'><a>Associated this record (".$kid.")</a></div>";
-				}
-				print "<div class='ks_result_item' pid='${recinfo['pid']}' sid='${recinfo['sid']}' rid='${recinfo['rid']}' loaded='false' >$kid</div>";
-				
-				// PAGE SEPARATION
-				if ($currpagecount == RESULTS_IN_PAGE)
-				{ print "</div>"; $currpagecount = 0; $currpage++; }
-				else
-				{ $currpagecount++; }
-			}
-			// THIS WILL CLOSE OUT THE FINAL PAGE IF IT IS NOT EXACTLY THE RIGHT COUNT ALREADY
-			if ($currpagecount != 0)
-			{ print "</div>"; $currpagecount = 0; }
+		// TODO: MAYBE FIND A BETTER WAY TO PASS THIS ADJACENT_PAGES_SHOWN VAR TO JAVASCRIPT?
+		print "<div class='ks_results' navlinkadj='".ADJACENT_PAGES_SHOWN."' >";
+		
+		//This is the div for pagination
+		print "<div class='ks_results_navlinks'></div>";
+		
+		print"<div class='ks_results_numresults'>Num Results</div><br /><br />";
+		$currpage = 1;
+		$currpagecount = 0;
+		foreach ($results_ as $kid)
+		{
+			$recinfo = Record::ParseRecordID($kid);
+			if (!$recinfo) { continue; }
 			
-			print "<div class='ks_results_navlinks'></div>";
-			if(sizeof($results_)>0)
-				print "<div class='ks_results_numresults'>Num Results</div>";
-			print "</div>";
+			// PAGE SEPARATION
+			if ($currpagecount == 0)
+			{ print "<div class='ks_results_page' page='$currpage' >"; }
+			
+			
+			if($isAssociatorSearch){
+				print "<div class='ks_results_assoc' kid='".$kid."'><a>Associated this record (".$kid.")</a></div>";
+			}
+			print "<div class='ks_result_item' pid='${recinfo['pid']}' sid='${recinfo['sid']}' rid='${recinfo['rid']}' loaded='false' >$kid</div>";
+			
+			// PAGE SEPARATION
+			if ($currpagecount == RESULTS_IN_PAGE)
+			{ print "</div>"; $currpagecount = 0; $currpage++; }
+			else
+			{ $currpagecount++; }
 		}
+		// THIS WILL CLOSE OUT THE FINAL PAGE IF IT IS NOT EXACTLY THE RIGHT COUNT ALREADY
+		if ($currpagecount != 0)
+		{ print "</div>"; $currpagecount = 0; }
+		
+		print "<div class='ks_results_navlinks'></div>";
+		if(sizeof($results_)>0)
+			print "<div class='ks_results_numresults'>Num Results</div>";
+		print "</div>";
 		
 		return true;
 	}
@@ -739,7 +732,7 @@ class KoraSearch {
 				$control = new $controlClass(Manager::GetProject()->GetPID(),$c['cid']);
 				
 				echo '<tr><td>'.$c['name'].': </td><td>';
-				$control->display(true);
+				$control->display(false);
 				echo '</td></tr>';
 			}
 		}

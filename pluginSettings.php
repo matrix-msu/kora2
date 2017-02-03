@@ -1,4 +1,6 @@
 <?php
+use KORA\Manager;
+use Kora\Plugin;
 /*
 Copyright (2008) Matrix: Michigan State University
 
@@ -23,6 +25,8 @@ require_once('includes/includes.php');
 Manager::AddJS('javascripts/plugin.js', Manager::JS_CLASS); 
 
 Manager::Init();
+
+Manager::RequireLogin();
 
 Manager::PrintHeader();
 

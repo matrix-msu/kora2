@@ -54,8 +54,8 @@ $(function() {
 			
 			//send them
 			$.ajaxSetup({ async: false });
-			loadSymbolOn();
-			$.post(ajaxhandler, {action:'updateMultiDef',source:'MultiListControl',pid:pid,sid:sid,cid:cid,options:options,defVal:defVal}, function(resp){$("#ajaxstatus").html(resp);loadSymbolOff();}, 'html');
+			
+			$.post(ajaxhandler, {action:'updateMultiDef',source:'MultiListControl',pid:pid,sid:sid,cid:cid,options:options,defVal:defVal}, function(resp){$("#ajaxstatus").html(resp);}, 'html');
 			PrintControlOpts(pid,sid,cid);
 			$.ajaxSetup({ async: true });
 		}
@@ -85,7 +85,7 @@ function KCMLC_Validate(kcdiv)
 	});
 	fd.append(datadom.attr('name'), datavals);
 	
-	loadSymbolOn();
+	
 	$.ajax({
 			url: 'ajax/control.php',
 			data: fd,
@@ -100,7 +100,7 @@ function KCMLC_Validate(kcdiv)
 				}else{
 					kcdiv.attr('kcvalid','invalid');
 				}
-				loadSymbolOff();
+				
 			}
 	});		
 	

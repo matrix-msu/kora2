@@ -1,4 +1,5 @@
 <?php
+use KORA\Manager;
 /**
 Copyright (2008) Matrix: Michigan State University
 
@@ -70,7 +71,7 @@ class MultiTextControl extends TextControl
 	  *
 	  * @return void
 	  */
-	public function display()
+	public function display($defaultValue=true)
 	{
 		global $db;
 		
@@ -87,7 +88,10 @@ class MultiTextControl extends TextControl
 		<?php       if (isset($this->value->text))
 		{
 			foreach($this->value->text as $text) {
-				echo '            <option value="'.(string)$text.'">'.(string)$text."</option>\n";
+				if($this->hasData())
+					echo '            <option value="'.(string)$text.'" selected>'.(string)$text."</option>\n";
+				else
+					echo '            <option value="'.(string)$text.'">'.(string)$text."</option>\n";
 			}
 		}
 		?>
@@ -160,7 +164,12 @@ class MultiTextControl extends TextControl
 	  * @return void
 	  */
     public function setXMLInputValue($value) {
-    	$this->XMLInputValue = $value;
+    	$x = array();
+		foreach($value as $v)
+		{
+			$x[] = xmlEscape($v);
+		}
+		$this->XMLInputValue = $value;
     }
     
     /**
@@ -171,10 +180,10 @@ class MultiTextControl extends TextControl
 	  * @return void
 	  */
     private function loadValues($textArray) {
-    	$this->value = simplexml_load_string('<multitext></multitext>');
+    	$this->value = simplexml_load_string(utf8_encode('<?xml version="1.0" encoding="UTF-8"?><multitext></multitext>'));
     	foreach($textArray as $selectedOption)
     	{
-    		$this->value->addChild('text', xmlEscape($selectedOption));
+			$this->value->addChild('text', xmlEscape($selectedOption));
     	}
     }
     	
@@ -206,7 +215,7 @@ class MultiTextControl extends TextControl
     		}else if (!empty($_REQUEST) && isset($_REQUEST[$this->cName])) {
 			$this->loadValues($_REQUEST[$this->cName]);
 		} else {
-			$this->value = simplexml_load_string('<multitext></multitext>');
+			$this->value = simplexml_load_string('<?xml version="1.0" encoding="UTF-8"?><multitext></multitext>');
 		}
 		
 		// ingest the data
@@ -306,7 +315,9 @@ class MultiTextControl extends TextControl
 			$texts = $this->XMLInputValue;
 		}else return '';
 		
-		if(sizeof($texts)==0){echo 'size is zero';}
+		if($texts[0]=='' && $this->required){
+			return gettext('No value supplied for required field').': '.htmlEscape($this->name);
+		}
 		
 		$pattern = (string) $this->options->regex;
 		if (empty($pattern)) return '';

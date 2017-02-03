@@ -20,12 +20,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 $(function() {
 	if ($('#approjectschemes').length >= 0)
 	{
-		var pid = $('#kora_globals').attr('pid');
 		loadSymbolOn();
-		$.post("ajax/project.php",{action:"PrintProjectSchemes",source:"ProjectFunctions",pid:pid},function(resp){$("#approjectschemes").html(resp);loadSymbolOff();}, 'html');
+		var pid = $('#kora_globals').attr('pid');
+		
+		$.post("ajax/project.php",{action:"PrintProjectSchemes",source:"ProjectFunctions",pid:pid},function(resp){$("#approjectschemes").html(resp);}, 'html');
+		loadSymbolOff();
 	}
 	
 	$("#approjectschemes" ).on( "click",'.add_scheme', function() {
+		loadSymbolOn();
 		var c = $(this);
 		var pid = $('#kora_globals').attr('pid');
 		$.ajaxSetup({ async: false });
@@ -45,7 +48,7 @@ $(function() {
 			fd.append('publicIngestion',$('.project_addScheme_publicIngest').val());
 			fd.append('legal',$('.project_addScheme_legal').val());
 			
-			loadSymbolOn();
+			
 			$.ajax({
 				url: 'ajax/project.php',
 				data: fd,
@@ -57,17 +60,19 @@ $(function() {
 					if (resp == ""){ check_error = 1; }
 					$("#cbox_error").append(resp);
 					$.colorbox.resize();
-					loadSymbolOff();
+					
 				}
 			});
 			
 			if ( check_error == 1){ $.colorbox.close(); } //If no error, close cbox
-			loadSymbolOn();
-			$.post("ajax/project.php",{action:"PrintProjectSchemes",source:"ProjectFunctions",pid:pid},function(resp){$("#approjectschemes").html(resp);loadSymbolOff();}, 'html');
+			
+			$.post("ajax/project.php",{action:"PrintProjectSchemes",source:"ProjectFunctions",pid:pid},function(resp){$("#approjectschemes").html(resp);}, 'html');
 		});
+		loadSymbolOff();
 	});
 
 	$("#approjectschemes" ).on( "click",'.edit_scheme', function() {
+		loadSymbolOn();
 		var c = $(this);
 		var pid = $('#kora_globals').attr('pid');
 		var sid = c.parents('.project_scheme').first().attr('sid');
@@ -87,7 +92,7 @@ $(function() {
 			fd.append('publicIngestion',$('.project_editScheme_publicIngest').val());
 			fd.append('legal',$('.project_editScheme_legal').val());
 			
-			loadSymbolOn();
+			
 			$.ajax({
 				url: 'ajax/project.php',
 				data: fd,
@@ -99,93 +104,116 @@ $(function() {
 					if (resp == ""){ check_error = 1; }
 					$("#cbox_error").append(resp);
 					$.colorbox.resize();
-					loadSymbolOff();
+					
 				}
 			});
 			
 			if ( check_error == 1){ $.colorbox.close(); } //If no error, close cbox
-			loadSymbolOn();
-			$.post("ajax/project.php",{action:"PrintProjectSchemes",source:"ProjectFunctions",pid:pid},function(resp){$("#approjectschemes").html(resp);loadSymbolOff();}, 'html');
+			
+			$.post("ajax/project.php",{action:"PrintProjectSchemes",source:"ProjectFunctions",pid:pid},function(resp){$("#approjectschemes").html(resp);}, 'html');
 		});
+		loadSymbolOff();
 	});
 
 	$("#approjectschemes" ).on( "click",'.move_scheme_up', function() {
+		loadSymbolOn();
 		var c = $(this);
 		var pid = $('#kora_globals').attr('pid');
 		var sid = c.parents('.project_scheme').first().attr('sid');
-		loadSymbolOn();
+		
 		$.post("ajax/project.php",{action:"MoveProjectScheme",source:"ProjectFunctions",pid:pid,movesid:sid,direction:"up"},function(resp){$("#global_error").append(resp);}, 'html');
-		$.post("ajax/project.php",{action:"PrintProjectSchemes",source:"ProjectFunctions",pid:pid},function(resp){$("#approjectschemes").html(resp);loadSymbolOff();loadSymbolOff();}, 'html');
+		$.post("ajax/project.php",{action:"PrintProjectSchemes",source:"ProjectFunctions",pid:pid},function(resp){$("#approjectschemes").html(resp);}, 'html');
+		loadSymbolOff();
 	});
 
 	$("#approjectschemes" ).on( "click",'.move_scheme_down', function() {
+		loadSymbolOn();
 		var c = $(this);
 		var pid = $('#kora_globals').attr('pid');
 		var sid = c.parents('.project_scheme').first().attr('sid');
-		loadSymbolOn();
+		
 		$.post("ajax/project.php",{action:"MoveProjectScheme",source:"ProjectFunctions",pid:pid,movesid:sid,direction:"down"},function(resp){$("#global_error").append(resp);}, 'html');
-		$.post("ajax/project.php",{action:"PrintProjectSchemes",source:"ProjectFunctions",pid:pid},function(resp){$("#approjectschemes").html(resp);loadSymbolOff();}, 'html');
+		$.post("ajax/project.php",{action:"PrintProjectSchemes",source:"ProjectFunctions",pid:pid},function(resp){$("#approjectschemes").html(resp);}, 'html');
+		loadSymbolOff();
 	});
 
 	$("#approjectschemes" ).on( "click",'.delete_scheme', function() {
+		loadSymbolOn();
 		var answer = confirm(kgt_reallydelscheme);
 		if(answer) {
 			var c = $(this);
 			var pid = $('#kora_globals').attr('pid');
 			var sid = c.parents('.project_scheme').first().attr('sid');
 			$.ajaxSetup({ async: false });
-			loadSymbolOn();
+			
 			$.post("ajax/project.php",{action:"DeleteProjectScheme",source:"ProjectFunctions",pid:pid,delsid:sid},function(resp){$("#global_error").append(resp);}, 'html');
-			$.post("ajax/project.php",{action:"PrintProjectSchemes",source:"ProjectFunctions",pid:pid},function(resp){$("#approjectschemes").html(resp);loadSymbolOff();}, 'html');
+			$.post("ajax/project.php",{action:"PrintProjectSchemes",source:"ProjectFunctions",pid:pid},function(resp){$("#approjectschemes").html(resp);}, 'html');
 			$.ajaxSetup({ async: true });
 		}
+		loadSymbolOff();
 	});
 
 	if ($('#apmanageprojusers').length > 0)
 	{
+		loadSymbolOn();
 		var pid = $('#kora_globals').attr('pid');
-		loadSymbolOn();		
-		$.post('ajax/project.php', {action:'PrintProjectUsers',source:'ProjectFunctions',pid:pid}, function(resp){$("#apmanageprojusers").html(resp);loadSymbolOff();}, 'html');
+				
+		$.post('ajax/project.php', {action:'PrintProjectUsers',source:'ProjectFunctions',pid:pid}, function(resp){$("#apmanageprojusers").html(resp);}, 'html');
+		loadSymbolOff();
 	}
 	if ($('#apmanagegroups').length > 0)
 	{
-		var pid = $('#kora_globals').attr('pid');
 		loadSymbolOn();
-		$.post('ajax/project.php', {action:'PrintGroups',source:'ProjectFunctions',pid:pid}, function(resp){$("#apmanagegroups").html(resp);loadSymbolOff();}, 'html');
+		var pid = $('#kora_globals').attr('pid');
+		
+		$.post('ajax/project.php', {action:'PrintGroups',source:'ProjectFunctions',pid:pid}, function(resp){$("#apmanagegroups").html(resp);}, 'html');
+		loadSymbolOff();
 	}
 	
 	$("#apmanageprojusers").on( "click",'.addprojectuser', function() {
+		loadSymbolOn();
 	    	addProjectUser();
+			loadSymbolOff();
 	});
 
 	$("#apmanageprojusers").on( "click",'.delprojectuser', function() {
+		loadSymbolOn();
 		var c = $(this);
 	    	var uid = c.attr('uid');
 	    	deleteProjectUser(uid);
+			loadSymbolOff();
 	});
 
 	$("#apmanagegroups").on( "click",'.addgroup', function() {
+		loadSymbolOn();
 	    	addGroup();
+			loadSymbolOff();
 	});
 
 	$("#apmanagegroups").on( "click",'.delgroup', function() {
+		loadSymbolOn();
 		var c = $(this);
 	    	var gid = c.attr('gid');
 	    	deleteGroup(gid);
+			loadSymbolOff();
 	});
 
 	$("#apmanagegroups").on( "click",'input[name^="gp"]', function() {
+		loadSymbolOn();
 		var c = $(this);
 	    	var gid = c.attr('gid');
 	    	var perm = c.attr('perm');
 	    	modGroupPerms(gid,perm,c.is(':checked'));
+			loadSymbolOff();
 	});
 	
 	$("#right_container").on("change", '.kpquickjump', function() {
+		loadSymbolOn();
 		window.location = 'selectScheme.php?pid='+$(this).val();
 	});
 	
 	$("#projectmanagerform").on("click",'.kp_manage_newProjBtn', function(){
+		loadSymbolOn();
 		$.ajaxSetup({ async: false });
 		$.colorbox({href:'ajax/project.php',data:{action:"PrintNewProject",source:"ProjectFunctions"}});
 		$.ajaxSetup({ async: true });
@@ -202,7 +230,7 @@ $(function() {
 			fd.append('action','createProject');
 			fd.append('source','ProjectFunctions');
 			
-			loadSymbolOn();
+			
 			$.ajax({
 				url: 'ajax/project.php',
 				data: fd,
@@ -214,7 +242,7 @@ $(function() {
 					if (resp == ""){ check_error = 1; }
 					$("#cbox_error").append(resp);
 					$.colorbox.resize();
-					loadSymbolOff();
+					
 				}
 			});
 			
@@ -223,9 +251,11 @@ $(function() {
 				PrintUpdateProjectsTable();
 			}
 		});
+		loadSymbolOff();
 	});
 	
 	$("#projectmanagerform").on("click",'.kp_manage_editProjBtn', function(){
+		loadSymbolOn();
 		var pid = [];
 		if($('#kp_manage_active').val()!=null)
 			pid = pid.concat($('#kp_manage_active').val());
@@ -254,7 +284,7 @@ $(function() {
 				fd.append('action','editProject');
 				fd.append('source','ProjectFunctions');
 				
-				loadSymbolOn();
+				
 				$.ajax({
 					url: 'ajax/project.php',
 					data: fd,
@@ -266,7 +296,7 @@ $(function() {
 						if (resp == ""){ check_error = 1; }
 						$("#cbox_error").append(resp);
 						$.colorbox.resize();
-						loadSymbolOff();
+						
 					}
 				});
 				
@@ -280,9 +310,11 @@ $(function() {
 			$("#global_error").text("More than one project selected. Please select only one project for editting.");
 			$("#global_error").attr('style','color:red');
 		}
+		loadSymbolOff();
 	});
 	
 	$("#projectmanagerform" ).on( "click",'.kp_manage_delProjBtn', function() {
+		loadSymbolOn();
 		var pids = [];
 		if($('#kp_manage_active').val()!=null)
 			pids = pids.concat($('#kp_manage_active').val());
@@ -298,15 +330,17 @@ $(function() {
 			var answer = confirm(kgt_reallydelproj);
 			if(answer) {
 				$.ajaxSetup({ async: false });
-				loadSymbolOn();
-				$.post("ajax/project.php",{action:"deleteProjects",source:"ProjectFunctions",pids:pids},function(resp){$("#global_error").append(resp);loadSymbolOff();}, 'html');
+				
+				$.post("ajax/project.php",{action:"deleteProjects",source:"ProjectFunctions",pids:pids},function(resp){$("#global_error").append(resp);}, 'html');
 				$.ajaxSetup({ async: true });
 				PrintUpdateProjectsTable();
 			}
 		}
+		loadSymbolOff();
 	});
 	
 	$("#projectmanagerform" ).on( "click",'.kp_manage_deactivateProj', function() {
+		loadSymbolOn();
 		var pids = [];
 		if($('#kp_manage_active').val()!=null)
 			pids = pids.concat($('#kp_manage_active').val());
@@ -317,14 +351,16 @@ $(function() {
 		}
 		else{	
 			$.ajaxSetup({ async: false });
-			loadSymbolOn();
-			$.post("ajax/project.php",{action:"deactivateProjects",source:"ProjectFunctions",pids:pids},function(resp){$("#global_error").append(resp);loadSymbolOff();}, 'html');
+			
+			$.post("ajax/project.php",{action:"deactivateProjects",source:"ProjectFunctions",pids:pids},function(resp){$("#global_error").append(resp);}, 'html');
 			$.ajaxSetup({ async: true });
 			PrintUpdateProjectsTable();
 		}
+		loadSymbolOff();
 	});
 	
 	$("#projectmanagerform" ).on( "click",'.kp_manage_activateProj', function() {
+		loadSymbolOn();
 		var pids = [];
 		if($('#kp_manage_inactive').val()!=null)
 			pids = pids.concat($('#kp_manage_inactive').val());
@@ -335,11 +371,12 @@ $(function() {
 		}
 		else{	
 			$.ajaxSetup({ async: false });
-			loadSymbolOn();
-			$.post("ajax/project.php",{action:"activateProjects",source:"ProjectFunctions",pids:pids},function(resp){$("#global_error").append(resp);loadSymbolOff();}, 'html');
+			
+			$.post("ajax/project.php",{action:"activateProjects",source:"ProjectFunctions",pids:pids},function(resp){$("#global_error").append(resp);}, 'html');
 			$.ajaxSetup({ async: true });
 			PrintUpdateProjectsTable();
 		}
+		loadSymbolOff();
 	});
 	
 });
@@ -347,19 +384,19 @@ $(function() {
 //For refreshing the manage projects page after an action
 function PrintUpdateProjectsTable(){
 	$.ajaxSetup({ async: false });
-	loadSymbolOn();
-	$.post("ajax/project.php",{action:"PrintUpdatedProjectsTable",source:"ProjectFunctions"},function(resp){$("#projectmanagerform").html(resp);loadSymbolOff();}, 'html');
+	
+	$.post("ajax/project.php",{action:"PrintUpdatedProjectsTable",source:"ProjectFunctions"},function(resp){$("#projectmanagerform").html(resp);}, 'html');
 	$.ajaxSetup({ async: true });
 }
 
 //Add a user to a project
 function addProjectUser() {
 	var pid = $('#kora_globals').attr('pid');
-	loadSymbolOn();	
+		
 	$.post('ajax/project.php',{action:'addProjectUser',source:'ProjectFunctions',pid:pid,user:$('#useradd').val(),
 		group:$('#groupadd').val() },function(resp){$("#ajaxstatus").html(resp);}, 'html');
 	$.post('ajax/project.php',{action:'PrintGroups',source:'ProjectFunctions',pid:pid}, function(resp){$("#apmanagegroups").html(resp);}, 'html');
-	$.post('ajax/project.php',{action:'PrintProjectUsers',source:'ProjectFunctions',pid:pid },function(resp){$("#apmanageprojusers").html(resp);loadSymbolOff();}, 'html');
+	$.post('ajax/project.php',{action:'PrintProjectUsers',source:'ProjectFunctions',pid:pid },function(resp){$("#apmanageprojusers").html(resp);}, 'html');
 }
 
 //Remove a user from a project
@@ -367,10 +404,10 @@ function deleteProjectUser(varuser) {
 	var answer = confirm(kgt_reallydelpuser);
 	if(answer) {
 		var pid = $('#kora_globals').attr('pid');
-		loadSymbolOn();		
+				
 		$.post('ajax/project.php',{action:'deleteProjectUser',source:'ProjectFunctions',pid:pid,user:varuser},function(resp){$("#ajaxstatus").html(resp);}, 'html');
 		$.post('ajax/project.php',{action:'PrintGroups',source:'ProjectFunctions',pid:pid}, function(resp){$("#apmanagegroups").html(resp);}, 'html');
-		$.post('ajax/project.php',{action:'PrintProjectUsers',source:'ProjectFunctions',pid:pid },function(resp){$("#apmanageprojusers").html(resp);loadSymbolOff();}, 'html');
+		$.post('ajax/project.php',{action:'PrintProjectUsers',source:'ProjectFunctions',pid:pid },function(resp){$("#apmanageprojusers").html(resp);}, 'html');
 	}
 	return;
 }
@@ -378,10 +415,10 @@ function deleteProjectUser(varuser) {
 //Modify the permissions of a particular group
 function modGroupPerms(vargid,varperm,varset) {
 	var pid = $('#kora_globals').attr('pid');	
-	loadSymbolOn();
+	
 	$.post('ajax/project.php', {action:'updateGroupPerms',source:'ProjectFunctions',pid:pid,gid:vargid,permission:varperm,checked:varset}, function(resp){$("#ajaxstatus").html(resp);}, 'html');
 	$.post('ajax/project.php',{action:'PrintGroups',source:'ProjectFunctions',pid:pid}, function(resp){$("#apmanagegroups").html(resp);}, 'html');
-	$.post('ajax/project.php',{action:'PrintProjectUsers',source:'ProjectFunctions',pid:pid },function(resp){$("#apmanageprojusers").html(resp);loadSymbolOff();}, 'html');
+	$.post('ajax/project.php',{action:'PrintProjectUsers',source:'ProjectFunctions',pid:pid },function(resp){$("#apmanageprojusers").html(resp);}, 'html');
 }
 
 //Delete a group from a project
@@ -389,10 +426,10 @@ function deleteGroup(vargid) {
 	var answer = confirm(kgt_reallydelpgrp);
 	if(answer) {
 		var pid = $('#kora_globals').attr('pid');	
-		loadSymbolOn();
+		
 		$.post('ajax/project.php', {action:'deleteGroup',source:'ProjectFunctions',pid:pid,gid:vargid}, function(resp){$("#ajaxstatus").html(resp);}, 'html');        
 		$.post('ajax/project.php',{action:'PrintGroups',source:'ProjectFunctions',pid:pid}, function(resp){$("#apmanagegroups").html(resp);}, 'html');
-		$.post('ajax/project.php',{action:'PrintProjectUsers',source:'ProjectFunctions',pid:pid },function(resp){$("#apmanageprojusers").html(resp);loadSymbolOff();}, 'html');
+		$.post('ajax/project.php',{action:'PrintProjectUsers',source:'ProjectFunctions',pid:pid },function(resp){$("#apmanageprojusers").html(resp);}, 'html');
 	}
 	return; 
 }
@@ -400,12 +437,12 @@ function deleteGroup(vargid) {
 //Add a group to a project
 function addGroup() {
 	var pid = $('#kora_globals').attr('pid');
-	loadSymbolOn();	
+		
 	$.post('ajax/project.php', {action:'addGroup',source:'ProjectFunctions', pid:pid, name:$('#groupname').val(), admin:$('#newadmin').is(':checked'),
 			ingestobj:$('#newingestobj').is(':checked'), delobj:$('#newdelobj').is(':checked'), edit:$('#newedit').is(':checked'), create:$('#newcreate').is(':checked'), delscheme:$('#newdelscheme').is(':checked'),
 			exports:$('#newexport').is(':checked'), moderator:$('#newmoderator').is(':checked')}, function(resp){$("#ajaxstatus").html(resp);}, 'html');
 	$.post('ajax/project.php',{action:'PrintGroups',source:'ProjectFunctions',pid:pid}, function(resp){$("#apmanagegroups").html(resp);}, 'html');
-	$.post('ajax/project.php',{action:'PrintProjectUsers',source:'ProjectFunctions',pid:pid },function(resp){$("#apmanageprojusers").html(resp);loadSymbolOff();}, 'html');
+	$.post('ajax/project.php',{action:'PrintProjectUsers',source:'ProjectFunctions',pid:pid },function(resp){$("#apmanageprojusers").html(resp);}, 'html');
 }
 
 

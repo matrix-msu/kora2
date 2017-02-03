@@ -1,4 +1,6 @@
 <?php
+use KORA\Manager;
+use KORA\User;
 /**
 Copyright (2008) Matrix: Michigan State University
 

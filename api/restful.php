@@ -1,22 +1,44 @@
 <?php 
-	//allow other servers
-	header('Access-Control-Allow-Origin: *');
-	
-	define('KORA_RESTFUL_MAX_QUERY_RECURSE', 5);
-	define('KORA_RESTFUL_MAX_QUERY_CHAIN', 5);
-	define('KORA_RESTFUL_TN_SMALL', 250);
-	define('KORA_RESTFUL_TN_LARGE', 1000);
+use KORA\Manager;
+use KORA\Importer;
+use KORA\Record;
+use KORA\Scheme;
+use KORA\KoraSearch;
+/** Copyright (2008) Matrix: Michigan State University
 
-	//require_once('../includes/exportCSV.php');
-	require_once('../includes/koraSearch.php');
-	require_once('../includes/grid/conf.php');
-	require_once('../model/manager.php');
-	// INCLUDE ALL CONTROL CLASSES AS WE MAY NEED THEM
-	foreach (glob("../controls/*.php") as $filename){
-		if ($filename != '../controls/index.php') {
-			require_once($filename);
-		}
+This file is part of KORA.
+
+KORA is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+KORA is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>. **/
+
+//allow other servers
+header('Access-Control-Allow-Origin: *');
+
+define('KORA_RESTFUL_MAX_QUERY_RECURSE', 5);
+define('KORA_RESTFUL_MAX_QUERY_CHAIN', 5);
+define('KORA_RESTFUL_TN_SMALL', 250);
+define('KORA_RESTFUL_TN_LARGE', 1000);
+
+//require_once('../includes/exportCSV.php');
+require_once('../includes/koraSearch.php');
+require_once('../includes/grid/conf.php');
+require_once('../model/manager.php');
+// INCLUDE ALL CONTROL CLASSES AS WE MAY NEED THEM
+foreach (glob("../controls/*.php") as $filename){
+	if ($filename != '../controls/index.php') {
+		require_once($filename);
 	}
+}
 	
 	/* 
 	 * ///////////////////////////////////////////////////////////////////////////
@@ -109,13 +131,14 @@
 	 * INSERT / UPDATE Specific Options
 	 * -----------------------
 	 * 	xml      - The complete xml for a record that you want to ingest or update
-	 *   Ex 1: <?xml version="1.0" encoding="ISO-8859-1"?>
+	 *   Ex 1: <?xml version="1.0" encoding="UTF-8"?>
      *         <Data><ConsistentData/><Record><id>2-9-0</id><systimestamp>2013-04-05T14:55:47-04:00</systimestamp>
      *         <recordowner>koraadmin</recordowner><Title>Yosemite</Title><Taken>4/5/2000 CE</Taken>
      *         <Photo originalName="yosemite-stream.jpg">2-9-0-42-yosemite-stream.jpg</Photo><Categories>landscape</Categories>
      *         <Categories>lake</Categories></Record></Data>
-	 *  zipFile  - The .zip file where files and images correspond to the zip file
-	 *        Example1: API_Demo-demo_Scheme-files_1.zip
+	 *  zipFile  - The .zip filepath containing files and images for the record
+	 *        Example1: FILE_PATH/API_Demo-demo_Scheme-files_1.zip
+	 *		   Example2: You may also pass the zipfile through the $_FILE stream
 	 *
 	 * UPDATE / DELETE Specific Options
 	 * -----------------------
@@ -142,17 +165,29 @@
 	$sid = $_REQUEST['sid'];
 	$tok = $_REQUEST['token'];
 	$req = $_REQUEST['request'];
+	$boolean = isset($_REQUEST['boolean']) ? $_REQUEST['boolean'] : null;
+	$keywords = isset($_REQUEST['keywords']) ? $_REQUEST['keywords'] : null;
 	
 	// Check Request
 	if (!in_array(strtolower($req), array('get', 'insert', 'update', 'delete'))) { die("Invalid request method specified."); }
-	
+
+
 	// Check KORA Token
-	if (!in_array($pid, getTokenPermissions($tok))) {
-		echo gettext('Invalid Authentication to Search').'!'."<br>";
-		return false;
+
+	$pid_array = explode(",",$pid); //For multiple project searches, explode the pids to an array
+	$sid_array = explode(",",$sid);
+	//$pid = $pid_array[0];
+	//$sid = $sid_array[0];
+
+	foreach($pid_array as $pids) {
+		if (!in_array($pids, getTokenPermissions($tok))) {
+			echo gettext('Invalid Authentication to Search') . '!' . "<br>";
+			return false;
+		}
 	}
 	 
 	$controls = array();
+	$c2 = array();
 	
 	/////////////////////////////////
 	////GET REQUEST//////////////////
@@ -172,9 +207,15 @@
 		$query = ParseQuery($qstr) or $query = new KORA_Clause('KID','==','');
 		
 		// GET REQUESTED FIELDS USING FUNCTION
-		$fields = GetRequestFields();
-		if (empty($fields))
+		if(!(count($pid_array) >1) && !(count($sid_array)>1)) {
+			//echo "getting request fields";
+			$fields = GetRequestFields();
+			if (empty($fields))
+				$fields = 'ALL';
+		}
+		else{
 			$fields = 'ALL';
+		}
 		
 		// FIND SORT BY OPTIONS
 		/* Only doing simple sort, meaning one control. KORA_Search can handle more controls to make it more exact.
@@ -194,34 +235,175 @@
 		}
 		// If not set then no sort is empty array
 		$simpleSortArray = isset($sortArray1) ? array($sortArray1) : array();
-		
+
 		// LIMITS
 		$first = isset($_REQUEST['first']) ? $_REQUEST['first'] : 0;
 		$count = isset($_REQUEST['count']) ? $_REQUEST['count'] : 0;
 		
 		// NOW DO A SIMPLE KORA SEARCH AS WE HAVE GATHERED ALL OF OUR COMPONENTS
-		$results = KORA_Search($tok,$pid,$sid,$query,$fields,$simpleSortArray,$first,$count);
-		
+		if(count($pid_array) == 1) {
+			$results = KORA_Search($tok, $pid_array[0], $sid, $query, $fields, $simpleSortArray, $first, $count);
+		}
+		else {
+			if (is_null($boolean) || !in_array($boolean, array('AND', 'OR'))) {
+				die("Invalid boolean for cross project search");
+			}
+			if (is_null($keywords) || count(explode(",", $keywords)) < 1) {
+				die("No keywords provided for cross project search");
+			}
+			$results = restfulCrossProjectSearch($pid_array, $keywords, $boolean, false, "DESC");
+
+			//stuff
+			$formattedResults = array();
+			$idList = array();
+			foreach($results as $result){
+				array_push($idList,'\''.$result.'\'');
+			}
+			//$returnFields = $fields;
+			$fieldsToReturn = $fields;
+			$fields_that_exist = array();
+
+			foreach ($sid_array as $schemeID) {
+				// Build the dictionary of controls.  $dictionary is a mapping of name => cid
+				// and reverseDictionary is a mapping of cid => name
+
+				foreach($pid_array as $projectID) {
+
+					$scheme = new Scheme($projectID, $schemeID);
+					if($scheme->GetPID() ==0){
+						continue;
+					}
+					$pid = $scheme->GetPID();
+					$sid = $scheme->GetPID();
+					$rfields = GetRequestFields();
+					$c2 = array_merge($c2,$controls);
+
+					$controlTable = 'p' . $projectID . 'Control';
+					$dictQuery = "SELECT $controlTable.cid AS cid, $controlTable.name AS name, ";
+					$dictQuery .= "$controlTable.type AS type, control.file AS file, control.xmlPacked AS xmlPacked ";
+					$dictQuery .= "FROM $controlTable LEFT JOIN control ON ($controlTable.type = control.class) ";
+					$dictQuery .= "WHERE $controlTable.schemeid = $schemeID";
+					$dictQuery = $db->query($dictQuery);
+
+					$dictionary = array();
+					$reverseDictionary = array();
+					$controlLibrary = array();
+
+
+					while ($dictRow = $dictQuery->fetch_assoc()) {
+						$dictionary[$dictRow['name']] = array('cid' => $dictRow['cid'], 'xmlPacked' => $dictRow['xmlPacked'], 'type' => $dictRow['type']);
+						$reverseDictionary[$dictRow['cid']] = $dictRow['name'];
+						$controlLibrary[$dictRow['cid']] = array('class' => $dictRow['type'], 'file' => $dictRow['file']);
+					}
+
+					$KORA_Search_dict = $dictionary;
+					// Build the list of fields to return
+					// The initial 0 is for the implied list of reverse associators
+					$returnFields = array(0);
+					// see if we're supposed to return everything
+					//if (in_array('ALL', $fieldsToReturn)) {
+						foreach ($dictionary as $key => $field) {
+							$returnFields[] = $field['cid'];
+							//$fields_that_exist[$key] = $field;
+							array_push($fields_that_exist,$key);
+							//var_dump($fields_that_exist);
+							//	}
+							/*} else {
+                                foreach ($fieldsToReturn as $field) {
+                                    if (isset($dictionary[$field])) {
+                                        $returnFields[] = $dictionary[$field]['cid'];
+                                    } else {
+                                        echo $projectID;
+                                        echo gettext('Unknown control') . ": $field";
+                                        return;
+                                    }
+                                }
+                            }*/
+						}
+
+					// Extract the actual Data
+					$dataQuery = 'SELECT id, cid, schemeid, value FROM p' . $projectID . 'Data WHERE ';
+					$dataQuery .= 'id IN (' . implode(',', $idList) . ') ';
+					$dataQuery .= 'AND cid IN (' . implode(',', $returnFields) . ') ';
+					$dataQuery .= 'ORDER BY id, cid';
+					$dataQuery = $db->query($dataQuery);
+
+					// assemble the data into a useful form
+
+					while ($r = $dataQuery->fetch_assoc()) {
+						$dataRecords = array();
+						if (!isset($dataRecords[$r['id']])) {
+							// Populate each row initially with kid, pid, sid
+							$dataRecords[$r['id']] = array('kid' => $r['id'], 'pid' => $projectID, 'schemeID' => $r['schemeid'], 'linkers' => array());
+						}
+						// Look up the name of the control and use it as the index in the record array.
+						// Instantiate an empty instance of the control which this is an instance of
+						// and use its method to format the value (potentially XML) to one appropriate
+						// for search Results
+
+						if ($r['cid'] != 0) {
+							require_once(basePath . 'controls/' . $controlLibrary[$r['cid']]['file']);
+							$theControl = new $controlLibrary[$r['cid']]['class'];
+							$dataRecords[$r['id']][$reverseDictionary[$r['cid']]] = $theControl->storedValueToSearchResult($r['value']);
+						}
+						else {
+							// This is the list of reverse associators
+							//			print_rr($r['value']);
+							$xml = simplexml_load_string($r['value']);
+							if (isset($xml->assoc)) {
+								foreach ($xml->assoc as $assoc) {
+									echo "xml->assoc";
+									$dataRecords[$r['id']]['linkers'][] = (string)$assoc->kid;
+								}
+								// remove duplicates
+								$dataRecords[$r['id']]['linkers'] = array_unique($dataRecords[$r['id']]['linkers']);
+								echo "removed dups";
+								//var_dump($dataRecords);
+							}
+						}
+						/*echo "<br>DR start";
+						var_dump($dataRecords);
+
+						echo "<br>DR END<br>";*/
+						$formattedResults = array_merge($formattedResults, $dataRecords);
+					}
+					break;
+				}
+			}
+			$results = $formattedResults;
+			$controls = $c2;
+			$fields = $fields_that_exist;
+		}
+
 		DisplayRecords($results, $dtype);
+
 	}
 	
 	/////////////////////////////////
 	////INSERT REQUEST///////////////
 	/////////////////////////////////
 	//  post information to the kora database - CREATE
-	// example url: .../database.php?request=INSERT&pid=1&sid=1&token=*********&xml="<record>...</record>"&zipFile="Filename.zip"
+	//  Files - There are two methods to passing files:
+	//		Via $_FILES: Passing through file stream using an html form
+	//		Via $_REQUEST (GET/POST): Passing the file path to file as a string
+	// example url: .../database.php?request=INSERT&pid=1&sid=1&token=*********&xml="<record>...</record>"&zipFile="Path/Filename.zip"
 	else if ($req == 'INSERT'){
 		if (Manager::CheckRequestsAreSet(['xml'])) {
 			//init
 			$xml="";
-			$zipFile="";
+			$zipFile=null;
+			$ziptype="";
 			//grab requsted
 			$xml = $_REQUEST['xml'];
 			if (isset($_FILES['zipFile'])) {
 				$zipFile = $_FILES['zipFile'];
+				$ziptype="FILES";
+			} else if (isset($_REQUEST['zipFile'])) {
+				$zipFile = fopen($_REQUEST['zipFile'], 'r');
+				$ziptype="REQUEST";
 			}
 			//ingest
-			XMLimport($xml, $zipFile);
+			XMLimport($xml, $zipFile, $ziptype);
 		}
 	}
 	
@@ -229,19 +411,27 @@
 	////UPDATE REQUEST///////////////
 	/////////////////////////////////
 	///put information into the kora database - UPDATE
+	//  Files - There are two methods to passing files:
+	//		Via $_FILES: Passing through file stream using an html form
+	//		Via $_REQUEST (GET/POST): Passing the file path to file as a string
 	// example url: .../database.php?request=UPDATE&pid=1&sid=1&&rid=1&token=*********&xml="<record>...</record>"&zipFile="Filename.zip"
 	else if ($req == 'UPDATE'){
 		if (Manager::CheckRequestsAreSet(['xml'])) {
 			//init
 			$xml="";
-			$zipFile="";
+			$zipFile=null;
+			$ziptype="";
 			//grab requsted
 			$xml = $_REQUEST['xml'];
 			if (isset($_FILES['zipFile'])) {
 				$zipFile = $_FILES['zipFile'];
+				$ziptype="FILES";
+			} else if (isset($_REQUEST['zipFile'])) {
+				$zipFile = fopen($_REQUEST['zipFile'], 'r');
+				$ziptype="REQUEST";
 			}
 			//ingest (same function as POST/INSERT)
-			XMLimport($xml, $zipFile);
+			XMLimport($xml, $zipFile, $ziptype);
 		}
 	}
 	
@@ -265,6 +455,18 @@
 		
 		echo "Error: Invalid API request type given.";
 		
+	}
+
+	function restfulCrossProjectSearch($pids,$keywords,$boolean,$sortBy,$sortOrder){
+		$sids = '';
+		$results = array();
+		$resultsmerged = array();
+		foreach($pids as $currpid)
+		{
+			$results[$currpid] = KoraSearch::SortedInternalSearchResults($currpid,$sids,$keywords,$boolean,$sortBy,$sortOrder,false);
+			$resultsmerged = array_merge($resultsmerged, $results[$currpid]);
+		}
+		return $resultsmerged;
 	}
 	
 	function DisplayRecords($koradata_, $dtype)
@@ -344,7 +546,7 @@
 			print json_encode($koradata_);
 			break;
 		case 'xml':
-			$xmlout = new SimpleXMLElement("<?xml version=\"1.0\"?><kora_data></kora_data>");
+			$xmlout = new SimpleXMLElement("<?xml version=\"1.0\" encoding=\"UTF-8\"?><kora_data></kora_data>");
 			ArrayToXML($koradata_,$xmlout);
 			print $xmlout->asXML();
 			break;
@@ -400,6 +602,7 @@
 				$htmlout .= "<div class='koraobj_control_value'>".$kid."</div></div>\n";
 				foreach ($fields as $dfield)
 				{
+					//var_dump($dfield);
 					if (isset($koraobj[$dfield]))
 					{
 						// SKIP THIS ROW UNLESS SHOWEMPTY HAS BEEN SET TO TRUE
@@ -423,12 +626,13 @@
 			//$count = 1;
 			foreach ($koradata_ as $kid => $koraobj)
 			{
-				$htmlout .= "<div class='koraobj_container'>\n";
-				$htmlout .= "<input type='checkbox' id='$kid' value='$kid' name='checked[]'>";
+				$htmlout .= "<div class='koraobj_container' id='".$kid."'>\n";
+				//$htmlout .= "<input type='checkbox' id='$kid' value='$kid' name='checked[]'>";
 				//$count += 1;
 				// OUTPUT THE KID ALSO
 				$htmlout .= "\t<div class='koraobj_control koraobj_control_kid' ><div class='koraobj_control_label'>KID</div>";
 				$htmlout .= "<div class='koraobj_control_value'>".$kid."</div></div>\n";
+				$htmlouttemp = "";
 				foreach ($fields as $dfield)
 				{
 					if (isset($koraobj[$dfield]))
@@ -436,12 +640,22 @@
 						// SKIP THIS ROW UNLESS SHOWEMPTY HAS BEEN SET TO TRUE
 						if ((!$showempty) &&  $koraobj[$dfield] == '') { continue; }
 						$ctlDisplay = new $controls[$dfield]['type']($pid,$controls[$dfield]['cid'],$kid);
-						$htmlout .= "\t<div class='koraobj_control koraobj_control_".htmlentities($controls[$dfield]['name'],ENT_QUOTES)."' ><div class='koraobj_control_label'>".$controls[$dfield]['name']."</div>";
-						$htmlout .= "<div class='koraobj_control_value'>" . 
+						// Want to display the image first so check to see if it's type ImageControl
+						if(get_class($ctlDisplay) == "ImageControl"){
+							$htmlout .= "\t<div class='koraobj_control koraobj_control_".htmlentities($controls[$dfield]['name'],ENT_QUOTES)."' ><div class='koraobj_control_label'>".$controls[$dfield]['name']."</div>";
+							$htmlout .= "<div class='koraobj_control_value'>" . 
 							     $ctlDisplay->showData() . 
 							     "</div></div>\n";
+						}
+						else{
+							$htmlouttemp .= "\t<div class='koraobj_control koraobj_control_".htmlentities($controls[$dfield]['name'],ENT_QUOTES)."' ><div class='koraobj_control_label'>".$controls[$dfield]['name']."</div>";
+							$htmlouttemp .= "<div class='koraobj_control_value'>" . 
+							     $ctlDisplay->showData() . 
+							     "</div></div>\n";
+						}
 					}
 				}
+				$htmlout .= $htmlouttemp;
 				$htmlout .= "</div>\n";
 			}
 			print $htmlout;
@@ -474,6 +688,27 @@
 							$htmlpictureout .= "<div class='koraobj_control_value'>" . 
 							     substr($imagecontrolstring,$imagepos) . 
 							     "</div>";
+						}else if(is_a($ctlDisplay,'FileControl')){
+							$htmlout .= "\t<div class='koraobj_control koraobj_control_".htmlentities($controls[$dfield]['name'],ENT_QUOTES)."' ><div class='koraobj_control_label'>".$controls[$dfield]['name']."</div>";
+							$htmlout .= "<div class='koraobj_control_value'>" . 
+							     $ctlDisplay->showData() . 
+								"</div></div>\n";
+							if(strpos($htmlout,'Audio:') !== false){
+								$audvidcontrolstring = $ctlDisplay->showData();
+								$part1 = explode('<audio src',$audvidcontrolstring)[1];
+								$part2 = explode('</audio>',$part1)[0];
+								$htmlpictureout .= "<div class='koraobj_control_value'><audio src" . 
+							     $part2 . 
+							     "</audio></div>";
+							}
+							if(strpos($htmlout,'Video:') !== false){
+								$audvidcontrolstring = $ctlDisplay->showData();
+								$part1 = explode('<video src',$audvidcontrolstring)[1];
+								$part2 = explode('</video>',$part1)[0];
+								$htmlpictureout .= "<div class='koraobj_control_value'><video src" . 
+							     $part2 . 
+							     "</video></div>";
+							}
 						}
 						else {
 							$htmlout .= "\t<div class='koraobj_control koraobj_control_".htmlentities($controls[$dfield]['name'],ENT_QUOTES)."' ><div class='koraobj_control_label'>".$controls[$dfield]['name']."</div>";
@@ -503,7 +738,7 @@
 			{
 				foreach ($fields as $dfield)
 				{
-					if (isset($koraobj[$dfield]) && in_array($controls[$dfield]['type'], $validctrls))
+					if (isset($koraobj[$dfield]) && is_array($koraobj[$dfield]) && in_array($controls[$dfield]['type'], $validctrls))
 					{
 						// TODO: PARTS OF THIS TN GENERATION THIS SHOULD BE A PROCEDURE PROBABLY, UTILTIY OR INSIDE CONTROL CLASS
 						$ridparts = Record::ParseRecordID($kid);
@@ -537,6 +772,55 @@
 		}
 		
 	}
+
+function CrossProjectGetRequestFields($schemes,$fields,$db)
+{
+
+	/*foreach($schemes as $scheme){
+		///echo $scheme;
+	}*/
+
+	global $pid,$sid,$fields,$db;
+	// THIS IS FILLED IN FOR THE GLOBAL SCOPE
+	global $controls;
+
+	// DEFAULT FIELDS TO false IF NOT SET,
+	$fields = isset($_REQUEST['fields']) ? explode(',', $_REQUEST['fields']) : false;
+	// ALSO IF IT IS SET WITH VALUE == 'ALL' HANDLE THAT AS TO NOT PASS IT IN AS A FIELD NAMED ALL IN ARRAY (I.E. HANDLE THIS AS A SPECIAL-CASE VARIABLE)
+	if (isset($_REQUEST['fields']) &&  (strtoupper($_REQUEST['fields']) == 'ALL')) { $fields = 'ALL'; }
+
+	// GET THE LIST OF CONTROLS FOR THIS SCHEME FOR LATER DISPLAY USE
+	foreach(array_combine(explode(",",$pid),explode(",",$sid)) as $individual_pid => $individual_sid) {
+		$controlQuery = 'SELECT * FROM p' . $individual_pid . 'Control';
+		$controlQuery .= ' WHERE schemeid IN (' . $individual_sid . ') ';
+		$controlQuery .= ' ORDER BY schemeid, cid';
+		//var_dump($controlQuery);
+		$controlQuery = $db->query($controlQuery);
+
+
+		while ($ctl = $controlQuery->fetch_assoc()) {
+			$controls[$ctl['name']] = $ctl;
+		}
+	}
+
+	$dfields = array();
+	// IF USER SPECIFICALLY REQUESTED ALL FIELDS, INCLUDE THEM ALL
+	if ($fields == 'ALL')
+	{
+		foreach ($controls as $ctl)
+		{ $dfields[] = $ctl['name']; }
+	}
+	// ELSE, IF REQUESTED FIELDS IS DEFAULTED TO ALL, DEFAULT THE DISPLAY OF THE OBJECT TO DEFAULT KORA SHOWINDISPLAY VALUES
+	elseif ($fields === false)
+	{
+		foreach ($controls as $ctl)
+		{ if ($ctl['showInResults'] == '1') { $dfields[] = $ctl['name']; } }
+	}
+	// ELSE, SHOW ONLY THE ARRAY OF FIELDS THE USER REQUESTED
+	else { $dfields = $fields; }
+
+	return $dfields;
+}
 	
 	function GetRequestFields()
 	{
@@ -550,13 +834,17 @@
 		if (isset($_REQUEST['fields']) &&  (strtoupper($_REQUEST['fields']) == 'ALL')) { $fields = 'ALL'; }
 		
 		// GET THE LIST OF CONTROLS FOR THIS SCHEME FOR LATER DISPLAY USE
-		$controlQuery = 'SELECT * FROM p'.$pid.'Control';
-		$controlQuery .= ' WHERE schemeid IN ('.$sid.') ';
-		$controlQuery .= ' ORDER BY schemeid, cid';
-		$controlQuery = $db->query($controlQuery);
-		while ($ctl = $controlQuery->fetch_assoc())
-		{
-			$controls[$ctl['name']] = $ctl;
+		foreach(array_combine(explode(",",$pid),explode(",",$sid)) as $individual_pid => $individual_sid) {
+			$controlQuery = 'SELECT * FROM p' . $individual_pid . 'Control';
+			$controlQuery .= ' WHERE schemeid IN (' . $individual_sid . ') ';
+			$controlQuery .= ' ORDER BY schemeid, cid';
+			//var_dump($controlQuery);
+			$controlQuery = $db->query($controlQuery);
+
+
+			while ($ctl = $controlQuery->fetch_assoc()) {
+				$controls[$ctl['name']] = $ctl;
+			}
 		}
 		
 		$dfields = array();
@@ -622,7 +910,7 @@
 			if (sizeof($qprsplit) % 2 != 1) { trigger_error("Invalid parsing at level $qp_, check comma delimiters carefully.", E_USER_ERROR); }
 			// IF NUMBER OF 'CHAINS' TOGETHER IN THIS PARATHETIC LEVEL IS > MAX ALLOWED, RETURN FALSE NOW
 			if ((sizeof($qprsplit) / 2) > KORA_RESTFUL_MAX_QUERY_CHAIN)
-			{ trigger_error("Query chainig level too complex, please limit max and/or at same level to ".KORA_RESTFUL_MAX_QUERY_RECURSE." at level $qp_", E_USER_ERROR); }
+			{ trigger_error("Query chainig level too complex, please limit max and/or at same level to ".KORA_RESTFUL_MAX_QUERY_CHAIN." at level $qp_", E_USER_ERROR); }
 			
 			// CHECK THE SANITY OF OPERATORS, CAN'T MIX AND MATCH AND/OR AND ALL SHOULD BE AND/OR
 			$lastop = GetOperator($qprsplit[1]);
@@ -708,19 +996,26 @@
 	}	
 	
 	//function to import data from XML files and zip folders (INSERT -OR- UPDATE)
-	function XMLimport($xml, $zipFile="") {
+	function XMLimport($xml, $zipFile, $zipType) {
 		if ($xml !="") {
 			//If there's a zip file, unzip and extract
 			if (isset($zipFile)){
 				$uploadedFiles = false;
 				$zipFiles = true;
 				//if a zip folder was uploaded (ie error field != 4), extract files
-				if (isset($_FILES[$zipFile]) && $_FILES[$zipFile]['error'] != 4) {
+				if ($zipType=="FILES" && $zipFile['error'] != 4) {
 					$uploadedFiles = true;
-					$zipFiles = extractZipFolder($_FILES[$zipFile]['tmp_name'],$_FILES[$zipFile]['name']);
+					$zipFiles = extractZipFolder($zipFile['tmp_name'],$zipFile['name']);
 					if(!$zipFiles){
 						print '<div class="error">'.gettext('**ERROR: Could not extract from Zip file.').'</div>';
 					}
+				} else if($zipType=="REQUEST"){
+					$uploadedFiles = true;
+				}
+				else {
+					var_dump($zipFile);
+					echo "error no zip";
+					$uploadedFiles = false;
 				}
 			} else {
 				$uploadedFiles = false;
@@ -758,18 +1053,116 @@
 				//Move to .js for mapping and AJAX call to handleRecord.php
 				if(!Manager::CheckRequestsAreSet(['rid'])){
 				//INSERT ONLY - new record
-					echo '<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>';
-					echo '<script src="api.js"></script>';
+					/*echo '<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>';
+					echo '<script src="'.baseURI.'api/api.js"></script>';
 					echo '<script type="text/javascript">
-						MappingManager.postSubmit("'.$_REQUEST['pid'].'","'.$_REQUEST['sid'].'",'. json_encode($recordArray).');
-						</script>';		
+						MappingManager.postSubmit("'.$_REQUEST['pid'].'","'.$_REQUEST['sid'].'",'. json_encode($recordArray).',"'.baseURI.'");
+						</script>';
+
+					*/
+					/*$allingestdata = Array();
+					$allingestmaps = Array();
+					*/
+					$_REQUEST['ingestdata'] = Array();
+					$_REQUEST['ingestmap'] = Array();
+
+					foreach($recordArray as $record){
+						foreach($record as $index=>$obj){
+							array_push($_REQUEST['ingestmap'],$index);
+							array_push($_REQUEST['ingestdata'],$obj);
+						}
+
+						//var_dump($allingestdata);
+
+						//var_dump($allingestmaps);
+
+						Manager::init();
+						if (!Manager::GetProject()) { die(gettext('PID was not submitted this is required for ingestion')); }
+						if (!Manager::GetScheme()) { die(gettext('SID was not submitted this is required for ingestion')); }
+
+						$pid = $_REQUEST['pid'];
+						$sid = $_REQUEST['sid'];
+
+						$rid = Manager::CheckRequestsAreSet(['rid']) ? $_REQUEST['rid'] : null;
+
+						$keyfieldMatch = false;
+						$recorddata = null;
+
+						echo gettext("Ingesting object ")."... ";
+
+						//ingest record data
+						$ingestion = new Record($pid,$sid,$rid);
+
+						if (Manager::CheckRequestsAreSet(['ingestdata']) && Manager::CheckRequestsAreSet(['ingestmap']))
+						{ $recorddata = $ingestion->GetImportData(); }
+					
+						//set user
+						$recorddata['recordowner'] = 'restful';
+
+						if (!$keyfieldMatch)
+						{
+
+							if (!$ingestion->ingest($recorddata)) { die(gettext('Please fix errors and try again')); }
+						}
+
+
+					}
+
 				} else {
 				//UPDATE ONLY - update record
-					echo '<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>';
-					echo '<script src="api.js"></script>';
+					/*echo '<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>';
+					echo '<script src="'.baseURI.'api/api.js"></script>';
 					echo '<script type="text/javascript">
-						MappingManager.putSubmit("'.$_REQUEST['pid'].'","'.$_REQUEST['sid'].'","'.$_REQUEST['rid'].'",'. json_encode($recordArray).');
-						</script>';		
+						MappingManager.putSubmit("'.$_REQUEST['pid'].'","'.$_REQUEST['sid'].'","'.$_REQUEST['rid'].'",'. json_encode($recordArray).',"'.baseURI.'");
+						</script>';
+
+					$allingestdata = Array();
+					$allingestmaps = Array();*/
+
+					$_REQUEST['ingestdata'] = Array();
+					$_REQUEST['ingestmap'] = Array();
+
+					foreach($recordArray as $record) {
+						foreach ($record as $index => $obj) {
+							array_push($_REQUEST['ingestmap'], $index);
+							array_push($_REQUEST['ingestdata'], $obj);
+						}
+
+						Manager::init();
+						if (!Manager::GetProject()) { die(gettext('PID was not submitted this is required for ingestion')); }
+						if (!Manager::GetScheme()) { die(gettext('SID was not submitted this is required for ingestion')); }
+
+						$pid = $_REQUEST['pid'];
+						$sid = $_REQUEST['sid'];
+
+						$rid = Manager::CheckRequestsAreSet(['rid']) ? $_REQUEST['rid'] : null;
+
+						//var_dump($rid);
+
+						$keyfieldMatch = false;
+						$recorddata = null;
+
+						echo gettext("Ingesting object ")."... ";
+
+						//ingest record data
+						$ingestion = new Record($pid,$sid,$rid);
+
+						if (Manager::CheckRequestsAreSet(['ingestdata']) && Manager::CheckRequestsAreSet(['ingestmap']))
+						{ $recorddata = $ingestion->GetImportData(); }
+
+						//set user
+						$recorddata['recordowner'] = 'restful';
+
+						if (!$keyfieldMatch)
+						{
+
+							if (!$ingestion->ingest($recorddata)) { die(gettext('Please fix errors and try again')); }
+						}
+
+
+					}
+
+
 				}
 			}
 		} 

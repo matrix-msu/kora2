@@ -30,6 +30,7 @@ function DisablePublicIngest()
  
 $(function() {
 	$("#apschemecontrols" ).on( "click",'.add_control', function() {
+		loadSymbolOn();
 		var c = $(this);
 		var pid = $('#kora_globals').attr('pid');
 		var sid = $('#kora_globals').attr('sid');
@@ -72,19 +73,17 @@ $(function() {
 			fd.append('type',$('.ks_addControl_type').val());
 			fd.append('name',$('.ks_addControl_name').val());
 			fd.append('description',$('.ks_addControl_desc').val());
-			fd.append('required',$('.ks_addControl_req').val());
-			console.log($('.ks_addControl_req').val());
-			fd.append('searchable',$('.ks_addControl_search').val());
-			fd.append('advanced',$('.ks_addControl_adv').val());
-			console.log($('.ks_addControl_adv').val());
-			fd.append('showinresults',$('.ks_addControl_showRes').val());
+			fd.append('required',$('.ks_addControl_req').is(':checked'));
+			fd.append('searchable',$('.ks_addControl_search').is(':checked'));
+			fd.append('advanced',$('.ks_addControl_adv').is(':checked'));
+			fd.append('showinresults',$('.ks_addControl_showRes').is(':checked'));
 			fd.append('collectionid',$('.ks_addControl_collid').val());
 			fd.append('pid',pid);
 			fd.append('sid',sid);
 			fd.append('action','CreateControl');
 			fd.append('source','SchemeFunctions');
 			
-			loadSymbolOn();
+			
 			$.ajax({
 				url: 'ajax/scheme.php',
 				data: fd,
@@ -96,17 +95,19 @@ $(function() {
 					if (resp == ""){ check_error = 1; }
 					$("#cbox_error").html(resp);
 					$.colorbox.resize();
-					loadSymbolOff();
+					
 				}
 			});
 			
 			if ( check_error == 1){ $.colorbox.close(); } //If no error, close cbox
-			loadSymbolOn();
-			$.post('ajax/scheme.php', {action:'PrintSchemeLayout',source:'SchemeFunctions',pid:pid,sid:sid}, function(resp){$("#apschemecontrols").html(resp);loadSymbolOff();}, 'html');
+			
+			$.post('ajax/scheme.php', {action:'PrintSchemeLayout',source:'SchemeFunctions',pid:pid,sid:sid}, function(resp){$("#apschemecontrols").html(resp);}, 'html');
 		});
+		loadSymbolOff();
 	});
 	
 	$("#apschemecontrols" ).on( "click",'.add_collection', function() {
+		loadSymbolOn();
 		var c = $(this);
 		var pid = $('#kora_globals').attr('pid');
 		var sid = $('#kora_globals').attr('sid');
@@ -125,7 +126,7 @@ $(function() {
 			fd.append('action','CreateCollection');
 			fd.append('source','SchemeFunctions');
 			
-			loadSymbolOn();
+			
 			$.ajax({
 				url: 'ajax/scheme.php',
 				data: fd,
@@ -137,17 +138,19 @@ $(function() {
 					if (resp == ""){ check_error = 1; }
 					$("#cbox_error").append(resp);
 					$.colorbox.resize();
-					loadSymbolOff();
+					
 				}
 			});
 			
 			if ( check_error == 1){ $.colorbox.close(); } //If no error, close cbox
-			loadSymbolOn();
-			$.post('ajax/scheme.php', {action:'PrintSchemeLayout',source:'SchemeFunctions',pid:pid,sid:sid}, function(resp){$("#apschemecontrols").html(resp);loadSymbolOff();}, 'html');
+			
+			$.post('ajax/scheme.php', {action:'PrintSchemeLayout',source:'SchemeFunctions',pid:pid,sid:sid}, function(resp){$("#apschemecontrols").html(resp);}, 'html');
 		});
+		loadSymbolOff();
 	});
 	
 	$("#apschemecontrols" ).on( "click",'.update_collection', function() {
+		loadSymbolOn();
 		var c = $(this);
 		var pid = $('#kora_globals').attr('pid');
 		var sid = $('#kora_globals').attr('sid');
@@ -168,7 +171,7 @@ $(function() {
 			fd.append('action','UpdateCollection');
 			fd.append('source','SchemeFunctions');
 			
-			loadSymbolOn();
+			
 			$.ajax({
 				url: 'ajax/scheme.php',
 				data: fd,
@@ -180,17 +183,19 @@ $(function() {
 					if (resp == ""){ check_error = 1; }
 					$("#cbox_error").append(resp);
 					$.colorbox.resize();
-					loadSymbolOff();
+					
 				}
 			});
 			
 			if ( check_error == 1){ $.colorbox.close(); } //If no error, close cbox
-			loadSymbolOn();
-			$.post('ajax/scheme.php', {action:'PrintSchemeLayout',source:'SchemeFunctions',pid:pid,sid:sid}, function(resp){$("#apschemecontrols").html(resp);loadSymbolOff();}, 'html');
+			
+			$.post('ajax/scheme.php', {action:'PrintSchemeLayout',source:'SchemeFunctions',pid:pid,sid:sid}, function(resp){$("#apschemecontrols").html(resp);}, 'html');
 		});
+		loadSymbolOff();
 	});
 	
 	$("#apschemecontrols" ).on( "click",'.edit_control', function(e) {
+		loadSymbolOn();
 		e.preventDefault();
 		var c = $(this);
 		var pid = $('#kora_globals').attr('pid');
@@ -199,125 +204,147 @@ $(function() {
 		$.ajaxSetup({ async: false });
 		$.colorbox({href:'ajax/control.php',data:{action:"ShowDialog",source:"ControlFunctions",pid:pid,sid:sid,cid:cid},onClosed: function() {$.post('ajax/scheme.php', {action:'PrintSchemeLayout',source:'SchemeFunctions',pid:pid,sid:sid}, function(resp){$("#apschemecontrols").html(resp);/*checkSelectAlls();*/}, 'html')}});
 		$.ajaxSetup({ async: true });
+		loadSymbolOff();
 	});
 
 	$("#apschemecontrols" ).on( "click",'.move_collection_up', function() {
+		loadSymbolOn();
 		var c = $(this);
 		var pid = $('#kora_globals').attr('pid');
 		var sid = $('#kora_globals').attr('sid');
 		var cid = c.parents('.scheme_collection').first().attr('kcollid');
 		$.ajaxSetup({ async: false });
-		loadSymbolOn();
+		
 		$.post("ajax/scheme.php",{action:"MoveSchemeCollection",source:"SchemeFunctions",pid:pid,sid:sid,movecid:cid,direction:"up"},function(resp){$("#global_error").append(resp);}, 'html');
-		$.post('ajax/scheme.php', {action:'PrintSchemeLayout',source:'SchemeFunctions',pid:pid,sid:sid}, function(resp){$("#apschemecontrols").html(resp);loadSymbolOff();}, 'html');
+		$.post('ajax/scheme.php', {action:'PrintSchemeLayout',source:'SchemeFunctions',pid:pid,sid:sid}, function(resp){$("#apschemecontrols").html(resp);}, 'html');
 		$.ajaxSetup({ async: true });
+		loadSymbolOff();
 	});
 
 	$("#apschemecontrols" ).on( "click",'.move_collection_down', function() {
+		loadSymbolOn();
 		var c = $(this);
 		var pid = $('#kora_globals').attr('pid');
 		var sid = $('#kora_globals').attr('sid');
 		var cid = c.parents('.move_collection').prevAll('.scheme_collection').first().attr('kcollid');
 		$.ajaxSetup({ async: false });
-		loadSymbolOn();
+		
 		$.post("ajax/scheme.php", {action:"MoveSchemeCollection",source:"SchemeFunctions",pid:pid,sid:sid,movecid:cid,direction:"down"},function(resp){$("#global_error").append(resp);}, 'html');
-		$.post('ajax/scheme.php', {action:'PrintSchemeLayout',source:'SchemeFunctions',pid:pid,sid:sid}, function(resp){$("#apschemecontrols").html(resp);loadSymbolOff();}, 'html');
+		$.post('ajax/scheme.php', {action:'PrintSchemeLayout',source:'SchemeFunctions',pid:pid,sid:sid}, function(resp){$("#apschemecontrols").html(resp);}, 'html');
 		$.ajaxSetup({ async: true });
+		loadSymbolOff();
 	});
 
 	$("#apschemecontrols" ).on( "click",'.move_control_up', function() {
+		loadSymbolOn();
 		var c = $(this);
 		var pid = $('#kora_globals').attr('pid');
 		var sid = $('#kora_globals').attr('sid');
 		var cid = c.parents('.scheme_control').first().attr('kcid');
 		$.ajaxSetup({ async: false });
-		loadSymbolOn();
+		
 		$.post("ajax/scheme.php",{action:"MoveSchemeControl",source:"SchemeFunctions",pid:pid,sid:sid,movecid:cid,direction:"up"},function(resp){$("#global_error").append(resp);}, 'html');
-		$.post('ajax/scheme.php', {action:'PrintSchemeLayout',source:'SchemeFunctions',pid:pid,sid:sid}, function(resp){$("#apschemecontrols").html(resp);loadSymbolOff();}, 'html');
+		$.post('ajax/scheme.php', {action:'PrintSchemeLayout',source:'SchemeFunctions',pid:pid,sid:sid}, function(resp){$("#apschemecontrols").html(resp);}, 'html');
 		$.ajaxSetup({ async: true });
+		loadSymbolOff();
 	});
 
 	$("#apschemecontrols" ).on( "click",'.move_control_down', function() {
+		loadSymbolOn();
 		var c = $(this);
 		var pid = $('#kora_globals').attr('pid');
 		var sid = $('#kora_globals').attr('sid');
 		var cid = c.parents('.scheme_control').first().attr('kcid');
 		$.ajaxSetup({ async: false });
-		loadSymbolOn();
+		
 		$.post("ajax/scheme.php", {action:"MoveSchemeControl",source:"SchemeFunctions",pid:pid,sid:sid,movecid:cid,direction:"down"},function(resp){$("#global_error").append(resp);}, 'html');
-		$.post('ajax/scheme.php', {action:'PrintSchemeLayout',source:'SchemeFunctions',pid:pid,sid:sid}, function(resp){$("#apschemecontrols").html(resp);loadSymbolOff();}, 'html');
+		$.post('ajax/scheme.php', {action:'PrintSchemeLayout',source:'SchemeFunctions',pid:pid,sid:sid}, function(resp){$("#apschemecontrols").html(resp);}, 'html');
 		$.ajaxSetup({ async: true });
+		loadSymbolOff();
 	});
 
 	$("#apschemecontrols" ).on( "click",'.showhide_permissions', function() {
+		loadSymbolOn();
 		var c = $(this);
 		c.parents('.scheme_collection').first().find('.searchoption').toggle();
 		c.parents('.scheme_collection').first().find('.controldescription').toggle();
 		c.parents('.scheme_collection').first().find('.kcgcl-col-adv').toggle();
 		c.parents('.scheme_collection').first().find('.kcgcl-col-desc').toggle();
+		loadSymbolOff();
 	});
 	
 	$("#apschemecontrols" ).on( "click",'.required', function() {
+		loadSymbolOn();
 		var c = $(this);
 		var pid = $('#kora_globals').attr('pid');
 		var sid = $('#kora_globals').attr('sid');
 		var cid = c.parents('.scheme_control').first().attr('kcid');
 		$.ajaxSetup({ async: false });
-		loadSymbolOn();
-		$.post("ajax/control.php", {action:"SetStdOption",source:"SchemeFunctions",pid:pid,sid:sid,cid:cid,ctrlopt:"required",ctrloptval:$(this).is(':checked')},function(resp){$("#global_error").append(resp);loadSymbolOff();}, 'html');
+		
+		$.post("ajax/control.php", {action:"SetStdOption",source:"SchemeFunctions",pid:pid,sid:sid,cid:cid,ctrlopt:"required",ctrloptval:$(this).is(':checked')},function(resp){$("#global_error").append(resp);}, 'html');
 		DisablePublicIngest();
 		$.ajaxSetup({ async: true });
+		loadSymbolOff();
 	});
 
 	$("#apschemecontrols" ).on( "click",'.searchable', function() {
+		loadSymbolOn();
 		var c = $(this);
 		var pid = $('#kora_globals').attr('pid');
 		var sid = $('#kora_globals').attr('sid');
 		var cid = c.parents('.scheme_control').first().attr('kcid');
 		$.ajaxSetup({ async: false });
-		loadSymbolOn();
-		$.post("ajax/control.php", {action:"SetStdOption",source:"SchemeFunctions",pid:pid,sid:sid,cid:cid,ctrlopt:"searchable",ctrloptval:$(this).is(':checked')},function(resp){$("#global_error").append(resp);loadSymbolOff();}, 'html');
+		
+		$.post("ajax/control.php", {action:"SetStdOption",source:"SchemeFunctions",pid:pid,sid:sid,cid:cid,ctrlopt:"searchable",ctrloptval:$(this).is(':checked')},function(resp){$("#global_error").append(resp);}, 'html');
 		DisablePublicIngest();
 		$.ajaxSetup({ async: true });
+		loadSymbolOff();
 	});
 
 	$("#apschemecontrols" ).on( "click",'.advsearchable', function() {
+		loadSymbolOn();
 		var c = $(this);
 		var pid = $('#kora_globals').attr('pid');
 		var sid = $('#kora_globals').attr('sid');
 		var cid = c.parents('.scheme_control').first().attr('kcid');
 		$.ajaxSetup({ async: false });
-		loadSymbolOn();
-		$.post("ajax/control.php", {action:"SetStdOption",source:"SchemeFunctions",pid:pid,sid:sid,cid:cid,ctrlopt:"advsearchable",ctrloptval:$(this).is(':checked')},function(resp){$("#global_error").append(resp);loadSymbolOff();}, 'html');
+		
+		$.post("ajax/control.php", {action:"SetStdOption",source:"SchemeFunctions",pid:pid,sid:sid,cid:cid,ctrlopt:"advsearchable",ctrloptval:$(this).is(':checked')},function(resp){$("#global_error").append(resp);}, 'html');
 		DisablePublicIngest();
 		$.ajaxSetup({ async: true });
+		loadSymbolOff();
 	});
 
 	$("#apschemecontrols" ).on( "click",'.showinresults', function() {
+		loadSymbolOn();
 		var c = $(this);
 		var pid = $('#kora_globals').attr('pid');
 		var sid = $('#kora_globals').attr('sid');
 		var cid = c.parents('.scheme_control').first().attr('kcid');
 		$.ajaxSetup({ async: false });
-		loadSymbolOn();
-		$.post("ajax/control.php", {action:"SetStdOption",source:"SchemeFunctions",pid:pid,sid:sid,cid:cid,ctrlopt:"showinresults",ctrloptval:$(this).is(':checked')},function(resp){$("#global_error").append(resp);loadSymbolOff();}, 'html');
+		
+		$.post("ajax/control.php", {action:"SetStdOption",source:"SchemeFunctions",pid:pid,sid:sid,cid:cid,ctrlopt:"showinresults",ctrloptval:$(this).is(':checked')},function(resp){$("#global_error").append(resp);}, 'html');
 		DisablePublicIngest();
 		$.ajaxSetup({ async: true });
+		loadSymbolOff();
 	});
 
 	$("#apschemecontrols" ).on( "click",'.publicentry', function() {
+		loadSymbolOn();
 		var c = $(this);
 		var pid = $('#kora_globals').attr('pid');
 		var sid = $('#kora_globals').attr('sid');
 		var cid = c.parents('.scheme_control').first().attr('kcid');
 		$.ajaxSetup({ async: false });
-		loadSymbolOn();
-		$.post("ajax/control.php", {action:"SetStdOption",source:"SchemeFunctions",pid:pid,sid:sid,cid:cid,ctrlopt:"publicentry",ctrloptval:$(this).is(':checked')},function(resp){$("#global_error").append(resp);loadSymbolOff();}, 'html');
+		
+		$.post("ajax/control.php", {action:"SetStdOption",source:"SchemeFunctions",pid:pid,sid:sid,cid:cid,ctrlopt:"publicentry",ctrloptval:$(this).is(':checked')},function(resp){$("#global_error").append(resp);}, 'html');
 		DisablePublicIngest();
 		$.ajaxSetup({ async: true });
+		loadSymbolOff();
 	});
 	
 	$("#apschemecontrols" ).on( "click",'.delete_control', function() {
+		loadSymbolOn();
 		var answer = confirm(kgt_reallydelctrl);
 		if(answer) {
 			var c = $(this);
@@ -325,14 +352,16 @@ $(function() {
 			var sid = $('#kora_globals').attr('sid');
 			var cid = c.parents('.scheme_control').first().attr('kcid');
 			$.ajaxSetup({ async: false });
-			loadSymbolOn();
+			
 			$.post("ajax/scheme.php",{action:"DeleteSchemeControl",source:"SchemeFunctions",pid:pid,sid:sid,delcid:cid},function(resp){$("#global_error").append(resp);}, 'html');
-			$.post('ajax/scheme.php', {action:'PrintSchemeLayout',source:'SchemeFunctions',pid:pid,sid:sid}, function(resp){$("#apschemecontrols").html(resp);loadSymbolOff();}, 'html');
+			$.post('ajax/scheme.php', {action:'PrintSchemeLayout',source:'SchemeFunctions',pid:pid,sid:sid}, function(resp){$("#apschemecontrols").html(resp);}, 'html');
 			$.ajaxSetup({ async: true });
 		}
+		loadSymbolOff();
 	});
 
 	$("#apschemecontrols" ).on( "click",'.delete_collection', function() {
+		loadSymbolOn();
 		var answer = confirm(kgt_reallydelcoll);
 		if(answer) {
 			var c = $(this);
@@ -340,14 +369,16 @@ $(function() {
 			var sid = $('#kora_globals').attr('sid');
 			var cid = c.parents('.scheme_collection').first().attr('kcollid');
 			$.ajaxSetup({ async: false });
-			loadSymbolOn();
+			
 			$.post("ajax/scheme.php",{action:"DeleteSchemeCollection",source:"SchemeFunctions",pid:pid,sid:sid,delcid:cid},function(resp){$("#global_error").append(resp);}, 'html');
-			$.post('ajax/scheme.php', {action:'PrintSchemeLayout',source:'SchemeFunctions',pid:pid,sid:sid}, function(resp){$("#apschemecontrols").html(resp);loadSymbolOff();}, 'html');
+			$.post('ajax/scheme.php', {action:'PrintSchemeLayout',source:'SchemeFunctions',pid:pid,sid:sid}, function(resp){$("#apschemecontrols").html(resp);}, 'html');
 			$.ajaxSetup({ async: true });
 		}
+		loadSymbolOff();
 	});
 
 	$("#apschemeallowedassoc" ).on( "click",'.delete_allowed_assoc', function() {
+		loadSymbolOn();
 		var answer = confirm(kgt_reallydelschemeassoc);
 		if(answer) {
 			var c = $(this);
@@ -356,14 +387,16 @@ $(function() {
 			var tarpid = c.parents('.scheme_allowed_assoc').first().attr('pid');
 			var tarsid = c.parents('.scheme_allowed_assoc').first().attr('sid');
 			$.ajaxSetup({ async: false });
-			loadSymbolOn();
+			
 			$.post("ajax/scheme.php", {action:"DeleteAllowedAssoc",source:"SchemeFunctions",pid:globalpid,sid:globalsid,delpid:tarpid,delsid:tarsid},function(resp){$("#global_error").append(resp);}, 'html');
-			$.post('ajax/scheme.php', {action:'PrintAllowedAssoc',source:'SchemeFunctions',pid:globalpid,sid:globalsid}, function(resp){$("#apschemeallowedassoc").html(resp);loadSymbolOff();}, 'html');
+			$.post('ajax/scheme.php', {action:'PrintAllowedAssoc',source:'SchemeFunctions',pid:globalpid,sid:globalsid}, function(resp){$("#apschemeallowedassoc").html(resp);}, 'html');
 			$.ajaxSetup({ async: true });
 		}
+		loadSymbolOff();
 	});
 	
 	$("#apschemesetallowedassoc" ).on( "change",'.add_allowed_assoc_proj', function() {
+		loadSymbolOn();
 		var selpid = $(this).val();
 		var selscheme = $(this).parents('#apschemesetallowedassoc').first().find('.add_allowed_assoc_scheme').first();
 		// IF SELPID == 'all' WE DO THINGS A BIT DIFFERENTLY
@@ -379,9 +412,11 @@ $(function() {
 			selscheme.find('.showall').show();
 			selscheme.find('.proj'+selpid).show();
 		}
+		loadSymbolOff();
 	});
 	
 	$("#apschemesetallowedassoc" ).on( "click",'.add_allowed_assoc', function() {
+		loadSymbolOn();
 		var globalpid = $('#kora_globals').attr('pid');
 		var globalsid = $('#kora_globals').attr('sid');
 		var selprojjq = $(this).parents('#apschemesetallowedassoc').first().find('.add_allowed_assoc_proj :selected').first();
@@ -403,26 +438,30 @@ $(function() {
 		}
 		
 		$.ajaxSetup({ async: false });
-		loadSymbolOn();
+		
 		for (var i=0; i<addsids.length; i++)
 		{ $.post("ajax/scheme.php", {action:"AddAllowedAssoc",source:"SchemeFunctions",pid:globalpid,sid:globalsid,addpid:addsids[i].attr('pid'),addsid:addsids[i].val()},function(resp){$("#global_error").append(resp);}, 'html'); }
-		$.post('ajax/scheme.php', {action:'PrintAllowedAssoc',source:'SchemeFunctions',pid:globalpid,sid:globalsid}, function(resp){$("#apschemeallowedassoc").html(resp);loadSymbolOff();}, 'html');
+		$.post('ajax/scheme.php', {action:'PrintAllowedAssoc',source:'SchemeFunctions',pid:globalpid,sid:globalsid}, function(resp){$("#apschemeallowedassoc").html(resp);}, 'html');
 		$.ajaxSetup({ async: true });
+		loadSymbolOff();
 	});
 	
 	$("#apschemecontrols").on( "click",'.ks_btn_schemePreset', function() {
+		loadSymbolOn();
 		var globalpid = $('#kora_globals').attr('pid');
 		var globalsid = $('#kora_globals').attr('sid');
 		var preset = $(this).is(':checked');
 		
 		$.ajaxSetup({ async: false });
-		loadSymbolOn();
+		
 		$.post('ajax/scheme.php', {action:'UpdateSchemePreset',source:'SchemeFunctions',pid:pid,sid:sid,preset:preset}, function(resp){$("#apschemecontrols").html(resp);/*checkSelectAlls();*/}, 'html');
-		$.post('ajax/scheme.php', {action:'PrintSchemeLayout',source:'SchemeFunctions',pid:pid,sid:sid}, function(resp){$("#apschemecontrols").html(resp);loadSymbolOff();/*checkSelectAlls();*/}, 'html');
+		$.post('ajax/scheme.php', {action:'PrintSchemeLayout',source:'SchemeFunctions',pid:pid,sid:sid}, function(resp){$("#apschemecontrols").html(resp);/*checkSelectAlls();*/}, 'html');
 		$.ajaxSetup({ async: true });
+		loadSymbolOff();
 	});
 	
 	$("#xmlUploadForm" ).on( "click",'.scheme_uploadXML_submit', function() {
+		loadSymbolOn();
 		var fd = new FormData();
 
 		fd.append('xmlFileName',$('input[type=file]')[0].files[0]);
@@ -430,7 +469,7 @@ $(function() {
 		fd.append('action','SchemeXMLUpload');
 		fd.append('source','SchemeFunctions');
 		
-		loadSymbolOn();
+		
 		$.ajax({
 			url: 'ajax/scheme.php',
 			data: fd,
@@ -439,13 +478,15 @@ $(function() {
 			async: false,
 			type: 'POST',
 			success: function(resp) { 
-				$("#global_error").text(resp);
-				loadSymbolOff();
+				$("#global_error").html(resp);
+				
 			}
 		});
+		loadSymbolOff();
 	});
 	
 	$("#xmlUploadForm" ).on( "click",'.records_uploadXML_submit', function() {
+		loadSymbolOn();
 		var fd = new FormData();
 
 		fd.append('xmlFileName',$('input[type=file]')[0].files[0]);
@@ -455,7 +496,7 @@ $(function() {
 		fd.append('action','MultiRecordXMLUpload');
 		fd.append('source','SchemeFunctions');
 		
-		loadSymbolOn();
+		
 		$.ajax({
 			url: 'ajax/scheme.php',
 			data: fd,
@@ -466,49 +507,57 @@ $(function() {
 			success: function(resp) { 
 				$('#ingestXMLerror').html('');
 				$('#xmlActionDisplay').html(resp);
-				loadSymbolOff();
+				
 			},
 			error: function() {
 				$('#ingestXMLerror').html('Invalid XML File');
 				$('#xmlActionDisplay').html();
-				loadSymbolOff();
+				
 			}
 		});
+		loadSymbolOff();
 	});
 
 	if ($('#apschemecontrols').length > 0)
 	{
+		loadSymbolOn();
 		var pid = $('#kora_globals').attr('pid');
 		var sid = $('#kora_globals').attr('sid');
 		$.ajaxSetup({ async: false });
-		loadSymbolOn();
-		$.post('ajax/scheme.php', {action:'PrintSchemeLayout',source:'SchemeFunctions',pid:pid,sid:sid}, function(resp){$("#apschemecontrols").html(resp);loadSymbolOff();/*checkSelectAlls();*/}, 'html');
+		
+		$.post('ajax/scheme.php', {action:'PrintSchemeLayout',source:'SchemeFunctions',pid:pid,sid:sid}, function(resp){$("#apschemecontrols").html(resp);/*checkSelectAlls();*/}, 'html');
 		DisablePublicIngest();
 		$.ajaxSetup({ async: true });
+		loadSymbolOff();
 	}
 	
 	if ($('#apschemesetallowedassoc').length > 0)
 	{
+		loadSymbolOn();
 		var pid = $('#kora_globals').attr('pid');
 		var sid = $('#kora_globals').attr('sid');
 		$.ajaxSetup({ async: false });
-		loadSymbolOn();
-		$.post('ajax/scheme.php', {action:'PrintSetAllowedAssoc',source:'SchemeFunctions',pid:pid,sid:sid}, function(resp){$("#apschemesetallowedassoc").html(resp);loadSymbolOff();}, 'html');
+		
+		$.post('ajax/scheme.php', {action:'PrintSetAllowedAssoc',source:'SchemeFunctions',pid:pid,sid:sid}, function(resp){$("#apschemesetallowedassoc").html(resp);}, 'html');
 		$("#apschemesetallowedassoc").find('.add_allowed_assoc_proj').trigger('change');
 		$.ajaxSetup({ async: true });
+		loadSymbolOff();
 	}
 	
 	if ($('#apschemeallowedassoc').length > 0)
 	{
+		loadSymbolOn();
 		var pid = $('#kora_globals').attr('pid');
 		var sid = $('#kora_globals').attr('sid');
 		$.ajaxSetup({ async: false });
-		loadSymbolOn();
-		$.post('ajax/scheme.php', {action:'PrintAllowedAssoc',source:'SchemeFunctions',pid:pid,sid:sid}, function(resp){$("#apschemeallowedassoc").html(resp);loadSymbolOff();}, 'html');
+		
+		$.post('ajax/scheme.php', {action:'PrintAllowedAssoc',source:'SchemeFunctions',pid:pid,sid:sid}, function(resp){$("#apschemeallowedassoc").html(resp);}, 'html');
 		$.ajaxSetup({ async: true });
+		loadSymbolOff();
 	}
 	
 	$("#right_container").on("change", '.ksquickjump', function() {
+		loadSymbolOn();
 		var pid = $(this).attr('pid');
 		window.location = 'schemeLayout.php?pid='+pid+'&sid='+$(this).val();
 	});

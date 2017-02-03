@@ -1,4 +1,5 @@
 <?php
+use KORA\Manager;
 /*
 Copyright (2008) Matrix: Michigan State University
 
@@ -1412,6 +1413,126 @@ if(version_compare($systemInfo['version'], '2.6.2', '<'))
 	$anyUpdatesDone = true;
 	echo '<br />';
 	flush();
+}
+if(version_compare($systemInfo['version'], '2.6.3', '<'))
+{
+	// THERE WERE NO DATABASE UPDATES BETWEEN 2.6.2 AND 2.6.3
+	$allUpdated = true;
+	
+	if($allUpdated)
+	{
+		echo gettext('Successful');
+	}
+	else
+	{
+		echo '<font color="#ff0000">'.gettext('Failed').'</font>';
+		$allTestsPassed = false;
+	}
+	echo "</strong><br/>";
+	
+	//Change version number
+	if ($allTestsPassed)
+	{
+		$result = $db->query("UPDATE systemInfo SET version='2.6.3' WHERE baseURL=".escape(baseURI).' LIMIT 1');
+		if (isset($_SESSION['dbVersion']))
+		{
+			$_SESSION['dbVersion'] = '2.6.3';
+		}
+	}
+	//Mark anyUpdatesDone as true
+	$anyUpdatesDone = true;
+	echo '<br />';
+	flush();
+}
+if(version_compare($systemInfo['version'], '2.6.5', '<'))
+{
+	// THERE WERE NO DATABASE UPDATES BETWEEN 2.6.3 AND 2.6.5
+	$allUpdated = true;
+	
+	if($allUpdated)
+	{
+		echo gettext('Successful');
+	}
+	else
+	{
+		echo '<font color="#ff0000">'.gettext('Failed').'</font>';
+		$allTestsPassed = false;
+	}
+	echo "</strong><br/>";
+	
+	//Change version number
+	if ($allTestsPassed)
+	{
+		$result = $db->query("UPDATE systemInfo SET version='2.6.5' WHERE baseURL=".escape(baseURI).' LIMIT 1');
+		if (isset($_SESSION['dbVersion']))
+		{
+			$_SESSION['dbVersion'] = '2.6.5';
+		}
+	}
+	//Mark anyUpdatesDone as true
+	$anyUpdatesDone = true;
+	echo '<br />';
+	flush();
+}
+if(version_compare($systemInfo['version'], '2.6.6.1', '<'))
+{
+    // THERE WERE NO DATABASE UPDATES BETWEEN 2.6.5 AND 2.6.6.1
+    $allUpdated = true;
+
+    if($allUpdated)
+    {
+        echo gettext('Successful');
+    }
+    else
+    {
+        echo '<font color="#ff0000">'.gettext('Failed').'</font>';
+        $allTestsPassed = false;
+    }
+    echo "</strong><br/>";
+
+    //Change version number
+    if ($allTestsPassed)
+    {
+        $result = $db->query("UPDATE systemInfo SET version='2.6.6.1' WHERE baseURL=".escape(baseURI).' LIMIT 1');
+        if (isset($_SESSION['dbVersion']))
+        {
+            $_SESSION['dbVersion'] = '2.6.6.1';
+        }
+    }
+    //Mark anyUpdatesDone as true
+    $anyUpdatesDone = true;
+    echo '<br />';
+    flush();
+}
+if(version_compare($systemInfo['version'], '2.7.0', '<') | $systemInfo['version'] == '2.6.6.1') //4 digit versions broke the function so we need to reset to three if the user ended up on 2.6.6.1
+{
+    // THERE WERE NO DATABASE UPDATES BETWEEN 2.6.6.1 AND 2.7.0
+    $allUpdated = true;
+
+    if($allUpdated)
+    {
+        echo gettext('Successful');
+    }
+    else
+    {
+        echo '<font color="#ff0000">'.gettext('Failed').'</font>';
+        $allTestsPassed = false;
+    }
+    echo "</strong><br/>";
+
+    //Change version number
+    if ($allTestsPassed)
+    {
+        $result = $db->query("UPDATE systemInfo SET version='2.7.0' WHERE baseURL=".escape(baseURI).' LIMIT 1');
+        if (isset($_SESSION['dbVersion']))
+        {
+            $_SESSION['dbVersion'] = '2.7.0';
+        }
+    }
+    //Mark anyUpdatesDone as true
+    $anyUpdatesDone = true;
+    echo '<br />';
+    flush();
 }
 
 

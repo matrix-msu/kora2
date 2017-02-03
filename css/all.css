@@ -108,7 +108,7 @@ legend { margin: 5px; }
 .controlTable { border: solid #000 1px; }
 .kora_ccLeftCol { width: 200px; text-align: right; }
 .kora_ccRightCol { border-bottom: solid #000 1px; }
-#inlineInput {position: relative; margin-top: -16px; margin-left: 150px;}
+#inlineInput {position: relative; margin-top: -16px; margin-left: 10px;}
 #thickboxDescrip {margin-top: -15px;}
 select { max-width :300px; font-size: 9px;}
 form, button { border:0; margin:0; padding:0; }

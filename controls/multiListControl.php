@@ -1,4 +1,5 @@
 <?php
+use KORA\Manager;
 /**
 Copyright (2008) Matrix: Michigan State University
 
@@ -68,7 +69,7 @@ class MultiListControl extends ListControl
 	  *
 	  * @return void
 	  */
-	public function display()
+	public function display($defaultValue=true)
 	{
 		$hasDef = false;
 		if($this->value != null && $this->value->value != ""){
@@ -90,7 +91,7 @@ class MultiListControl extends ListControl
 		// display the options, with the current value selected.
 		foreach($this->options->option as $option) {
 			echo "<option value='".htmlEscape($option)."'";
-			if(in_array($option, $values)) echo ' selected="selected"';
+			if(in_array($option, $values) && $defaultValue) echo ' selected="selected"';
 			echo ">$option</option>\n";
 		}
 		
@@ -163,7 +164,7 @@ class MultiListControl extends ListControl
 		{
 			$x[] = xmlEscape($v);
 		}
-		$this->XMLInputValue = $x;
+		$this->XMLInputValue = $value;
 	}
 	
 	/**
@@ -174,7 +175,7 @@ class MultiListControl extends ListControl
 	  * @return void
 	  */
 	private function loadValues($valueArray) {
-		$this->value = simplexml_load_string(utf8_encode('<multilist></multilist>'));
+		$this->value = simplexml_load_string(utf8_encode('<?xml version="1.0" encoding="UTF-8"?><multilist></multilist>'));
 		
 		foreach($valueArray as $selectedOption)
 		{

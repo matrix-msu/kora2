@@ -1,5 +1,7 @@
 <?php
+namespace KORA;
 
+use Exception;
 /**
 Copyright (2008) Matrix: Michigan State University
 

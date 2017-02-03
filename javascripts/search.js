@@ -28,14 +28,26 @@ $(function() {
 		
 		//'In order' is disabled until 'sort results by' is selected
 		$('#advSearch_table_keyword').on("change",".advSearch_sortByKeyword", function(){
+			loadSymbolOn();
 			$('.sortOrder_keyword').removeAttr("disabled");
+			loadSymbolOff();
 		});
 		$('#advSearch_table_other').on("change",".advSearch_sortBy", function(){
+			loadSymbolOn();
 			$('.sortOrder_other').removeAttr("disabled");
+			loadSymbolOff();
 		});
+		
+		/*View all pages without pagination
+		$('#content_container').on('click', '.ks_view_all_pages', function(){
+			loadSymbolOn();
+			viewAllPages();
+			loadSymbolOff();
+		}); */
 		
 		//Submission of keyword search
 		$('#advSearch_table_keyword').on("click",".ks_asKs_submit", function(){
+			loadSymbolOn();
 			var fd = new FormData();
 			
 			fd.append('pid',$('.ks_asKs_pid').val());
@@ -45,7 +57,7 @@ $(function() {
 			fd.append('sortBy',$('.advSearch_sortByKeyword').val());
 			fd.append('sortOrder',$('.sortOrder_keyword').val());
 			
-			loadSymbolOn();
+			$.ajaxSetup({ async: true });
 			$.ajax({
 				url: 'searchResults.php',
 				data: fd,
@@ -54,14 +66,17 @@ $(function() {
 				type: 'POST',
 				success: function(data){
 					document.write(data);
+					document.close();
 					KS_InitSearchResults();
 					loadSymbolOff();
 				}
 			});	
+			$.ajaxSetup({ async: true });
 		});
 		
 		//Submission of advanced search
 		$('#advSearch_table_other').on("click",".ks_as_submit", function(){
+			loadSymbolOn();
 			var fd = new FormData();
 			var keywords = '';
 			
@@ -77,7 +92,8 @@ $(function() {
 					var mon = $(this).children(".kcdc_month:first").val();
 					var day = $(this).children(".kcdc_day:first").val();
 					var year = $(this).children(".kcdc_year:first").val();
-					keywords += KS_ASKeyConversion_DC(mon,day,year,cid);
+					if(mon!='' | day!='' | year!='')
+						keywords += KS_ASKeyConversion_DC(mon,day,year,cid);
 				}
 				//MultiDateControl
 				else if($(this).attr('kcclass')=='MultiDateControl'){
@@ -93,7 +109,7 @@ $(function() {
 				else if($(this).attr('kcclass')=='ListControl'){
 					var key = $(this).children("select:first").val();
 					if(key.length>1)
-						keywords += KS_ASKeyConversion(key,cid);
+						keywords += KS_ASKeyConversion_LC(key,cid);
 				} 
 				//MultiListControl
 				else if($(this).attr('kcclass')=='MultiListControl'){
@@ -126,7 +142,7 @@ $(function() {
 			fd.append('sortBy',$('.advSearch_sortBy').val());
 			fd.append('sortOrder',$('.sortOrder_other').val());
 			
-			loadSymbolOn();
+			$.ajaxSetup({ async: true });
 			$.ajax({
 				url: 'searchResults.php',
 				data: fd,
@@ -135,14 +151,18 @@ $(function() {
 				type: 'POST',
 				success: function(data){
 					document.write(data);
+					document.close();
 					KS_InitSearchResults();
 					loadSymbolOff();
 				}
 			});
+			
+			$.ajaxSetup({ async: true });
 		});
 		
 		//Submission of cross project search
 		$('.ks_cps_table').on("click",".ks_cps_submit", function(){
+			loadSymbolOn();
 			var fd = new FormData();
 			
 			var pids = []; 
@@ -153,7 +173,7 @@ $(function() {
 			fd.append('boolean',$('.ks_cps_boolean').val());
 			fd.append('projects',pids);
 			
-			loadSymbolOn();
+			$.ajaxSetup({ async: true });
 			$.ajax({
 				url: 'searchResults.php',
 				data: fd,
@@ -162,24 +182,30 @@ $(function() {
 				type: 'POST',
 				success: function(data){
 					document.write(data);
+					document.close();
 					KS_InitSearchResults();
 					loadSymbolOff();
 				}
 			});	
+			
+			$.ajaxSetup({ async: true });
 		});
 		
 		//disables submit if no projects selected in cross project search
 		$('.ks_cps_table').on("change",".ks_cps_projects", function(){
+			loadSymbolOn();
 			var projs = $('.ks_cps_projects').val();
 			if(projs==null){
 				$('.ks_cps_submit').attr("disabled", "disabled");
 			}else{
 				$('.ks_cps_submit').removeAttr("disabled");
 			}
+			loadSymbolOff();
 		});
 		
 		//Submission of project search
 		$('.ks_ps_table').on("click",".ks_ps_submit", function(){
+			loadSymbolOn();
 			var fd = new FormData();
 			
 			fd.append('pid',$('.ks_ps_pid').val());
@@ -187,7 +213,7 @@ $(function() {
 			fd.append('keywords',$('.ks_ps_keywords').val());
 			fd.append('boolean',$('.ks_ps_boolean').val());
 			
-			loadSymbolOn();
+			$.ajaxSetup({ async: true });
 			$.ajax({
 				url: 'searchResults.php',
 				data: fd,
@@ -196,10 +222,13 @@ $(function() {
 				type: 'POST',
 				success: function(data){
 					document.write(data);
+					document.close();
 					KS_InitSearchResults();
 					loadSymbolOff();
 				}
 			});	
+			$.ajaxSetup({ async: true });
+			
 		});
 });
 
@@ -222,14 +251,14 @@ function KS_ShowPage(ksdiv, page)
 					var rid = $(this).attr('rid');
 					console.log('Loading: '+$(this).attr('rid'));
 					$.ajaxSetup({ async: false });
-					loadSymbolOn();
+					
 					$.post($('#kora_globals').attr('baseuri')+"ajax/record.php",{
 						action:"viewRecord",
 						source:"RecordFunctions",
 						pid:pid,
 						sid:sid,
 						rid:rid},
-						function(resp){c.html(resp); c.attr('loaded', 'true');loadSymbolOff(); }, 'html');
+						function(resp){c.html(resp); c.attr('loaded', 'true'); }, 'html');
 					KS_PrintRecordActions(c,pid,sid,rid);
 					$.ajaxSetup({ async: true });
 				}
@@ -246,14 +275,14 @@ function KS_ShowPage(ksdiv, page)
 	var maxpage = ksdiv.find('.ks_results_page').size();
 	var adjacentpage = ksdiv.attr('navlinkadj');
 	$.ajaxSetup({ async: false });
-	loadSymbolOn();
+	
 	$.post($('#kora_globals').attr('baseuri')+"ajax/search.php",{
 		action:"GetSearchNavLinks",
 		source:"SearchFunctions",
 		maxpage:maxpage,
 		adjacentpage:adjacentpage,
 		currpage:page},
-		function(resp){ksdiv.find('.ks_results_navlinks').each(function(){$(this).html(resp);loadSymbolOff();});
+		function(resp){ksdiv.find('.ks_results_navlinks').each(function(){$(this).html(resp);});
 		}, 'html');
 	$.ajaxSetup({ async: true });
 }
@@ -270,8 +299,8 @@ function KS_PrintRecordActions(ksobjdiv,pid,sid,rid)
 	else
 	{ 
 		ascheme = { };
-		loadSymbolOn();
-		$.post($('#kora_globals').attr('baseuri')+"ajax/scheme.php",{action:"GetRecordActions",source:"SchemeFunctions",pid:pid,sid:sid},function(resp){ ascheme[String(sid)] = resp; loadSymbolOff();}, 'html');
+		
+		$.post($('#kora_globals').attr('baseuri')+"ajax/scheme.php",{action:"GetRecordActions",source:"SchemeFunctions",pid:pid,sid:sid},function(resp){ ascheme[String(sid)] = resp; }, 'html');
 		ks_projacts[String(pid)] = ascheme; 
 	}
 	
@@ -332,20 +361,104 @@ function KS_ASKeyConversion_MDC(dates,cid){
 
 function KS_ASKeyConversion_MLC(values,cid){
 	var mlcKey = '%';
+	var mlcEncodedKey = '%';
+	var mlcHTMLKey = '%';
 	for(var i=0;i<values.length;i++){
+		var fd = new FormData();
+		fd.append('value', values[i]);
+		fd.append('action', 'encodeValue');
+		fd.append('source', 'SearchFunctions');
+		$.ajax({
+			url: 'ajax/search.php',
+			data: fd,
+			processData: false,
+			contentType: false,
+			type: 'POST',
+			success: function(result){
+				mlcEncodedKey += ('<value>'+result+'</value>%');
+			}
+		});	
 		mlcKey += ('<value>'+values[i]+'</value>%');
+		mlcHTMLKey += ('<value>'+escapeHtml(values[i])+'</value>%');
 	}
-	return "(cid="+cid+" AND value LIKE '"+'%'+mlcKey+'%'+"')<ADVSEARCHKEY>";
+	return "(cid="+cid+" AND (value LIKE '"+mlcKey+"' OR value LIKE '"+mlcEncodedKey+"' OR value LIKE '"+mlcHTMLKey+"'))<ADVSEARCHKEY>";
 }
 
 function KS_ASKeyConversion_MTC(texts,cid){
 	var mtcKey = '%';
+	var mtcEncodedKey = '%';
 	for(var i=0;i<texts.length;i++){
+		var fd = new FormData();
+		fd.append('value', values[i]);
+		fd.append('action', 'encodeValue');
+		fd.append('source', 'SearchFunctions');
+		$.ajax({
+			url: 'ajax/search.php',
+			data: fd,
+			processData: false,
+			contentType: false,
+			type: 'POST',
+			success: function(result){
+				mtcEncodedKey += ('<value>'+result+'</value>%');
+			}
+		});	
 		mtcKey += ('<text>'+texts[i]+'</text>%');
 	}
-	return "(cid="+cid+" AND value LIKE '"+'%'+mtcKey+'%'+"')<ADVSEARCHKEY>";
+	return "(cid="+cid+" AND (value LIKE '"+mtcKey+"' OR value LIKE '"+mtcEncodedKey+"'))<ADVSEARCHKEY>";
+}
+
+function KS_ASKeyConversion_LC(keyword,cid){
+	return '(cid='+cid+' AND value LIKE"'+keyword+'")<ADVSEARCHKEY>';
 }
 
 function KS_ASKeyConversion(keyword,cid){
-	return "(cid="+cid+" AND value LIKE'"+'%'+keyword+'%'+"')<ADVSEARCHKEY>";
+	return '(cid='+cid+' AND value LIKE"'+"%"+keyword+"%"+'")<ADVSEARCHKEY>';
+}
+
+function viewAllPages(){
+	loadSymbolOn();
+	$(".ks_results").find('.ks_results_page').each(function() {
+		
+		$(this).attr('style', '');
+		// NOW LOAD IF NECESSARY THE TARGET PAGE RECORDS
+		$(this).find('.ks_result_item').each(function() {
+			if ($(this).attr('loaded') != 'true')
+			{
+				var c = $(this);
+				var pid = $(this).attr('pid');
+				var sid = $(this).attr('sid');
+				var rid = $(this).attr('rid');
+				$.ajaxSetup({ async: true });
+				
+				$.post($('#kora_globals').attr('baseuri')+"ajax/record.php",{
+					action:"viewRecord",
+					source:"RecordFunctions",
+					pid:pid,
+					sid:sid,
+					rid:rid},
+					function(resp){ c.html(resp); c.attr('loaded', 'true'); KS_PrintRecordActions(c,pid,sid,rid);}, 'html');
+				
+				$.ajaxSetup({ async: true });
+			}
+		});
+		
+		// NOW SHOW THE TARGET PAGE
+		$(this).show();
+		
+	});
+	$(".ks_results_navlinks").each(function () { $(this).hide(); });
+	$(".ks_view_all_pages").each(function () { $(this).hide(); });
+	loadSymbolOff();
+}
+
+function escapeHtml(text) {
+  var map = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;'
+  };
+
+  return text.replace(/[&<>"']/g, function(m) { return map[m]; });
 }

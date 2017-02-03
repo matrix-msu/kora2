@@ -1,4 +1,6 @@
 <?php
+use KORA\Manager;
+use KORA\Record;
 /*
 Copyright (2008) Matrix: Michigan State University
 
@@ -101,9 +103,11 @@ If you can't ingest the second or third object into the p(pid)Data table, make s
 		
 		<!--Colorbox-->
 		<link href= "<?php echo baseURI."javascripts/colorbox/colorbox.css" ?>" rel="stylesheet" type="text/css" />
+        <link rel="stylesheet" href="includes/mediaelement/build/mediaelementplayer.css" />
 		<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 		<script type="text/javascript" src= "<?php echo baseURI."javascripts/colorbox/jquery.colorbox.js"?>" ></script>
 		<script type="text/javascript" src= "<?php echo baseURI."javascripts/colorbox/jquery.colorbox-min.js"?>" ></script>
+        <script src="includes/mediaelement/build/mediaelement-and-player.min.js"></script>
 		<script type="text/javascript" src= "<?php echo baseURI."javascripts/control.js"?>"></script>
 		<script type="text/javascript" src= "<?php echo baseURI."javascripts/search.js"?>"></script>
 		<!--Control calls that may work-->

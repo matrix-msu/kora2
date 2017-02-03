@@ -1,4 +1,7 @@
 <?php
+use KORA\Manager;
+use KORA\Project;
+use KORA\KoraSearch;
 /*
 Copyright (2008) Matrix: Michigan State University
 
@@ -74,6 +77,11 @@ if (!Manager::IsSystemAdmin())
 	foreach($pids AS $pid)
 	{
 		$proj = new Project($pid);
+		
+		if($pid==Manager::GetProject()->GetPID() && Manager::IsProjectAdmin()){
+			continue;
+		}
+		
 		if ($proj->GetUserPermissions() < 256) 
 		{
 			Manager::PrintErrDiv(gettext('Sorry, but you do not have permission to search some of the requested projects').'.');
@@ -106,28 +114,18 @@ if ($searchok)
 	}
 	$_SESSION['results'] = $results;
 
-	if (Manager::GetScheme() != null && (!Manager::CheckRequestsAreSet(['display']) || ($_REQUEST['display'] != 'all' && $_REQUEST['display'] != 'false'))) {
-		//Display "List All Scheme Records Link at bottom of page"
-		echo '<br><br>';
-		echo '<a href="searchResults.php?pid='.Manager::GetProject()->GetPID().'&sid='.Manager::GetScheme()->GetSID().'&display=all">View All</a>';
-		echo '<br><br>';
-	}
+	//Display "List All Scheme Records Link at bottom of page"
+	echo '<br><br>';
+	echo '<a class="ks_view_all_pages" onclick="viewAllPages()">View All</a>';
+	echo '<br><br>';
 
 	//paginate
-	if (Manager::CheckRequestsAreSet(['display']) && $_REQUEST['display'] == 'all') {
-		//display whole search on one page
-		KoraSearch::PrintSearchResultsAJAXLoad($resultsmerged, false, 'all');
-	}
-	else {
-		KoraSearch::PrintSearchResultsAJAXLoad($resultsmerged);
-	}
+	KoraSearch::PrintSearchResultsAJAXLoad($resultsmerged);
 	
-	if (Manager::GetScheme() != null && (!Manager::CheckRequestsAreSet(['display']) || ($_REQUEST['display'] != 'all' && $_REQUEST['display'] != 'false'))) {
-		//Display "List All Scheme Records Link at bottom of page"
-		echo '<br><br>';
-		echo '<a href="searchResults.php?pid='.Manager::GetProject()->GetPID().'&sid='.Manager::GetScheme()->GetSID().'&display=all">View All</a>';
-		echo '<br><br>';
-	}
+	//Display "List All Scheme Records Link at bottom of page"
+	echo '<br><br>';
+	echo '<a class="ks_view_all_pages"  onclick="viewAllPages()">View All</a>';
+	echo '<br><br>';
 }
 
 Manager::PrintFooter();

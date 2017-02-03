@@ -1,4 +1,5 @@
 <?php
+use KORA\Manager;
     include_once('utilities.php');
 	
     $length = strlen(basePath);
@@ -54,7 +55,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 <?php
 
 Manager::CheckDatabaseVersion();
-Manager::PrintBreadcrumbs();
-
+Manager::PrintBreadcrumbs($NoProj);
+?> <br /><br /><img class="kora_loading_img" src="images/ajax-loader.gif" style="border:0px;visibility:hidden"></img> <?php
 print "<div id='global_error'></div>";
 ?>
+

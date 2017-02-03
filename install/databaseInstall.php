@@ -48,9 +48,9 @@ function validate(form)
 
 <?php 
 include_once('header.php');
-include_once('../includes/includes.php');
 
 if(isset($_REQUEST["submit"])) { 
+
 	//If the user checked Generate Configuration file, test that conf.php is writable
 	if(isset($_REQUEST['generateConf'])){
     	$createConfig = $controlUpdate = true;   //control update can only happen if there is a valid conf file
@@ -77,14 +77,14 @@ if(isset($_REQUEST["submit"])) {
 	}
 	
 	//Check if a new database should be made
-   if (isset($_REQUEST['newDB']))
-   {
-   		$createDatabase = true;
-   		//base name for new database
-   		$newdbname = "kora";
-   		$dbuser = $_REQUEST['rootDBUser'];
-   		$dbpass = $_REQUEST['rootDBPass'];
-   }
+	if (isset($_REQUEST['newDB']))
+	{
+		$createDatabase = true;
+		//base name for new database
+		$newdbname = "kora";
+		$dbuser = $_REQUEST['rootDBUser'];
+		$dbpass = $_REQUEST['rootDBPass'];
+	}
    	else{
    		$createDatabase = false;
    		if (isset($_REQUEST['dbName'])){
@@ -140,7 +140,7 @@ if(isset($_REQUEST["submit"])) {
    
    //Drop all tables from the database - make **sure** the user knows this is going to happen
    //First get a list of the tables in the database
-   $tables = array();
+   /* $tables = array();
    $tablesquery = "SHOW TABLES";
    if($tablesresult=mysqli_query($dbLink,$tablesquery)){
    	while($row=mysqli_fetch_row($tablesresult)){
@@ -155,7 +155,7 @@ if(isset($_REQUEST["submit"])) {
     			die( "Error deleting $table_name. MySQL Error: " . mysqli_error() . "<br/>");
    			}
    		}
-   }
+   } */
    // Table Creation Queries
    $tQueries = array();
    
@@ -268,9 +268,9 @@ if(isset($_REQUEST["submit"])) {
                            kid VARCHAR(20) NOT NULL, 
                            cid INTEGER UNSIGNED NOT NULL, 
                            path VARCHAR(512),
-                           initialHash VARCHAR(".HASH_HEX_SIZE.") NOT NULL,
+                           initialHash VARCHAR(128) NOT NULL,
                            initialTime DATETIME NOT NULL, 
-                           computedHash VARCHAR(".HASH_HEX_SIZE."),
+                           computedHash VARCHAR(128),
                            computedTime DATETIME NOT NULL,
                            PRIMARY KEY(kid,cid)) CHARACTER SET utf8 COLLATE utf8_general_ci";
    $tQueries['controlPreset'] = "CREATE TABLE controlPreset(
@@ -376,12 +376,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */\n") ===
          fwrite($filehandle,$_REQUEST['koraDBUser']);
       else
          fwrite($filehandle,$dbuser);
-      fwrite($filehandle,"\";\n".'$dbpass = "');
+      fwrite($filehandle,"\";\n".'$dbpass = \'');
       if($createKoraDBUser) 
          fwrite($filehandle,$_REQUEST['koraDBPass']);
       else
          fwrite($filehandle,$dbpass);
-      fwrite($filehandle,"\";\n".'$dbname = "'.$newdbname.'";'."\n");
+      fwrite($filehandle,"';\n".'$dbname = "'.$newdbname.'";'."\n");
       fwrite($filehandle,'$dbhost = "'.$_REQUEST['dbHost'].'";'."\n");
       fwrite($filehandle,"define('baseURI','http://".$_SERVER['SERVER_NAME'].substr($_SERVER['PHP_SELF'],0,-27)."');\n");
       fwrite($filehandle,"define('basePath','".substr($_SERVER['SCRIPT_FILENAME'],0,-27)."');\n");
@@ -389,13 +389,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */\n") ===
       fwrite($filehandle,"define('fileDir', 'files/');\n");
       fwrite($filehandle,"define('extractFileDir', fileDir.'extractedFiles/');\n");
       fwrite($filehandle,"define('awaitingApprovalFileDir', fileDir.'awaitingApproval/');\n");
-      fwrite($filehandle,"if (!defined('sessionTimeout')) define('sessionTimeout', 30*60); // in seconds\n");
-      fwrite($filehandle,"define('RESULTS_IN_PAGE', 5);\n\n");
+      fwrite($filehandle,"if (!defined('sessionTimeout')) define('sessionTimeout', 30*60); // in seconds\n\n");
+      fwrite($filehandle,"//Recaptcha Keys go here!\n");
+      fwrite($filehandle,"define('PublicKey', '".$_REQUEST['koraRecapPub']."');\n");
+	  fwrite($filehandle,"define('PrivateKey', '".$_REQUEST['koraRecapPri']."');\n\n");
+	  fwrite($filehandle,"define('RESULTS_IN_PAGE', 10);\n\n");
       fwrite($filehandle,"require_once('includes.php');\n ?>");
       
       fclose($filehandle);
       echo '++ Created ../includes/conf.php - please review it and adjust as needed. <br />';
    }
+   
+   //once config is setup, include things
+	include_once('../includes/includes.php');
    
    //pre-populate the controls into KORA
    if($controlUpdate) {
@@ -458,12 +464,14 @@ else if(isset($_REQUEST['oldDB']))
    </tr><tr>
    <td align="right">Email for System Admin:</td><td><input type="text" name="koraAdminEmail" /></td>
    </tr><tr>
+   <td align="right">Public ReCAPTCHA Token:</td><td><input type="text" name="koraRecapPub" /></td>
+   </tr><tr>
+   <td align="right">Private ReCAPTCHA Token:</td><td><input type="text" name="koraRecapPri" /></td>
+   </tr><tr>
    <td align="right">Generate Configuration File</td><td><input type="checkbox" name="generateConf" checked/></td>
    </tr><tr>
    <td colspan="2" align="center"><input type="submit" name="submit" value="Install" /></td>
    </tr></table>
-   Note that this installation will drop all tables from the database - <br/>
-   Make sure to backup any data in this database that you don't want to lose.
    <input type="hidden" name="existingDB" value="existing" />
    </form>
 <?php  }
@@ -491,6 +499,10 @@ else if(isset($_REQUEST['newDB'])){
    <td><div id="newpasserror"></div></td>
    </tr><tr>
    <td align="right">Email for System Admin:</td><td><input type="text" name="koraAdminEmail" /></td>
+   </tr><tr>
+   <td align="right">Public ReCAPTCHA Token:</td><td><input type="text" name="koraRecapPub" /></td>
+   </tr><tr>
+   <td align="right">Private ReCAPTCHA Token:</td><td><input type="text" name="koraRecapPri" /></td>
    </tr><tr>
    <td align="right">Generate Configuration File</td><td><input type="checkbox" name="generateConf" checked/></td>
    </tr><tr>

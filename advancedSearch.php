@@ -1,4 +1,6 @@
 <?php
+use KORA\Manager;
+use KORA\KoraSearch;
 /**
 Copyright (2008) Matrix: Michigan State University
 
@@ -46,7 +48,7 @@ Manager::PrintHeader();
 	$query = "SELECT $cTable.type AS class, $cTable.cid AS cid, $cTable.name AS name, control.file AS file,
 			  control.name AS type FROM $cTable LEFT JOIN control ON ($cTable.type = control.class) WHERE
 			  $cTable.advSearchable=1 AND $cTable.schemeid=".Manager::GetScheme()->GetSID().' AND control.name
-			  NOT IN ("'.implode('","',$unsupportedAdvSearch).'") ORDER BY collid,sequence';
+			  NOT IN ("'.implode('","',$unsupportedAdvSearch).'") ORDER BY collid DESC,sequence';
 	$query = $db->query($query);
 	$controls = array();
 	while ($results = $query->fetch_assoc()) {
@@ -58,7 +60,7 @@ Manager::PrintHeader();
 	$sortQuery = "SELECT $cTable.type AS class, $cTable.cid AS cid, $cTable.name AS name, control.file AS file,
 			  	control.name AS type FROM $cTable LEFT JOIN control ON ($cTable.type = control.class) WHERE
 			  	$cTable.advSearchable=1 AND $cTable.schemeid=".Manager::GetScheme()->GetSID().' AND control.name
-			  	NOT IN ("'.implode('","',$unsupportedSort).'") ORDER BY collid,sequence';
+			  	NOT IN ("'.implode('","',$unsupportedSort).'") ORDER BY collid DESC,sequence';
 	$sortQuery = $db->query($sortQuery);
 	while ($sortResult = $sortQuery->fetch_assoc())
 	{

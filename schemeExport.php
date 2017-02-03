@@ -1,4 +1,7 @@
 <?php
+use KORA\Manager;
+use KORA\Record;
+use KORA\KoraSearch;
 /**
  Copyright (2008) Matrix: Michigan State University
 
@@ -117,7 +120,7 @@ foreach($results as $sid=>$result)
 	
 	// do not add scheme information when only record data is requested
 	if(!@($_REQUEST['type']=='data')){
-		$schemeNode = simplexml_load_string('<?xml version="1.0" encoding="ISO-8859-1"?><Scheme />');
+		$schemeNode = simplexml_load_string('<?xml version="1.0" encoding="UTF-8"?><Scheme />');
 		$schemeNode = Manager::GetScheme()->ExportSchemeToXML($schemeNode);
 
 		//If everything succeeded to here, send headers and the file directly
@@ -137,7 +140,7 @@ foreach($results as $sid=>$result)
 		//Get all data for the scheme
 		$results = KoraSearch::SortedInternalSearchResults(Manager::GetProject()->GetPID(), Manager::GetScheme()->GetSID());
 		
-		$dataNode = simplexml_load_string('<?xml version="1.0" encoding="ISO-8859-1"?><Data />');
+		$dataNode = simplexml_load_string('<?xml version="1.0" encoding="UTF-8"?><Data />');
 		$dataNode->addChild('ConsistentData');
 		
 		foreach ($results as $r)

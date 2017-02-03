@@ -1,4 +1,5 @@
 <?php
+use KORA\Manager;
     include_once(basePathPlugin.'includes/utilities.php');
 	
     $length = strlen(basePath);

@@ -32,7 +32,7 @@ function ValidateListItem(vname_, v_, kcdiv_)
 	
 	var baseURI = $('#kora_globals').attr('baseURI');
 	
-	loadSymbolOn();
+	
 	$.ajax({
 		url: baseURI+'ajax/control.php',
 		data: fd,
@@ -42,7 +42,7 @@ function ValidateListItem(vname_, v_, kcdiv_)
 		success: function(data){
 			kcdiv_.find('.ajaxerror').html(data);
 			if (data != '') { retval = false; }
-			loadSymbolOff();
+			
 		}
 	});
 	
@@ -54,8 +54,8 @@ function PrintControlPresets(pid,sid)
 {
 	if (($('#colorbox').length > 0) && ($('#cboxContent').length > 0))
 	{
-		loadSymbolOn();
-		$.post('ajax/control.php',{action:"showControlPresetDialog",source:"PresetFunctions",pid:pid,sid:sid}, function(resp){$("#presetControl").html(resp);loadSymbolOff();}, 'html');
+		
+		$.post('ajax/control.php',{action:"showControlPresetDialog",source:"PresetFunctions",pid:pid,sid:sid}, function(resp){$("#presetControl").html(resp);}, 'html');
 	}
 }
 
@@ -64,31 +64,36 @@ $(function() {
 	var ajaxhandler = 'ajax/control.php';
 	
 	$("#presetControl").on( "click",".preset_control_rename", function() {
+		loadSymbolOn();
 		var pid = $('#kora_globals').attr('pid');
 		var sid = $('#kora_globals').attr('sid');
 		var varpreID = $(this).attr('id');
 	    var varnewname = $('#newName'+varpreID).val();
 	    
 	    $.ajaxSetup({ async: false });
-		loadSymbolOn();
-		$.post(ajaxhandler, {action:'updateControlPresetName',source:'PresetFunctions',preID:varpreID,name:varnewname,pid:pid,sid:sid}, function(resp){$("#ajaxstatus").html(resp);loadSymbolOff();}, 'html');
+		
+		$.post(ajaxhandler, {action:'updateControlPresetName',source:'PresetFunctions',preID:varpreID,name:varnewname,pid:pid,sid:sid}, function(resp){$("#ajaxstatus").html(resp);}, 'html');
 		PrintControlPresets(pid,sid);
 		$.ajaxSetup({ async: true });
+		loadSymbolOff();
 	});
 	
 	$("#presetControl").on( "click",".preset_control_delete", function() {
+		loadSymbolOn();
 		var pid = $('#kora_globals').attr('pid');
 		var sid = $('#kora_globals').attr('sid');
 		var varpreID = $(this).attr('id');
 	    
 	    $.ajaxSetup({ async: false });
-		loadSymbolOn();
-		$.post(ajaxhandler, {action:'deleteControlPreset',source:'PresetFunctions',preID:varpreID,pid:pid,sid:sid}, function(resp){$("#ajaxstatus").html(resp);loadSymbolOff();}, 'html');
+		
+		$.post(ajaxhandler, {action:'deleteControlPreset',source:'PresetFunctions',preID:varpreID,pid:pid,sid:sid}, function(resp){$("#ajaxstatus").html(resp);}, 'html');
 		PrintControlPresets(pid,sid);
 		$.ajaxSetup({ async: true });
+		loadSymbolOff();
 	});
 	
 	$("#presetControl").on( "click",".preset_control_global", function() {
+		loadSymbolOn();
 		var pid = $('#kora_globals').attr('pid');
 		var sid = $('#kora_globals').attr('sid');
 		var varpreID = $(this).attr('id');
@@ -98,10 +103,11 @@ $(function() {
 		}
 	    
 	    $.ajaxSetup({ async: false });
-		loadSymbolOn();
-		$.post(ajaxhandler, {action:'updateControlPresetGlobal',source:'PresetFunctions',global:global,preID:varpreID,pid:pid,sid:sid}, function(resp){$("#ajaxstatus").html(resp);loadSymbolOff();}, 'html');
+		
+		$.post(ajaxhandler, {action:'updateControlPresetGlobal',source:'PresetFunctions',global:global,preID:varpreID,pid:pid,sid:sid}, function(resp){$("#ajaxstatus").html(resp);}, 'html');
 		PrintControlPresets(pid,sid);
 		$.ajaxSetup({ async: true });
+		loadSymbolOff();
 	});
 	
 });

@@ -1,4 +1,6 @@
 <?php 
+use KORA\Manager;
+use KORA\User;
 /**
 Copyright (2008) Matrix: Michigan State University
 
@@ -41,6 +43,11 @@ if(Manager::CheckRequestsAreSet(['action', 'source']) && $_REQUEST['source'] == 
 	elseif ($action == 'GetSearchNavLinks') {
 		if (Manager::CheckRequestsAreSet(['maxpage', 'currpage', 'adjacentpage']))
 		{ print Manager::GetBreadCrumbsHTML((int)$_REQUEST['maxpage'], (int)$_REQUEST['currpage'], (int)$_REQUEST['adjacentpage'], '', 'ks_results_nav'); }
+	}
+	//Handles special character encoding for multi-anythings
+	elseif ($action == 'encodeValue') {
+		if (Manager::CheckRequestsAreSet(['value']))
+		{ echo encodeValue($_REQUEST['value']); }
 	}
 }
 ?>

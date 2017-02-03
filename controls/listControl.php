@@ -1,4 +1,5 @@
 <?php
+use KORA\Manager;
 /**
 Copyright (2008) Matrix: Michigan State University
 
@@ -83,7 +84,7 @@ class ListControl extends Control {
 	  *
 	  * @return void
 	  */
-	public function display()
+	public function display($defaultValue=true)
 	{
 		$hasDef = false;
 		if($this->value != null){
@@ -94,13 +95,13 @@ class ListControl extends Control {
 		print '<select name="'.$this->cName.'">';
 		// default blank option
 		echo '<option value=""';
-		if (empty($this->value)) echo ' selected="selected"';
+		if (empty($this->value) && !$defaultValue) {echo ' selected="selected"';}
 		echo '>&nbsp;</option>';
 		
 		// display the options, with the current value selected.
 		foreach($this->options->option as $option) {
 			echo "<option value=\"$option\"";
-			if ($this->value == $option) echo ' selected="selected"';
+			if ($this->value == $option && $defaultValue) echo ' selected="selected"';
 			echo ">$option</option>\n";
 		}
 		
@@ -611,12 +612,12 @@ class ListControl extends Control {
 		{
 			$xml = $this->GetControlOptions();
 			
-			$newXML = simplexml_load_string('<options />');
+			$newXML = simplexml_load_string(utf8_encode('<?xml version="1.0" encoding="UTF-8"?><options />'));
 			if (isset($xml->option))
 			{
 				foreach($xml->option as $option)
 				{
-					$newXML->addChild('option', xmlEscape((string) $option));
+					$newXML->addChild('option', utf8_encode((string) $option));
 				}
 			}
 			

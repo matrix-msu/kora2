@@ -124,10 +124,12 @@ $(function() {
 		});
 		
 		$("#colorbox").on( "click",".kcmdcopts_defremove", function() {
-				$('#colorbox .kcmdcopts_defval > option:selected').each(function() {
-						$(this).remove();
-				});
-				KCMDC_SaveDefaultValue();
+				if(confirm('Are you sure you would like to remove these list options?')){
+					$('#colorbox .kcmdcopts_defval > option:selected').each(function() {
+							$(this).remove();
+					});
+					KCMDC_SaveDefaultValue();
+				}
 		});
 		
 		$("#colorbox").on( "click",".kcmdcopts_defmoveup", function() {
@@ -165,8 +167,8 @@ function KCMDC_SaveDefaultValue()
 	});
 	
 	$.ajaxSetup({ async: false });
-	loadSymbolOn();
-	$.post(ajaxhandler, {action:'saveMDDefault',source:'MultiDateControl',pid:pid,sid:sid,cid:cid,values:defdates}, function(resp){$("#ajaxstatus").html(resp);loadSymbolOff();}, 'html');
+	
+	$.post(ajaxhandler, {action:'saveMDDefault',source:'MultiDateControl',pid:pid,sid:sid,cid:cid,values:defdates}, function(resp){$("#ajaxstatus").html(resp);}, 'html');
 	$.ajaxSetup({ async: true });
 }
 
@@ -182,12 +184,12 @@ function KCMDC_Validate(kcdiv)
 	fd.append('sid',kcdiv.attr('ksid'));
 	fd.append('cid',kcdiv.attr('kcid'));
 	var datavals = [];
-	datadom.find('option:selected').each(function() {
+	datadom.find('option').each(function() {
 			datavals.push(this.value);
 	});
 	fd.append(datadom.attr('name'), datavals);
 	
-	loadSymbolOn();
+	
 	$.ajax({
 			url: 'ajax/control.php',
 			data: fd,
@@ -202,7 +204,7 @@ function KCMDC_Validate(kcdiv)
 				}else{
 					kcdiv.attr('kcvalid','invalid');
 				}
-				loadSymbolOff();
+				
 			}
 	});		
 	
