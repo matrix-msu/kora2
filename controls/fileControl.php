@@ -319,7 +319,7 @@ class FileControl extends Control {
 		}
 		elseif (!$this->isEmpty())
 		{
-			if ( (isset($_FILES[$this->cName]) && $_FILES[$this->cName]['error'] != UPLOAD_ERR_NO_FILE) || file_exists($this->XMLInputValue) )
+			if ( (isset($_FILES[$this->cName]) && $_FILES[$this->cName]['error'] != UPLOAD_ERR_NO_FILE) || (file_exists(basePath.$this->XMLInputValue) && $this->XMLInputValue!='') )
 			{
 				// Is there an existing file?  If so, delete it
 				if ($this->existingData)
@@ -380,17 +380,18 @@ class FileControl extends Control {
 					}
 				}
 				else if (isset($this->XMLInputValue)) {
-					$pathInfo = pathinfo($this->XMLInputValue);
+					$fullPath = basePath.$this->XMLInputValue;
+					$pathInfo = pathinfo($fullPath);
 					$origName = $pathInfo['basename'];
 					if (isset($this->XMLAttributes)){
 						$origName = $this->XMLAttributes['originalName'];
 					}
 					$finfo = finfo_open(FILEINFO_MIME); // return mime type ala mimetype extension
-					$type = finfo_file($finfo, $this->XMLInputValue);
+					$type = finfo_file($finfo, $fullPath);
 					finfo_close($finfo);
 		        		
 					$newName = $this->rid . '-' . $this->cid . '-' . $origName;
-					copy($this->XMLInputValue,$fileDir.$newName);
+					copy($fullPath,$fileDir.$newName);
 				}
 				
 				
@@ -551,21 +552,22 @@ class FileControl extends Control {
 		
 		
 		if (!empty($this->XMLInputValue)) {
-			$fileExists = file_exists($this->XMLInputValue);
-			$fileName = $this->XMLInputValue;
+			$fullPath = basePath.$this->XMLInputValue;
+			$fileExists = file_exists($fullPath);
+			$fileName = $fullPath;
 			
 			if($fileExists) 
 			{
 				// file ingesting through xml importer
 				$finfo = finfo_open(FILEINFO_MIME); // return mime type ala mimetype extension
-				$type = finfo_file($finfo, $this->XMLInputValue);
+				$type = finfo_file($finfo, $fullPath);
 				finfo_close($finfo);
 				// finfo returns strings like: image/jpeg; charset=binary
 				// we just want the first part.
 				$type = explode(";",$type);
 				$type = $type[0];
 				
-				$fileSize = filesize($this->XMLInputValue);
+				$fileSize = filesize($fullPath);
 			}
 			
 		}else if(!empty($_FILES[$this->cName])){

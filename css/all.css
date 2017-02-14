@@ -110,7 +110,7 @@ legend { margin: 5px; }
 .kora_ccRightCol { border-bottom: solid #000 1px; }
 #inlineInput {position: relative; margin-top: -16px; margin-left: 10px;}
 #thickboxDescrip {margin-top: -15px;}
-select { max-width :300px; font-size: 9px;}
+select { overflow :auto; font-size: 9px;}
 form, button { border:0; margin:0; padding:0; }
 .spacer { clear:both; height:1px; }
 /* ----------- My Form ----------- */

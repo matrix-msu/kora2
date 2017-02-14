@@ -229,7 +229,7 @@ class ImageControl extends FileControl
 		// check if there was a file uploaded
 		$fileName = '';
 		if (!empty($this->XMLInputValue)){
-			$fileName = $this->XMLInputValue;
+			$fileName = basePath.$this->XMLInputValue;
 		}else if (!empty($_FILES[$this->cName])){
 			$fileName = $_FILES[$this->cName]['tmp_name'];
 		}

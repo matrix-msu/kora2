@@ -1013,7 +1013,6 @@ function CrossProjectGetRequestFields($schemes,$fields,$db)
 					$uploadedFiles = true;
 				}
 				else {
-					var_dump($zipFile);
 					echo "error no zip";
 					$uploadedFiles = false;
 				}
